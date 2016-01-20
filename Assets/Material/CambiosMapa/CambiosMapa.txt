@@ -1,18 +1,18 @@
 Por estaciones:
 	Winter:
-		Nieve, pinos con nieve, muñecos de nieve, reno
+		Nieve, pinos con nieve, muÃ±ecos de nieve, reno
 	Spring:
 		Todo verde, cesped alto, almendro/cerezo, abejas
 	Summer:
 		Cesped raso medio seco, palmeras, cangrejo/camello
 	Autum:
-		Arboles con hojas marchitas, cesped medio
+		Arboles con hojas marchitas, cesped medio, ardillas comiendo piÃ±as
 
 
-Por temperatura: 1 es más frío que 4
+Por temperatura: 1 es mÃ¡s frÃ­o que 4
 	Rango 1:
 		Winter:
-			Nieve, pinos con nieve, muñecos de nieve, reno
+			Nieve, pinos con nieve, muÃ±ecos de nieve, reno
 		Spring:
 			cambiar indumentaria del tio, animales con gorro
 		Summer:
@@ -23,7 +23,7 @@ Por temperatura: 1 es más frío que 4
 
 	Rango 2:
 		Winter:
-			Nieve, pinos con nieve, muñecos de nieve, reno
+			Nieve, pinos con nieve, muÃ±ecos de nieve, reno
 		Spring:
 			Todo verde, cesped alto, almendro/cerezo, abejas
 		Summer:
@@ -32,7 +32,7 @@ Por temperatura: 1 es más frío que 4
 
 	Rango 3:
 		Winter:
-			Nieve derritiendose, pinos con nieve derritiendose,  muñecos de nieve derritiendose,  reno
+			Nieve derritiendose, pinos con nieve derritiendose,  muÃ±ecos de nieve derritiendose,  reno
 		Spring:
 			Todo verde, cesped alto, almendro/cerezo, abejas
 		Summer:
@@ -41,7 +41,7 @@ Por temperatura: 1 es más frío que 4
 
 	Rango 4:
 		Winter:
-			Nieve derritiendose, pinos con nieve derritiendose,  muñecos de nieve derritiendose,  reno
+			Nieve derritiendose, pinos con nieve derritiendose,  muÃ±ecos de nieve derritiendose,  reno
 		Spring:
 			Todo verde, cesped alto, almendro/cerezo, abejas
 		Summer:
@@ -52,21 +52,21 @@ Por temperatura: 1 es más frío que 4
 
 
 
-Por iluminacion: 1 es más oscuro que 4
+Por iluminacion: 1 es mÃ¡s oscuro que 4
 
 	Rango 1:
 		Amanecer:
 		
-		Medio día:
+		Medio dÃ­a:
 			Gafas de sol
 		Atardecer:
 			
 		Noche:
-			Rango iluminacion de farola 3( 3 mas intenso que 1),Rango iluminacion de linterna 3( 3 mas intenso que 1)
+			Rango iluminacion de farola 3( 3 mas intenso que 1),Rango iluminacion de linterna/palo que le sale de la espalda iluminando en plan yorick 3( 3 mas intenso que 1)
 	Rango 2:
 		Amanecer:
 		
-		Medio día:
+		Medio dÃ­a:
 			Gafas de sol
 		Atardecer:
 			
@@ -77,7 +77,7 @@ Por iluminacion: 1 es más oscuro que 4
 	Rango 3:
 		Amanecer:
 		
-		Medio día:
+		Medio dÃ­a:
 			Gafas de sol
 		Atardecer:
 			
@@ -87,7 +87,7 @@ Por iluminacion: 1 es más oscuro que 4
 	Rango 4:
 		Amanecer:
 		
-		Medio día:
+		Medio dÃ­a:
 			Gafas de sol
 		Atardecer:
 			
@@ -97,11 +97,11 @@ Por iluminacion: 1 es más oscuro que 4
 
 
 
-Por hora: Segun el momento del día un foco determinado de luz.
+Por hora: Segun el momento del dÃ­a un foco determinado de luz.
 
 	Amanecer:
 		
-	Medio día:
+	Medio dÃ­a:
 			Gafas de sol
 	Atardecer:
 			
