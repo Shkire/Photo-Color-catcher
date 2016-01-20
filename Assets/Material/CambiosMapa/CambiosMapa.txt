@@ -1,0 +1,110 @@
+Por estaciones:
+	Winter:
+		Nieve, pinos con nieve, muñecos de nieve, reno
+	Spring:
+		Todo verde, cesped alto, almendro/cerezo, abejas
+	Summer:
+		Cesped raso medio seco, palmeras, cangrejo/camello
+	Autum:
+		Arboles con hojas marchitas, cesped medio
+
+
+Por temperatura: 1 es más frío que 4
+	Rango 1:
+		Winter:
+			Nieve, pinos con nieve, muñecos de nieve, reno
+		Spring:
+			cambiar indumentaria del tio, animales con gorro
+		Summer:
+			cambiar indumentaria del tio, animales con gorro
+		Autum:
+			cambiar indumentaria del tio, animales con gorro
+			
+
+	Rango 2:
+		Winter:
+			Nieve, pinos con nieve, muñecos de nieve, reno
+		Spring:
+			Todo verde, cesped alto, almendro/cerezo, abejas
+		Summer:
+			Cesped raso medio seco, palmeras, cangrejo/camello
+		Autum:
+
+	Rango 3:
+		Winter:
+			Nieve derritiendose, pinos con nieve derritiendose,  muñecos de nieve derritiendose,  reno
+		Spring:
+			Todo verde, cesped alto, almendro/cerezo, abejas
+		Summer:
+			Cesped raso medio seco, palmeras, cangrejo/camello
+		Autum:
+
+	Rango 4:
+		Winter:
+			Nieve derritiendose, pinos con nieve derritiendose,  muñecos de nieve derritiendose,  reno
+		Spring:
+			Todo verde, cesped alto, almendro/cerezo, abejas
+		Summer:
+			Cesped raso medio seco, palmeras, cangrejo/camello
+		Autum:
+
+	
+
+
+
+Por iluminacion: 1 es más oscuro que 4
+
+	Rango 1:
+		Amanecer:
+		
+		Medio día:
+			Gafas de sol
+		Atardecer:
+			
+		Noche:
+			Rango iluminacion de farola 3( 3 mas intenso que 1),Rango iluminacion de linterna 3( 3 mas intenso que 1)
+	Rango 2:
+		Amanecer:
+		
+		Medio día:
+			Gafas de sol
+		Atardecer:
+			
+		Noche:
+			Rango iluminacion de farola 2, Rango iluminacion de linterna 2( 3 mas intenso que 1)
+			
+		
+	Rango 3:
+		Amanecer:
+		
+		Medio día:
+			Gafas de sol
+		Atardecer:
+			
+		Noche:
+			Rango iluminacion de farola 2, Rango iluminacion de linterna 2( 3 mas intenso que 1)
+		
+	Rango 4:
+		Amanecer:
+		
+		Medio día:
+			Gafas de sol
+		Atardecer:
+			
+		Noche: 
+			Se apagan las farolas, no hay linterna
+
+
+
+
+Por hora: Segun el momento del día un foco determinado de luz.
+
+	Amanecer:
+		
+	Medio día:
+			Gafas de sol
+	Atardecer:
+			
+	Noche:
+		Buho,farolas
+
