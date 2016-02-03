@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PJMovementController : CharacterMovementController {
+public class PjMovementController : CharacterMovementController {
 
 	
 	// Update is called once per frame

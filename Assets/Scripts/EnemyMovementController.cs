@@ -1,11 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnemyMovementController : CharacterMovementController {
+public abstract class EnemyMovementController : CharacterMovementController {
+
+	protected bool pjEnconuntered;
 	
-	// Update is called once per frame
-	void FixedUpdate () {
+	//Patron de movimiento estandar
+	protected void MovementPattern(){
+
+		if (!pjEnconuntered) {
+			NormalMovement ();
+		}
+		else{
+			PjEnconteredMovement ();
+		}
+
+	}
+
+	protected virtual void NormalMovement(){
 		
-	
+	}
+
+	protected virtual void PjEnconteredMovement(){
 	}
 }
