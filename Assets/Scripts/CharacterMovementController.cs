@@ -29,20 +29,27 @@ public abstract class CharacterMovementController : MonoBehaviour {
 
 		this.gameObject.transform.Translate(new Vector3(movement,0,0));
 
-	}
 
-	/*
+
+		/*
 		 * 
 		 * Valorar entre Flip Sprite o Flip Gameobject
 		 * 
 		 * 
+		 * */
 		//mirada del pj
-	if (movement > 0)
-		this.transform.rotation = new Quaternion (0,0,0,1.0f);
+		if (movement > 0)
+			this.gameObject.GetComponent<SpriteRenderer> ().flipY = false;
+			//this.transform.rotation = new Quaternion (0,0,0,1.0f);
 
-	if (movement < 0)
-		this.transform.rotation = new Quaternion (0,-1.0f,0,0);
-	*/
+		if (movement < 0)
+			this.gameObject.GetComponent<SpriteRenderer> ().flipY = true;
+			//this.transform.rotation = new Quaternion (0,-1.0f,0,0);
+		
+
+
+	}
+
 
 	protected void Jump(){
 		
