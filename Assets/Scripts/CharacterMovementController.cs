@@ -23,11 +23,10 @@ public abstract class CharacterMovementController : MonoBehaviour {
 
 	}
 
-	protected void Move(){
+	protected void Move(float movement){
 
 		//Movimiento izq der
 
-		float movement = Input.GetAxis ("Horizontal") * speed;
 		this.gameObject.transform.Translate(new Vector3(movement,0,0));
 
 	}
@@ -49,14 +48,8 @@ public abstract class CharacterMovementController : MonoBehaviour {
 		
 		//Salto
 
-		if (jumpAllowed) {
-
-			float canJump = Input.GetAxis ("Vertical");
-			if (canJump > 0) {
-				this.gameObject.GetComponent<Rigidbody2D> ().ResetAndAddForce (Vector2.up * jump);
-			}
-		}
-
+		if (jumpAllowed)
+			this.gameObject.GetComponent<Rigidbody2D> ().ResetAndAddForce (Vector2.up * jump);
 	}
 
 }
