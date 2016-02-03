@@ -4,7 +4,7 @@ using System.Collections;
 public class JumpController : MonoBehaviour {
 
 	[SerializeField]
-	private PJMovementController pj;
+	private CharacterMovementController pj;
 
 
 	void OnTriggerEnter2D (Collider2D coll){
