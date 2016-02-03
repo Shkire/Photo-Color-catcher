@@ -26,7 +26,7 @@ public static class ExtensionMethods {
 
     }
 
-    public static void ResetAndAddForce(this Rigidbody2D rb, Vector3 force)
+    public static void ResetAndAddForce(this Rigidbody2D rb, Vector2 force)
     {
 
         rb.ResetForces();
