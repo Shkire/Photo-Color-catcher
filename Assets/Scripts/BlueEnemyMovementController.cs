@@ -4,74 +4,71 @@ using System;
 
 public class BlueEnemyMovementController : EnemyMovementController {
 
-	private System.Random rand;
+	[SerializeField]
+	private float maxResponseTime;
 
 	[SerializeField]
-	private float timeLimit=6f;
+	private float minResponseTime;
 
-	private float timeLeft;
+	private float leftResponseTime;
+
+	private movementType nowMovingTo;
+
+	private System.Random rnd;
+
+
 
 	
-	private float waittime= 3.0f;
-	private float leftwaittime= 0.0f;
-
-
 	void OnEnable(){
-
-		leftwaittime = 4f;
-		rand = new System.Random (Guid.NewGuid().GetHashCode());
-	
+		rnd = new System.Random (Guid.NewGuid ().GetHashCode ());
 	}
+
+
+
 
 	void FixedUpdate(){
 
-		leftwaittime -= Time.fixedDeltaTime;
-
-		Debug.Log(leftwaittime);
-
-
-
-		if(leftwaittime > 0 && leftwaittime < 2){
-
-
-
-			NormalMovement();
+		if (!pjEnconuntered) {
+			leftResponseTime -= Time.fixedDeltaTime;
+			if (leftResponseTime <= 0) {
+				leftResponseTime = (float)(rnd.NextDouble () * (maxResponseTime - minResponseTime)) + minResponseTime;
+				nowMovingTo = movementType.Undefined;
+			}
 		}
-			
 
-		if(leftwaittime > 2 && leftwaittime < 4){
-
-			
-
-		}
-			
-
-
-		if (leftwaittime <= 0){
-
-			leftwaittime = 4f;
-
-		}
-	
-
+		MovementPattern ();
 
 	}
-	 
 
 	protected override void NormalMovement(){
 
+		if (nowMovingTo.Equals (movementType.Undefined)) {
+			int rndMovement = rnd.Next (1, 4);
+			switch (rndMovement) {
+			case 1:
+				nowMovingTo = movementType.Left;
+				break;
+			case 2:
+				nowMovingTo = movementType.Right;
+				break;
+			case 3:
+				nowMovingTo = movementType.Stay;
+				break;
+			}
+		}
 
-
-		int i = rand.Next (-1, 2);
-
-		Move (i);
-
-	}
-
-	protected override void PjEnconteredMovement(){
-
-
-
+		switch (nowMovingTo) {
+		case movementType.Left:
+			Move (-1);
+			break;
+		case movementType.Right:
+			Move (1);
+			break;
+		case movementType.Stay:
+			nowMovingTo = movementType.Stay;
+			break;
+		}
+		
 	}
 
 
