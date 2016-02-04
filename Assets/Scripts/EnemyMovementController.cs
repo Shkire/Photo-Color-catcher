@@ -4,6 +4,15 @@ using System.Collections;
 public abstract class EnemyMovementController : CharacterMovementController {
 
 	protected bool pjEnconuntered;
+
+	public bool hasEncounteredPj{
+		set{
+			pjEnconuntered = value;
+		}
+		get{
+			return pjEnconuntered;
+		}
+	}
 	
 	//Patron de movimiento estandar
 	protected void MovementPattern(){
