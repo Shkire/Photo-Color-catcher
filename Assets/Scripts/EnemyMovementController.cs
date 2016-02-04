@@ -3,6 +3,14 @@ using System.Collections;
 
 public abstract class EnemyMovementController : CharacterMovementController {
 
+	protected enum movementType
+	{
+		Undefined,
+		Stay,
+		Left,
+		Right
+	};
+
 	protected bool pjEnconuntered;
 
 	public bool hasEncounteredPj{

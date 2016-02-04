@@ -23,11 +23,11 @@ public abstract class CharacterMovementController : MonoBehaviour {
 
 	}
 
-	protected void Move(float movement){
+	protected void Move(float direction){
 
 		//Movimiento izq der
 
-		this.gameObject.transform.Translate(new Vector3(movement,0,0));
+		this.gameObject.transform.Translate(new Vector3(direction*speed,0,0));
 
 
 
@@ -38,11 +38,11 @@ public abstract class CharacterMovementController : MonoBehaviour {
 		 * 
 		 * */
 		//mirada del pj
-		if (movement > 0)
+		if (direction > 0)
 			this.gameObject.GetComponent<SpriteRenderer> ().flipY = false;
 			//this.transform.rotation = new Quaternion (0,0,0,1.0f);
 
-		if (movement < 0)
+		if (direction < 0)
 			this.gameObject.GetComponent<SpriteRenderer> ().flipY = true;
 			//this.transform.rotation = new Quaternion (0,-1.0f,0,0);
 		
