@@ -65,4 +65,12 @@ public class GreenEnemyMovementController : EnemyMovementController {
 		
 	}
 
+	protected override void PjEncounteredMovement(){
+		float dif = this.gameObject.transform.position.x-GameObject.FindGameObjectWithTag ("Player").transform.position.x;
+		if (dif < 0)
+			Move (-1);
+		else if (dif > 0)
+			Move (1);
+	}
+
 }

@@ -10,7 +10,7 @@ public class ObjectiveDetectionController : MonoBehaviour {
 	private float sightRange;
 
 	[SerializeField]
-	private string tag;
+	private string tag=string.Empty;
 
 	[SerializeField]
 	private string[] layerCollisionList;
@@ -34,6 +34,11 @@ public class ObjectiveDetectionController : MonoBehaviour {
 						break;
 					}
 				}
+			else if (hits.Length>0) {
+				objectiveSight = hits[0].collider.gameObject;
+				enemyMovementController.hasEncounteredPj = true;
+			}
+				
 		}
 	}
 

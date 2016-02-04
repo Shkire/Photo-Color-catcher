@@ -29,7 +29,7 @@ public abstract class EnemyMovementController : CharacterMovementController {
 			NormalMovement ();
 		}
 		else{
-			PjEnconteredMovement ();
+			PjEncounteredMovement ();
 		}
 
 	}
@@ -38,6 +38,6 @@ public abstract class EnemyMovementController : CharacterMovementController {
 		
 	}
 
-	protected virtual void PjEnconteredMovement(){
+	protected virtual void PjEncounteredMovement(){
 	}
 }
