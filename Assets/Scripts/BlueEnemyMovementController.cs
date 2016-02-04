@@ -10,6 +10,9 @@ public class BlueEnemyMovementController : EnemyMovementController {
 	[SerializeField]
 	private float minResponseTime;
 
+	[SerializeField]
+	private GameObject pJ;
+
 	private float leftResponseTime;
 
 	private movementType nowMovingTo;
@@ -18,7 +21,7 @@ public class BlueEnemyMovementController : EnemyMovementController {
 
 
 
-	
+
 	void OnEnable(){
 		rnd = new System.Random (Guid.NewGuid ().GetHashCode ());
 	}
@@ -70,6 +73,21 @@ public class BlueEnemyMovementController : EnemyMovementController {
 		}
 		
 	}
+
+
+	protected override void PjEncounteredMovement(){
+
+		float pos = pJ.transform.position.x;
+
+		if (pos > this.transform.position.x)
+			Move (-1);
+		if (pos < this.transform.position.x)
+			Move (1);
+
+
+
+	}
+
 
 
 }
