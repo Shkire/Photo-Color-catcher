@@ -3,8 +3,8 @@ using System.Collections;
 
 public class ObjectiveDetectionController : MonoBehaviour {
 
-	[SerializeField]
-	private EnemyMovementController enemyMovementController;
+	//[SerializeField]
+	//private EnemyMovementController enemyMovementController;
 
 	[SerializeField]
 	private float sightRange;
@@ -30,13 +30,13 @@ public class ObjectiveDetectionController : MonoBehaviour {
 				foreach (RaycastHit2D hit in hits) {
 					if (hit.collider.tag.Equals (tag)) {
 						objectiveSight = hit.collider.gameObject;
-						enemyMovementController.hasEncounteredPj = true;
+						SendMessage ("HasEncounteredPj");
 						break;
 					}
 				}
 			else if (hits.Length>0) {
 				objectiveSight = hits[0].collider.gameObject;
-				enemyMovementController.hasEncounteredPj = true;
+				SendMessage ("HasEncounteredPj");
 			}
 				
 		}

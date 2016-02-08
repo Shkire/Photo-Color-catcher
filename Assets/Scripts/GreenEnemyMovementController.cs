@@ -22,7 +22,7 @@ public class GreenEnemyMovementController : EnemyMovementController {
 
 	void FixedUpdate(){
 
-		if (!pjEnconuntered) {
+		if (!pjEncountered) {
 			leftResponseTime -= Time.fixedDeltaTime;
 			if (leftResponseTime <= 0) {
 				leftResponseTime = (float)(rnd.NextDouble () * (maxResponseTime - minResponseTime)) + minResponseTime;

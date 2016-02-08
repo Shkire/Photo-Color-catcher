@@ -11,21 +11,12 @@ public abstract class EnemyMovementController : CharacterMovementController {
 		Right
 	};
 
-	protected bool pjEnconuntered;
-
-	public bool hasEncounteredPj{
-		set{
-			pjEnconuntered = value;
-		}
-		get{
-			return pjEnconuntered;
-		}
-	}
+	protected bool pjEncountered;
 	
 	//Patron de movimiento estandar
 	protected void MovementPattern(){
 
-		if (!pjEnconuntered) {
+		if (!pjEncountered) {
 			NormalMovement ();
 		}
 		else{
@@ -39,5 +30,9 @@ public abstract class EnemyMovementController : CharacterMovementController {
 	}
 
 	protected virtual void PjEncounteredMovement(){
+	}
+
+	public void HasEncounteredPj(){
+		pjEncountered = true;
 	}
 }
