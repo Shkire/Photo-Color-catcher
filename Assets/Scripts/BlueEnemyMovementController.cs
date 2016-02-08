@@ -31,7 +31,7 @@ public class BlueEnemyMovementController : EnemyMovementController {
 
 	void FixedUpdate(){
 
-		if (!pjEnconuntered) {
+		if (!pjEncountered) {
 			leftResponseTime -= Time.fixedDeltaTime;
 			if (leftResponseTime <= 0) {
 				leftResponseTime = (float)(rnd.NextDouble () * (maxResponseTime - minResponseTime)) + minResponseTime;
@@ -79,10 +79,12 @@ public class BlueEnemyMovementController : EnemyMovementController {
 
 		float pos = pJ.transform.position.x;
 
+		//Debug.Log ("ola ke ase");
+
 		if (pos > this.transform.position.x)
-			Move (-1);
-		if (pos < this.transform.position.x)
 			Move (1);
+		if (pos < this.transform.position.x)
+			Move (-1);
 
 
 
