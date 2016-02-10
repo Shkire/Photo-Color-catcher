@@ -11,18 +11,6 @@ public abstract class CharacterMovementController : MonoBehaviour {
 
 	protected bool onFloor = false;
 
-	public bool jumpAllowed{
-
-		get{ 
-			return onFloor;
-		}
-
-		set{ 
-			onFloor = value;
-		}
-
-	}
-
 	protected void Move(float direction){
 
 		//Movimiento izq der
@@ -55,8 +43,23 @@ public abstract class CharacterMovementController : MonoBehaviour {
 		
 		//Salto
 
-		if (jumpAllowed)
+		if (onFloor)
 			this.gameObject.GetComponent<Rigidbody2D> ().ResetAndAddForce (Vector2.up * jump);
+
+		onFloor = false;
+
+		SendMessage ("DidJump");
+		
+	}
+
+	public void DidLand(){
+		//Aterriza
+		onFloor = true;
+	}
+
+	public void DidStartFalling(){
+		//Cae
+		onFloor = false;
 	}
 
 }

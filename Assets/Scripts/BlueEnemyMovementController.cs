@@ -77,7 +77,7 @@ public class BlueEnemyMovementController : EnemyMovementController {
 
 	protected override void PjEncounteredMovement(){
 
-		float pos = pJ.transform.position.x;
+		float pos = GameObject.FindGameObjectWithTag ("Player").transform.position.x;
 
 		if (pos > this.transform.position.x)
 			Move (1);
