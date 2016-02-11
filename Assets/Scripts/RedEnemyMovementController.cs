@@ -10,7 +10,6 @@ public class RedEnemyMovementController : EnemyMovementController {
 	[SerializeField]
 	private float minResponseTime;
 
-	[SerializeField]
 	private GameObject pJ;
 
 	private float leftResponseTime;
@@ -37,7 +36,7 @@ public class RedEnemyMovementController : EnemyMovementController {
 
 	protected override void NormalMovement(){
 
-		float pos = pJ.transform.position.x;
+		float pos = GameObject.FindGameObjectWithTag ("Player").transform.position.x;
 
 		if (pos > this.transform.position.x)
 			Move (1);

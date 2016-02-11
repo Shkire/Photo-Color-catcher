@@ -10,7 +10,7 @@ public class BlueEnemyMovementController : EnemyMovementController {
 	[SerializeField]
 	private float minResponseTime;
 
-	[SerializeField]
+
 	private GameObject pJ;
 
 	private float leftResponseTime;
