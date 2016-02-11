@@ -1,45 +1,41 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ObjectiveDetectionController : MonoBehaviour {
+[RequireComponent (typeof(CharacterMovementController))]
+public class ObjectiveDetectionController : MonoBehaviour
+{
 
-	//[SerializeField]
-	//private EnemyMovementController enemyMovementController;
+	[SerializeField]
+	private ObjectiveDetectionConfigElement[] config;
 
 	[SerializeField]
 	private float sightRange;
 
-	[SerializeField]
-	private string tag=string.Empty;
-
-	[SerializeField]
-	private string[] layerCollisionList;
-
-	private GameObject objectiveSight;
-
-	private int layerCode;
-
-	void OnEnable(){
-		layerCode = LayerMask.GetMask (layerCollisionList);
+	void OnEnable ()
+	{
+		foreach (ObjectiveDetectionConfigElement configElem in config)
+		{
+			configElem.SetLayerCode ();
+		}
+			
 	}
 
-	void FixedUpdate(){
-		if (objectiveSight == null) {
-			RaycastHit2D[] hits = Physics2D.RaycastAll (this.gameObject.transform.position, Vector2.right, sightRange, layerCode);
-			if (!tag.Equals (string.Empty))
+	void FixedUpdate ()
+	{
+
+		foreach (ObjectiveDetectionConfigElement configElem in config) {
+			if (configElem.MustKeepSearching) {
+				RaycastHit2D[] hits = Physics2D.RaycastAll (this.gameObject.transform.position, Vector2.right, sightRange, configElem.FilteringLayer);
 				foreach (RaycastHit2D hit in hits) {
-					if (hit.collider.tag.Equals (tag)) {
-						objectiveSight = hit.collider.gameObject;
-						SendMessage ("HasEncounteredPj");
+					Debug.Log (hit.collider.gameObject);
+					if (configElem.searchTag.Equals (string.Empty) || (hit.collider.gameObject.tag.Equals (configElem.searchTag))) {
+						SendMessage ("HasEncountered" + configElem.message, hit.collider.gameObject);
 						break;
 					}
 				}
-			else if (hits.Length>0) {
-				objectiveSight = hits[0].collider.gameObject;
-				SendMessage ("HasEncounteredPj");
 			}
-				
 		}
+				
 	}
-
 }
+	
