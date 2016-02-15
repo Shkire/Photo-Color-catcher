@@ -13,7 +13,6 @@ public abstract class EnemyMovementController : CharacterMovementController {
 
 	protected bool pjEncountered;
 	protected GameObject pj;
-	protected bool hasTeam;
 	
 	//Patron de movimiento estandar
 	protected void MovementPattern(){
@@ -34,16 +33,8 @@ public abstract class EnemyMovementController : CharacterMovementController {
 	protected virtual void PjEncounteredMovement(){
 	}
 
-	public virtual void TeamPlay(GameObject pj){
-		hasTeam = true;
-		pjEncountered = true;
-		this.pj = pj;
-		SendMessage ("StopSearching","Enemy");
-	}
-
 	public void HasEncounteredPj(GameObject pj){
 		pjEncountered = true;
 		this.pj = pj;
-		SendMessage ("StopSearching","Pj");
 	}
 }

@@ -14,8 +14,6 @@ public class GreenEnemyMovementController : EnemyMovementController {
 
 	private movementType nowMovingTo;
 
-	private GameObject enemyEncountered;
-
 	private System.Random rnd;
 
 	void OnEnable(){
@@ -68,35 +66,11 @@ public class GreenEnemyMovementController : EnemyMovementController {
 	}
 
 	protected override void PjEncounteredMovement(){
-		if (enemyEncountered == null) {
-			if (!hasTeam) {
-				float dif = this.gameObject.transform.position.x - pj.transform.position.x;
-				if (dif < 0)
-					Move (-1);
-				else if (dif > 0)
-					Move (1);
-			} else
-			{
-				float dif = this.gameObject.transform.position.x - pj.transform.position.x;
-				if (dif < 0)
-					Move (1);
-				else if (dif > 0)
-					Move (-1);
-			}
-		} else
-		{
-			float dif = this.gameObject.transform.position.x - enemyEncountered.transform.position.x;
-			if (dif < 0)
-				Move (1);
-			else if (dif > 0)
-				Move (-1);
-		}
-	}
-
-	public void HasEncounteredEnemy(GameObject enemy){
-		enemyEncountered = enemy;
-		enemyEncountered.GetComponent<EnemyMovementController> ().TeamPlay(pj);
-		SendMessage ("StopSearching","Enemy");
+		float dif = this.gameObject.transform.position.x-GameObject.FindGameObjectWithTag ("Player").transform.position.x;
+		if (dif < 0)
+			Move (-1);
+		else if (dif > 0)
+			Move (1);
 	}
 
 }
