@@ -27,11 +27,11 @@ public abstract class CharacterMovementController : MonoBehaviour {
 		 * */
 		//mirada del pj
 		if (direction > 0)
-			this.gameObject.GetComponent<SpriteRenderer> ().flipY = false;
+			this.gameObject.GetComponent<SpriteRenderer> ().flipX = true;
 			//this.transform.rotation = new Quaternion (0,0,0,1.0f);
 
 		if (direction < 0)
-			this.gameObject.GetComponent<SpriteRenderer> ().flipY = true;
+			this.gameObject.GetComponent<SpriteRenderer> ().flipX = false;
 			//this.transform.rotation = new Quaternion (0,-1.0f,0,0);
 		
 
