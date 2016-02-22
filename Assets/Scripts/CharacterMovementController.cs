@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public abstract class CharacterMovementController : MonoBehaviour {
 
@@ -11,30 +12,36 @@ public abstract class CharacterMovementController : MonoBehaviour {
 
 	protected bool onFloor = false;
 
+
+
+
 	protected void Move(float direction){
 
 		//Movimiento izq der
-
-		this.gameObject.transform.Translate(new Vector3(direction*speed,0,0));
-
-
+		this.gameObject.transform.Translate(new Vector3(Math.Abs(direction)*speed,0,0));
 
 		/*
 		 * 
-		 * Valorar entre Flip Sprite o Flip Gameobject
+		 * if y == 0 then 0,0 0,0 0,0 1,0
+		 * 
+		 * if y == 180 then 0,0 -1,0 0,0 0,0
 		 * 
 		 * 
 		 * */
+
 		//mirada del pj
-		if (direction > 0)
-			this.gameObject.GetComponent<SpriteRenderer> ().flipX = true;
-			//this.transform.rotation = new Quaternion (0,0,0,1.0f);
+		if (direction > 0) {
+			if ( Quaternion.Angle(gameObject.transform.rotation, new Quaternion(0f,-1f,0f,0f)) == 0 ) { 
+				gameObject.transform.rotation =  new Quaternion (0f,0f,0f,1f);
+			}
+		}
 
-		if (direction < 0)
-			this.gameObject.GetComponent<SpriteRenderer> ().flipX = false;
-			//this.transform.rotation = new Quaternion (0,-1.0f,0,0);
-		
-
+		if (direction < 0) {
+			if (Quaternion.Angle (gameObject.transform.rotation, new Quaternion (0f, 0f, 0f, 1f)) == 0) { 
+				gameObject.transform.rotation = new Quaternion (0f, -1f, 0f, 0f);
+			}
+		}
+			
 
 	}
 

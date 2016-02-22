@@ -25,9 +25,15 @@ public class ObjectiveDetectionController : MonoBehaviour
 
 		foreach (ObjectiveDetectionConfigElement configElem in config) {
 			if (configElem.MustKeepSearching) {
-				RaycastHit2D[] hits = Physics2D.RaycastAll (this.gameObject.transform.position, Vector2.right, sightRange, configElem.FilteringLayer);
+
+				Vector2 vectorAux = Vector2.right;
+
+				if ( Quaternion.Angle(gameObject.transform.rotation, new Quaternion(0f,-1f,0f,0f)) == 0 )
+					vectorAux = Vector2.left;
+		
+				RaycastHit2D[] hits = Physics2D.RaycastAll (this.gameObject.transform.position, vectorAux, sightRange, configElem.FilteringLayer);
+				
 				foreach (RaycastHit2D hit in hits) {
-					Debug.Log (hit.collider.gameObject);
 					if ((configElem.searchTag.Equals (string.Empty) || (hit.collider.gameObject.tag.Equals (configElem.searchTag))) && !hit.collider.gameObject.Equals(this.gameObject)) {
 						SendMessage ("HasEncountered" + configElem.message, hit.collider.gameObject);
 						break;
