@@ -2,35 +2,46 @@
 using System.Collections;
 using System;
 
-public class BlueEnemyMovementController : EnemyMovementController {
+/// <summary>
+/// Controls the Blue enemy movement.
+/// </summary>
+public class BlueEnemyMovementController : EnemyMovementController
+{
 
+	/// <summary>
+	/// The maximum response time.
+	/// </summary>
 	[SerializeField]
 	private float maxResponseTime;
 
+	/// <summary>
+	/// The minimum response time.
+	/// </summary>
 	[SerializeField]
 	private float minResponseTime;
 
-
-	private GameObject pJ;
-
+	/// <summary>
+	/// The left response time.
+	/// </summary>
 	private float leftResponseTime;
 
+	/// <summary>
+	/// Which type of movement has this enemy now when moving normally.
+	/// </summary>
 	private movementType nowMovingTo;
 
+	/// <summary>
+	/// The randomizer.
+	/// </summary>
 	private System.Random rnd;
 
-
-
-
-	void OnEnable(){
+	void OnEnable ()
+	{
 		rnd = new System.Random (Guid.NewGuid ().GetHashCode ());
 	}
 
-
-
-
-	void FixedUpdate(){
-
+	void FixedUpdate ()
+	{
 		if (!pjEncountered) {
 			leftResponseTime -= Time.fixedDeltaTime;
 			if (leftResponseTime <= 0) {
@@ -43,8 +54,11 @@ public class BlueEnemyMovementController : EnemyMovementController {
 
 	}
 
-	protected override void NormalMovement(){
-
+	/// <summary>
+	/// Enemy movement pattern when moving normally.
+	/// </summary>
+	protected override void NormalMovement ()
+	{
 		if (nowMovingTo.Equals (movementType.Undefined)) {
 			int rndMovement = rnd.Next (1, 4);
 			switch (rndMovement) {
@@ -71,23 +85,19 @@ public class BlueEnemyMovementController : EnemyMovementController {
 			nowMovingTo = movementType.Stay;
 			break;
 		}
-		
 	}
 
-
-	protected override void PjEncounteredMovement(){
-
+	/// <summary>
+	/// Enemy movement pattern when has encountered a Pj.
+	/// </summary>
+	protected override void PjEncounteredMovement ()
+	{
 		float pos = GameObject.FindGameObjectWithTag ("Player").transform.position.x;
 
 		if (pos > this.transform.position.x)
 			Move (1);
 		if (pos < this.transform.position.x)
 			Move (-1);
-
-
-
 	}
-
-
-
+		
 }
