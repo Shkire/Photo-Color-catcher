@@ -2,36 +2,47 @@
 using System.Collections;
 using System;
 
-[RequireComponent (typeof (CharacterMovementController))]
-public class CharacterHealthController : MonoBehaviour {
+/// <summary>
+/// Controls a character's (Pj or Enemy) health.
+/// </summary>
+[RequireComponent (typeof(CharacterMovementController))]
+public class CharacterHealthController : MonoBehaviour
+{
 
+	/// <summary>
+	/// Number of HP.
+	/// </summary>
 	[SerializeField]
 	private float health;
 
+	/// <summary>
+	/// Minimum time between damage detections.
+	/// </summary>
 	[SerializeField]
 	private float responseTime;
 
+	/// <summary>
+	/// TEMPORARY.
+	/// </summary>
 	private float blinkResponseTime = 1;
 
+	/// <summary>
+	/// The left response time until the next possible damage detection.
+	/// </summary>
 	private float leftResponseTime;
+
+	/// <summary>
+	/// TEMPORARY.
+	/// </summary>
 	private float blinkLeftResponseTime;
 
-
+	/// <summary>
+	/// If the character has recieved damage.
+	/// </summary>
 	private bool onDamage;
 
-
-
-
-
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void FixedUpdate () {
-
-
+	void FixedUpdate ()
+	{
 
 		if (onDamage) {
 			leftResponseTime -= Time.fixedDeltaTime;
@@ -41,38 +52,34 @@ public class CharacterHealthController : MonoBehaviour {
 			}
 
 			//animar
-			if(leftResponseTime >0 && leftResponseTime <=1){
+			if (leftResponseTime > 0 && leftResponseTime <= 1) {
 				this.gameObject.GetComponent<SpriteRenderer> ().enabled = false;
 			}
-				if(leftResponseTime >1 && leftResponseTime <=2){
+			if (leftResponseTime > 1 && leftResponseTime <= 2) {
 				this.gameObject.GetComponent<SpriteRenderer> ().enabled = true;
 			}
-					if(leftResponseTime >2 && leftResponseTime <3){
+			if (leftResponseTime > 2 && leftResponseTime < 3) {
 				this.gameObject.GetComponent<SpriteRenderer> ().enabled = false;
 			}
-			if(leftResponseTime >=3 ){
+			if (leftResponseTime >= 3) {
 				this.gameObject.GetComponent<SpriteRenderer> ().enabled = true;
 			}
-
 		}
-
-
-
+			
 		if (health <= 0.0) {
 			Destroy (gameObject);
 		}
-
 	}
 
-	public void DoDamage (float damage) {
-
-
+	/// <summary>
+	/// Does the points of damage specified.
+	/// </summary>
+	/// <param name="damage">Damage points.</param>
+	public void DoDamage (float damage)
+	{
 		if (!onDamage) {
 			health -= damage;
 			onDamage = true;
 		}
-
 	}
-
-
 }
