@@ -19,4 +19,11 @@ public class DamageController : MonoBehaviour
 			coll.gameObject.GetComponent<CharacterHealthController> ().DoDamage (damage);
 		}
 	}
+
+	void OnTriggerEnter2D (Collider2D coll)
+	{
+		if (coll.gameObject.GetComponent<CharacterHealthController> ()) {
+			coll.gameObject.GetComponent<CharacterHealthController> ().DoDamage (damage);
+		}
+	}
 }
