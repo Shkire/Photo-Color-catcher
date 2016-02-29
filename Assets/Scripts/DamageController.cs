@@ -1,22 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Leap;
 
-public class DamageController : MonoBehaviour {
-
-
+/// <summary>
+/// Character damage controller.
+/// </summary>
+public class DamageController : MonoBehaviour
+{
+	/// <summary>
+	/// Number of damage points that this character do on each hit.
+	/// </summary>
 	[SerializeField]
 	private float damage;
 
-
-	//Better Stay but we need a reset on pj
-	void OnCollisionEnter2D(Collision2D coll) {
-
+	//Change with stay
+	void OnCollisionEnter2D (Collision2D coll)
+	{
 		if (coll.gameObject.GetComponent<CharacterHealthController> ()) {
 			coll.gameObject.GetComponent<CharacterHealthController> ().DoDamage (damage);
 		}
-
 	}
-
-
 }
