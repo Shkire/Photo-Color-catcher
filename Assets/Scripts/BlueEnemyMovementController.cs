@@ -28,7 +28,7 @@ public class BlueEnemyMovementController : EnemyMovementController
 	/// <summary>
 	/// Which type of movement has this enemy now when moving normally.
 	/// </summary>
-	private movementType nowMovingTo;
+	private MovementType nowMovingTo;
 
 	/// <summary>
 	/// The randomizer.
@@ -46,7 +46,7 @@ public class BlueEnemyMovementController : EnemyMovementController
 			leftResponseTime -= Time.fixedDeltaTime;
 			if (leftResponseTime <= 0) {
 				leftResponseTime = (float)(rnd.NextDouble () * (maxResponseTime - minResponseTime)) + minResponseTime;
-				nowMovingTo = movementType.Undefined;
+				nowMovingTo = MovementType.Undefined;
 			}
 		}
 
@@ -59,30 +59,30 @@ public class BlueEnemyMovementController : EnemyMovementController
 	/// </summary>
 	protected override void NormalMovement ()
 	{
-		if (nowMovingTo.Equals (movementType.Undefined)) {
+		if (nowMovingTo.Equals (MovementType.Undefined)) {
 			int rndMovement = rnd.Next (1, 4);
 			switch (rndMovement) {
 			case 1:
-				nowMovingTo = movementType.Left;
+				nowMovingTo = MovementType.Left;
 				break;
 			case 2:
-				nowMovingTo = movementType.Right;
+				nowMovingTo = MovementType.Right;
 				break;
 			case 3:
-				nowMovingTo = movementType.Stay;
+				nowMovingTo = MovementType.Stay;
 				break;
 			}
 		}
 
 		switch (nowMovingTo) {
-		case movementType.Left:
+		case MovementType.Left:
 			Move (-1);
 			break;
-		case movementType.Right:
+		case MovementType.Right:
 			Move (1);
 			break;
-		case movementType.Stay:
-			nowMovingTo = movementType.Stay;
+		case MovementType.Stay:
+			nowMovingTo = MovementType.Stay;
 			break;
 		}
 	}

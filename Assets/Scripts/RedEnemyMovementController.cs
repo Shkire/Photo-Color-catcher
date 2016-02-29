@@ -14,7 +14,7 @@ public class RedEnemyMovementController : EnemyMovementController {
 
 	private float leftResponseTime;
 
-	private movementType nowMovingTo;
+	private MovementType nowMovingTo;
 
 	private System.Random rnd;
 

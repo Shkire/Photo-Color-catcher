@@ -10,7 +10,7 @@ public abstract class EnemyMovementController : CharacterMovementController
 	/// <summary>
 	/// Movement type enum declaration.
 	/// </summary>
-	protected enum movementType
+	protected enum MovementType
 	{
 		Undefined,
 		Stay,

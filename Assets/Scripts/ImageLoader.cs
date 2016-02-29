@@ -2,12 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ImageLoader : MonoBehaviour {
-
+/// <summary>
+/// Image loader.
+/// </summary>
+public class ImageLoader : MonoBehaviour
+{
+	/// <summary>
+	/// The loaded images.
+	/// </summary>
 	[SerializeField]
 	private List<Texture2D> loadedImages;
 
-	void Awake(){
+	void Awake()
+	{
 		loadedImages = new List<Texture2D> ();
 		string[] files = System.IO.Directory.GetFiles (Application.persistentDataPath+"/");
 		foreach (string loadingFile in files) 
@@ -18,6 +25,5 @@ public class ImageLoader : MonoBehaviour {
 			tempText.LoadImage (loadingBytes);
 			loadedImages.Add (tempText);
 		}
-
 	}
 }
