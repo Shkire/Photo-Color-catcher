@@ -62,7 +62,7 @@ public abstract class EnemyMovementController : CharacterMovementController
 	/// <summary>
 	/// Another character has joined this on team play.
 	/// </summary>
-	/// <param name="pj">Pj objective of these characters' team play.</param>
+	/// <param name="pj">Pj objective of these characters team play.</param>
 	public virtual void TeamPlay (GameObject pj)
 	{
 		hasTeam = true;
