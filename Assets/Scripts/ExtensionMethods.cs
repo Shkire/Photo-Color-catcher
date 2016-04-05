@@ -43,4 +43,21 @@ public static class ExtensionMethods
         rb.ResetForces();
         rb.AddForce(force);
     }
+
+	public static Texture2D ResizeBilinear(this Texture2D text, int newXSize, int newYSize)
+	{
+		//Create result texture and get pixels
+		Texture2D result = new Texture2D (newXSize, newYSize, text.format, true);
+		UnityEngine.Color[] rpixels = result.GetPixels ();
+		//Calculate inc
+		float incX=(1.0f/(float)newXSize);
+		float incY=(1.0f/(float)newYSize);
+		for (int px = 0; px < rpixels.Length; px++) 
+		{
+			rpixels [px] = text.GetPixelBilinear (incX * ((float)px % newXSize), incY * ((float)Mathf.Floor (px / newYSize)));
+		}
+		result.SetPixels(rpixels); 
+		result.Apply(); 
+		return result;
+	}
 }

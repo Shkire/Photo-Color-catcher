@@ -1,18 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class ImgTest : MonoBehaviour {
+public class ImgProcessManager : MonoBehaviour {
 
+	public int divisionFactor;
 	public string imgPath;
-	private ProcessedImage imagen;
+	public List<ProcessedImage> images;
 	public SpriteRenderer sprite;
 	private int count;
 	public Texture2D texturita;
 
 	// Use this for initialization
 	void Start () {
-		imagen = new ProcessedImage (imgPath);
-		StartCoroutine (imagen.InitProcessedImage(this.gameObject));
+		images = new List<ProcessedImage> ();
+		LoadImage (imgPath);
+		DivideImage (0);
+		//imagen = new ProcessedImage (imgPath);
+		//StartCoroutine (imagen.InitProcessedImage(this.gameObject));
 	}
 
 	/*
@@ -41,14 +46,25 @@ public class ImgTest : MonoBehaviour {
 	}
 	*/
 
-	void DidImageInit()
+	void LoadImage(string path)
 	{
-		StartCoroutine (imagen.ToTexture2D(texturita,this.gameObject));
+		images.Add (new ProcessedImage (path));
 	}
 
-	void DidImageToTexture()
+	void DivideImage (int idx)
 	{
-		sprite.sprite = Sprite.Create(texturita,new Rect(0,0,10,10),new Vector2(0,0));
+		if (images [idx] != null)
+			StartCoroutine(images [idx].Divide (divisionFactor));
+	}
+
+	void DidImageInit()
+	{
+		//StartCoroutine (imagen.ToTexture2D(this.gameObject));
+	}
+
+	void DidImageToTexture(object text)
+	{
+		sprite.sprite = Sprite.Create((Texture2D)text,new Rect(0,0,10,10),new Vector2(0,0));
 		Debug.Log ("¡YA TENGO SPRITEEEE!");
 	}
 }
