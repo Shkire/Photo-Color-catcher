@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ImgProcessManager : MonoBehaviour {
+public class ImgProcessManager : Singleton<ImgProcessManager> {
 
 	public int divisionFactor;
 	public string imgPath;
@@ -11,6 +11,10 @@ public class ImgProcessManager : MonoBehaviour {
 	private int count;
 	public Texture2D texturita;
 
+	protected ImgProcessManager () 
+	{
+	}
+		
 	// Use this for initialization
 	void Start () {
 		images = new List<ProcessedImage> ();
@@ -19,7 +23,6 @@ public class ImgProcessManager : MonoBehaviour {
 		//imagen = new ProcessedImage (imgPath);
 		//StartCoroutine (imagen.InitProcessedImage(this.gameObject));
 	}
-
 	/*
 	void FixedUpdate(){
 		StartCoroutine (imagen.ToTexture2D (texturita));
@@ -67,4 +70,5 @@ public class ImgProcessManager : MonoBehaviour {
 		sprite.sprite = Sprite.Create((Texture2D)text,new Rect(0,0,10,10),new Vector2(0,0));
 		Debug.Log ("¡YA TENGO SPRITEEEE!");
 	}
+		
 }

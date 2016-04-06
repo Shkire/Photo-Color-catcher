@@ -2,9 +2,14 @@
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections;
 using System.IO;
+using System.Collections.Generic;
 
 public static class PersistenceManager
 {
+	private string lastId;
+
+	private List<string> otherAvailId;
+
 	public static void SaveImage(ProcessedImage img)
 	{
 		FileStream file; 

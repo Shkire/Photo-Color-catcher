@@ -6,49 +6,39 @@ using System.Collections.Generic;
 [System.Serializable]
 public class ProcessedImage{
 
-	public string id;
+	private string id;
 
-	private int[,] rData;
+	private string path;
 
-	private int[,] gData;
+	private UnityEngine.Color[] pixels;
 
-	private int[,] bData;
+	private int width;
 
-	public int width;
+	private int height;
 
-	public int height;
+	private Dictionary<Vector2,string> children;
 
-	public Bitmap img;
-
-	public Texture2D img2;
-
-	public Texture2D img3;
-
-	//public Dictionary<Vector2,ProcessedImage> children;
-	public List<ProcessedImage> children;
-
+	/*
 	public ProcessedImage()
 	{
 		img2 = null;
 	}
+	*/
 
-	public ProcessedImage(string path)
+	public ProcessedImage(string i_path)
 	{
-		img2 = new Texture2D(1,1);
+		id = PersistenceManager.GetNewId();
+		path = i_path;
+		Texture2D tempText = new Texture2D(1,1);
 		byte[] imgRead = System.IO.File.ReadAllBytes (Application.persistentDataPath+"/"+path);
-		img2.LoadImage (imgRead);
-		width = img2.width;
-		height = img2.height;
-		//img = new Bitmap (Application.persistentDataPath+"/"+path);
-		//width = img.Width;
-		Debug.Log ("Width: " + img2.width);
-		//height = img.Height;
-		Debug.Log ("Height: " + img2.height);
-		//rData = new int[img.Width, img.Height];
-		//gData = new int[img.Width, img.Height];
-		//bData = new int[img.Width, img.Height];
+		tempText.LoadImage (imgRead);
+		width = tempText.width;
+		height = tempText.height;
+		pixels = tempText.GetPixels();
+		children = new Dictionary<Vector2, string> ();
 	}
 
+	/*
 	public IEnumerator InitProcessedImage(GameObject callingGo)
 	{
 		for (int x = 0; x < width; x++)
@@ -61,7 +51,9 @@ public class ProcessedImage{
 		}
 		callingGo.SendMessage ("DidImageInit");
 	}
+	*/
 
+	/*
 	public void SetRGBValue (int rValue, int gValue, int bValue, int xValue, int yValue)
 	{
 		rData [xValue, yValue] = rValue;
@@ -110,47 +102,29 @@ public class ProcessedImage{
 			yield return null;
 		}
 	}
+	*/
 
-	public IEnumerator Divide(int divisionFactor)
+	public void Divide(int i_divisionFactor)
 	{
-		int childrenWidth = Mathf.CeilToInt ((float)width / divisionFactor);
-		//Debug.Log ("Children width unceiled:"+((float)width / divisionFactor));
-		//Debug.Log ("Children width:"+childrenWidth);
-		int childrenHeight = Mathf.CeilToInt ((float)height / divisionFactor);
-		//Debug.Log ("Children height unceiled:"+(height / divisionFactor));
-		//Debug.Log ("Children height:"+childrenHeight);
-		//Texture2D
-		img3 = img2.ResizeBilinear (childrenWidth * divisionFactor, childrenHeight * divisionFactor);
-		Debug.Log ("IMG3: 20,20:"+img3.GetPixel(20,20));
-		//img3.Resize (childrenWidth * divisionFactor, childrenHeight * divisionFactor);
-		Debug.Log ("IMG3: 20,20:"+img3.GetPixel(20,20));
-		img3.Apply ();
-		Debug.Log ("Img resized size:"+img3.width+","+img3.height);
-		Debug.Log ("IMG2: 20,20:"+img2.GetPixel(20,20));
-		Debug.Log ("IMG3: 20,20:"+img3.GetPixel(20,20));
-		//children = new Dictionary<Vector2,ProcessedImage> ();
-		children = new List<ProcessedImage>();
-		for (int x = 0; x < divisionFactor; x++) 
+		int childrenWidth = Mathf.CeilToInt ((float)width / i_divisionFactor);
+		int childrenHeight = Mathf.CeilToInt ((float)height / i_divisionFactor);
+		Texture2D tempText = new Texture2D (1, 1);
+		tempText.SetPixels (pixels);
+		tempText = tempText.ResizeBilinear (childrenWidth * i_divisionFactor, childrenHeight * i_divisionFactor);
+		for (int x = 0; x < i_divisionFactor; x++) 
 		{
-			for (int y = 0; y < divisionFactor; y++) 
+			for (int y = 0; y < i_divisionFactor; y++) 
 			{
-				Texture2D auxText = new Texture2D (childrenWidth,childrenHeight);
-				for (int i=0; i<childrenWidth;i++)
-				{
-					for (int j=0; j<childrenHeight;j++)
+				UnityEngine.Color[] auxPixels = new UnityEngine.Color[childrenWidth * childrenHeight];
+				for (int i = 0; i < childrenWidth; i++) {
+					for (int j = 0; j < childrenHeight; j++) 
 					{
-						auxText.SetPixel(i,j,img3.GetPixel((childrenWidth*x)+i,(childrenHeight*y)+j));
+						int origPos = x * childrenWidth + y * i_divisionFactor * childrenWidth * childrenHeight + i + j * childrenWidth * i_divisionFactor;
+						auxPixels [i + j*childrenWidth] = new UnityEngine.Color(pixels [origPos].r,pixels [origPos].g,pixels [origPos].b,pixels [origPos].a);
 					}
-
-					yield return null;
 				}
-				auxText.Apply ();
-				ProcessedImage auxImg = new ProcessedImage ();
-				auxImg.img2 = auxText;
-				Debug.Log ("Width: " + auxImg.img2.width);
-				Debug.Log ("Height: " + auxImg.img2.height);
-				//children.Add (new Vector2 (x, y), auxImg);
-				children.Add(auxImg);
+				ProcessedImage auxImg = new ProcessedImage(auxPixels);
+				children.Add (new Vector2 (x, y), auxImg.id);
 			}
 		}
 	}
