@@ -3,10 +3,9 @@ using System.Collections;
 using System.Drawing;
 using System.Collections.Generic;
 
-[System.Serializable]
 public class ProcessedImage{
 
-	private string id;
+	private int id;
 
 	private string path;
 
@@ -16,7 +15,7 @@ public class ProcessedImage{
 
 	private int height;
 
-	private Dictionary<Vector2,string> children;
+	private Dictionary<Vector2,int> children;
 
 	/*
 	public ProcessedImage()
@@ -28,15 +27,42 @@ public class ProcessedImage{
 	public ProcessedImage(string i_path)
 	{
 		id = PersistenceManager.GetNewId();
+		Debug.Log ("Setting path");
 		path = i_path;
+		Debug.Log ("Creating text");
 		Texture2D tempText = new Texture2D(1,1);
+		Debug.Log ("Reading image");
 		byte[] imgRead = System.IO.File.ReadAllBytes (Application.persistentDataPath+"/"+path);
 		tempText.LoadImage (imgRead);
+		Debug.Log ("Setting width");
 		width = tempText.width;
+		Debug.Log ("Setting height");
 		height = tempText.height;
+		Debug.Log ("Setting pixels");
 		pixels = tempText.GetPixels();
-		children = new Dictionary<Vector2, string> ();
+		Debug.Log ("Initiating children");
+		children = new Dictionary<Vector2, int> ();
 	}
+
+	public ProcessedImage(UnityEngine.Color[] i_pixels, int i_width, int i_height)
+	{
+		id = PersistenceManager.GetNewId();
+		path = string.Empty;
+		width = i_width;
+		height = i_height;
+		pixels = i_pixels;
+		children = null;
+	}
+	public ProcessedImage(int i_id, string i_path, UnityEngine.Color[] i_pixels, int i_width, int i_height, Dictionary<Vector2,int> i_children)
+	{
+		id = i_id;
+		path = i_path;
+		pixels = i_pixels;
+		width = i_width;
+		height = i_height;
+		children = i_children;
+	}
+
 
 	/*
 	public IEnumerator InitProcessedImage(GameObject callingGo)
@@ -108,9 +134,11 @@ public class ProcessedImage{
 	{
 		int childrenWidth = Mathf.CeilToInt ((float)width / i_divisionFactor);
 		int childrenHeight = Mathf.CeilToInt ((float)height / i_divisionFactor);
-		Texture2D tempText = new Texture2D (1, 1);
+		Texture2D tempText = new Texture2D (width, height);
 		tempText.SetPixels (pixels);
+		tempText.Apply ();
 		tempText = tempText.ResizeBilinear (childrenWidth * i_divisionFactor, childrenHeight * i_divisionFactor);
+		UnityEngine.Color[] tempPixels = tempText.GetPixels ();
 		for (int x = 0; x < i_divisionFactor; x++) 
 		{
 			for (int y = 0; y < i_divisionFactor; y++) 
@@ -120,12 +148,38 @@ public class ProcessedImage{
 					for (int j = 0; j < childrenHeight; j++) 
 					{
 						int origPos = x * childrenWidth + y * i_divisionFactor * childrenWidth * childrenHeight + i + j * childrenWidth * i_divisionFactor;
-						auxPixels [i + j*childrenWidth] = new UnityEngine.Color(pixels [origPos].r,pixels [origPos].g,pixels [origPos].b,pixels [origPos].a);
+						auxPixels [i + j*childrenWidth] = new UnityEngine.Color(tempPixels [origPos].r,tempPixels [origPos].g,tempPixels [origPos].b,tempPixels [origPos].a);
 					}
 				}
-				ProcessedImage auxImg = new ProcessedImage(auxPixels);
+				ProcessedImage auxImg = new ProcessedImage(auxPixels,childrenWidth,childrenHeight);
 				children.Add (new Vector2 (x, y), auxImg.id);
+				PersistenceManager.IndexImage (auxImg);
 			}
 		}
+	}
+
+	public int GetId()
+	{
+		return id;
+	}
+
+	public PersistentProcessedImage ToPersistent()
+	{
+		float[][] auxPixels = new float[pixels.Length][];
+		for (int i=0; i<pixels.Length; i++)
+			auxPixels[i]=new float[4]{pixels[i].r,pixels[i].g,pixels[i].b,pixels[i].a};
+		Dictionary<int[],int> auxChildren = new Dictionary<int[], int>();
+		foreach (Vector2 index in children.Keys)
+			auxChildren.Add (new int[2]{Mathf.FloorToInt(index.x),Mathf.FloorToInt(index.y)},children[index]);
+		PersistentProcessedImage img = new PersistentProcessedImage (id, path, auxPixels, width, height, auxChildren);
+		return img;
+	}
+
+	public Texture2D ToTexture2D()
+	{
+		Texture2D text = new Texture2D (width, height);
+		text.SetPixels (pixels);
+		text.Apply();
+		return text;
 	}
 }

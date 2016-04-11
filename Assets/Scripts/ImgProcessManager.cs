@@ -19,7 +19,11 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 	void Start () {
 		images = new List<ProcessedImage> ();
 		LoadImage (imgPath);
+		Debug.Log ("Dividing image");
 		DivideImage (0);
+		foreach (int index in PersistenceManager.GetAllIds())
+			ImgProcessManager.Instance.Instantiate (index, "Creada");
+		PersistenceManager.SaveImage (images[0]);
 		//imagen = new ProcessedImage (imgPath);
 		//StartCoroutine (imagen.InitProcessedImage(this.gameObject));
 	}
@@ -57,7 +61,8 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 	void DivideImage (int idx)
 	{
 		if (images [idx] != null)
-			StartCoroutine(images [idx].Divide (divisionFactor));
+			//StartCoroutine(images [idx].Divide (divisionFactor));
+			images[idx].Divide(divisionFactor);
 	}
 
 	void DidImageInit()
@@ -69,6 +74,14 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 	{
 		sprite.sprite = Sprite.Create((Texture2D)text,new Rect(0,0,10,10),new Vector2(0,0));
 		Debug.Log ("¡YA TENGO SPRITEEEE!");
+	}
+
+	public void Instantiate(int index,string name){
+		GameObject go = new GameObject(name);
+		SpriteRenderer sprtRend = go.AddComponent<SpriteRenderer> ();
+		Sprite spr = new Sprite ();
+		spr = Sprite.Create (PersistenceManager.GetImage (index).ToTexture2D (), new Rect (0, 0, 25,25), new Vector2 (0, 0));
+		sprtRend.sprite = spr;
 	}
 		
 }
