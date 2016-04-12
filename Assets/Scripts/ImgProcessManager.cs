@@ -17,13 +17,14 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		
 	// Use this for initialization
 	void Start () {
+		//PersistenceManager.LoadImageList ();
 		images = new List<ProcessedImage> ();
-		LoadImage (imgPath);
+		//LoadImage (imgPath);
 		Debug.Log ("Dividing image");
-		DivideImage (0);
-		foreach (int index in PersistenceManager.GetAllIds())
-			ImgProcessManager.Instance.Instantiate (index, "Creada");
-		PersistenceManager.SaveImage (images[0]);
+		//DivideImage (0);
+		//foreach (int index in PersistenceManager.GetAllIds())
+			//ImgProcessManager.Instance.Instantiate (index, "Creada");
+		//PersistenceManager.SaveImage (images[0]);
 		//imagen = new ProcessedImage (imgPath);
 		//StartCoroutine (imagen.InitProcessedImage(this.gameObject));
 	}
@@ -80,7 +81,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		GameObject go = new GameObject(name);
 		SpriteRenderer sprtRend = go.AddComponent<SpriteRenderer> ();
 		Sprite spr = new Sprite ();
-		spr = Sprite.Create (PersistenceManager.GetImage (index).ToTexture2D (), new Rect (0, 0, 25,25), new Vector2 (0, 0));
+		//spr = Sprite.Create (PersistenceManager.GetImage (index).ToTexture2D (), new Rect (0, 0, 25,25), new Vector2 (0, 0));
 		sprtRend.sprite = spr;
 	}
 		

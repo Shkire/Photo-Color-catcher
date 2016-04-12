@@ -37,7 +37,7 @@ public class PersistentProcessedImage{
 		Dictionary<Vector2,int> auxChildren = new Dictionary<Vector2, int> ();
 		foreach (int[] index in children.Keys)
 			auxChildren.Add (new Vector2(index[0],index[1]),children[index]);
-		ProcessedImage img = new ProcessedImage (id,path,auxPixels,width,height,auxChildren);
+		ProcessedImage img = new ProcessedImage (id,path,auxPixels,width,height,auxChildren,false);
 		return img;
 	}
 }
