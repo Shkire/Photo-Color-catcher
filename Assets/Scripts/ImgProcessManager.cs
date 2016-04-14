@@ -16,11 +16,19 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 	}
 		
 	// Use this for initialization
+
+	public void ProccesAndIndexImage(string i_path)
+	{
+		PersistenceManager.MainLoad ();
+		ProcessedImage img = new ProcessedImage (i_path);
+		img.Divide (divisionFactor);
+	}
 	void Start () {
+		ProccesAndIndexImage (imgPath);
 		//PersistenceManager.LoadImageList ();
-		images = new List<ProcessedImage> ();
+		//images = new List<ProcessedImage> ();
 		//LoadImage (imgPath);
-		Debug.Log ("Dividing image");
+		//Debug.Log ("Dividing image");
 		//DivideImage (0);
 		//foreach (int index in PersistenceManager.GetAllIds())
 			//ImgProcessManager.Instance.Instantiate (index, "Creada");

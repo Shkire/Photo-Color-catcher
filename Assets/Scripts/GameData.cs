@@ -92,8 +92,9 @@ public class GameData{
 	public PersistentGameData ToPersistent()
 	{
 		Dictionary<int,PersistentProcessedImage> auxImgDict = new Dictionary<int, PersistentProcessedImage> ();
-		foreach (int index in imgDict.Keys)
-			auxImgDict.Add (index,imgDict[index].ToPersistent());
+		if (imgDict!=null && imgDict.Count>0)
+			foreach (int index in imgDict.Keys)
+				auxImgDict.Add (index,imgDict[index].ToPersistent());
 		PersistentGameData auxData = new PersistentGameData (parentImgs,auxImgDict,lastId,otherAvailId);
 		return auxData;
 	}

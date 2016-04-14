@@ -64,6 +64,7 @@ public class ProcessedImage{
 	{
 		int childrenWidth = Mathf.CeilToInt ((float)width / i_divisionFactor);
 		int childrenHeight = Mathf.CeilToInt ((float)height / i_divisionFactor);
+		List<ProcessedImage> tempChildren = new List<ProcessedImage> ();
 		Texture2D tempText = new Texture2D (width, height);
 		tempText.SetPixels (pixels);
 		tempText.Apply ();
@@ -83,9 +84,10 @@ public class ProcessedImage{
 				}
 				ProcessedImage auxImg = new ProcessedImage(auxPixels,childrenWidth,childrenHeight);
 				children.Add (new Vector2 (x, y), auxImg.id);
-				PersistenceManager.IndexImage (auxImg);
+				tempChildren.Add(auxImg);
 			}
 		}
+		PersistenceManager.LevelDataSave (this,tempChildren);
 	}
 
 	public int GetId()
@@ -112,10 +114,16 @@ public class ProcessedImage{
 		for (int i=0; i<pixels.Length; i++)
 			auxPixels[i]=new float[4]{pixels[i].r,pixels[i].g,pixels[i].b,pixels[i].a};
 		Dictionary<int[],int> auxChildren = new Dictionary<int[], int>();
-		foreach (Vector2 index in children.Keys)
-			auxChildren.Add (new int[2]{Mathf.FloorToInt(index.x),Mathf.FloorToInt(index.y)},children[index]);
+		if (children!=null && children.Count>0)
+			foreach (Vector2 index in children.Keys)
+				auxChildren.Add (new int[2]{Mathf.FloorToInt(index.x),Mathf.FloorToInt(index.y)},children[index]);
 		PersistentProcessedImage img = new PersistentProcessedImage (id, path, auxPixels, width, height, auxChildren);
 		return img;
+	}
+
+	public int GetChildId(int x, int y)
+	{
+		return children [new Vector2 ((float)x, (float)y)];
 	}
 
 	public Texture2D ToTexture2D()

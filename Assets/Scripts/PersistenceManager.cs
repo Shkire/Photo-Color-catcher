@@ -67,6 +67,7 @@ public static class PersistenceManager
 		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
 		{
 			file = File.Open (Application.persistentDataPath + "/savedData.phgm",FileMode.Create);
+			bf.Serialize(file,loadedData.ToPersistent());
 		}
 		else
 			file = File.Create (Application.persistentDataPath + "/savedData.phgm");
@@ -108,6 +109,14 @@ public static class PersistenceManager
 			currentData.NextLastId ();
 		}
 		return id;
+	}
+
+	public static ProcessedImage GetImage(int id)
+	{
+		ProcessedImage img=null;
+		if (currentData != null)
+			img=currentData.GetImage (id);
+		return img;
 	}
 
 	/*
