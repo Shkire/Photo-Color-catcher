@@ -103,6 +103,11 @@ public class ProcessedImage{
 		return ids;
 	}
 
+	public int GetChildrenCount()
+	{
+		return GetChildrenId ().Count;
+	}
+
 	public void SetCompleted(bool i_completed)
 	{
 		completed = i_completed;

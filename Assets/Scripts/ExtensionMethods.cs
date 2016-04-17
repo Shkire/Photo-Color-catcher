@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// Extension methods.
@@ -59,5 +60,22 @@ public static class ExtensionMethods
 		result.SetPixels(rpixels); 
 		result.Apply(); 
 		return result;
+	}
+
+	public static GameObject GetChild(this GameObject go)
+	{
+		foreach (Transform aux in go.GetComponentsInChildren<Transform>())
+			if (aux.gameObject.GetInstanceID () != go.GetInstanceID ())
+				return aux.gameObject;
+		return null;
+	}
+
+	public static GameObject[] GetChildren(this GameObject go)
+	{
+		List<GameObject> auxList = new List<GameObject> ();
+		foreach (Transform aux in go.GetComponentsInChildren<Transform>())
+			if (aux.gameObject.GetInstanceID () != go.GetInstanceID ())
+				auxList.Add (aux.gameObject);
+		return auxList.ToArray();
 	}
 }
