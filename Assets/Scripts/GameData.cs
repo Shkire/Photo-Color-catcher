@@ -6,6 +6,7 @@ public class GameData{
 
 	private List<int> parentImgs;
 	private Dictionary<int,ProcessedImage> imgDict;
+	private Dictionary<int,ProcessedImageData> imgDataDict;
 	private int lastId;
 	private List<int> otherAvailId;
 
@@ -19,6 +20,7 @@ public class GameData{
 	{
 		parentImgs = new List<int> ();
 		imgDict = new Dictionary<int, ProcessedImage> ();
+		imgDataDict = new Dictionary<int, ProcessedImageData> ();
 		lastId = 0;
 		otherAvailId = new List<int> ();
 	}
@@ -61,6 +63,16 @@ public class GameData{
 	{
 		foreach (ProcessedImage img in i_images)
 			imgDict.Add (img.GetId(),img);
+	}
+
+	public void AddDataInfo(Dictionary<int,ProcessedImageData> i_imgDataDict)
+	{
+		foreach (int id in i_imgDataDict.Keys)
+		{
+			if (imgDataDict.ContainsKey (id))
+				imgDict.Remove (id);
+			imgDataDict.Add (id, i_imgDataDict [id]);
+		}
 	}
 
 	public void SetCompleted(int i_index, bool i_completed)

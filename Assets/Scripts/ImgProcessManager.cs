@@ -22,6 +22,10 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		PersistenceManager.MainLoad ();
 		ProcessedImage img = new ProcessedImage (i_path);
 		img.Divide (divisionFactor);
+		Dictionary<int,ProcessedImageData> tempDataDict = new Dictionary<int,ProcessedImageData> ();
+		foreach (int id in img.GetChildrenId())
+			tempDataDict.Add(id,PersistenceManager.GetImage (id).GetImageData ());
+		PersistenceManager.LevelDataSave (tempDataDict);
 	}
 	void Start () {
 		ProccesAndIndexImage (imgPath);

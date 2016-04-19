@@ -62,6 +62,8 @@ public class ProcessedImage{
 
 	public void Divide(int i_divisionFactor)
 	{
+		if (children != null && children.Count > 0)
+			return;
 		int childrenWidth = Mathf.CeilToInt ((float)width / i_divisionFactor);
 		int childrenHeight = Mathf.CeilToInt ((float)height / i_divisionFactor);
 		List<ProcessedImage> tempChildren = new List<ProcessedImage> ();
@@ -87,7 +89,29 @@ public class ProcessedImage{
 				tempChildren.Add(auxImg);
 			}
 		}
-		PersistenceManager.LevelDataSave (this,tempChildren);
+		PersistenceManager.ProcessedLevelSave (this,tempChildren);
+	}
+
+	public ProcessedImageData GetImageData()
+	{
+		float redData=0;
+		float greenData=0;
+		float blueData=0;
+		foreach (UnityEngine.Color pixel in pixels) 
+		{
+			redData += pixel.r;
+			greenData += pixel.g;
+			blueData += pixel.b;
+		}
+		float redSaturation = redData / pixels.Length;
+		float greenSaturation = greenData / pixels.Length;
+		float blueSaturation = blueData / pixels.Length;
+		float totalData = redSaturation + greenSaturation + blueSaturation;
+		redData = redSaturation / totalData;
+		greenData = greenSaturation / totalData;
+		blueData = blueSaturation / totalData;
+		float blackLevel = totalData / 3;
+		return new ProcessedImageData (redData,greenData,blueData,redSaturation,greenSaturation,blueSaturation,blackLevel);
 	}
 
 	public int GetId()

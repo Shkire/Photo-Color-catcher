@@ -51,7 +51,7 @@ public static class PersistenceManager
 		}
 	}
 
-	public static void LevelDataSave(ProcessedImage i_img, List<ProcessedImage> i_children)
+	public static void ProcessedLevelSave(ProcessedImage i_img, List<ProcessedImage> i_children)
 	{
 		GameData loadedData = new GameData ();
 		FileStream file; 
@@ -64,6 +64,29 @@ public static class PersistenceManager
 		}
 		loadedData.AddParent (i_img);
 		loadedData.AddImages (i_children);
+		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
+		{
+			file = File.Open (Application.persistentDataPath + "/savedData.phgm",FileMode.Create);
+			bf.Serialize(file,loadedData.ToPersistent());
+		}
+		else
+			file = File.Create (Application.persistentDataPath + "/savedData.phgm");
+		bf.Serialize(file,loadedData.ToPersistent());
+		file.Close();
+	}
+
+	public static void LevelDataSave(Dictionary<int,ProcessedImageData> i_imgDict)
+	{
+		GameData loadedData = new GameData ();
+		FileStream file; 
+		BinaryFormatter bf = new BinaryFormatter();
+		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
+		{
+			file = File.Open(Application.persistentDataPath + "/savedData.phgm",FileMode.Open);
+			loadedData = ((PersistentGameData)(bf.Deserialize (file))).ToNonPersistent ();
+			file.Close();
+		}
+		loadedData.AddDataInfo (i_imgDict);
 		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
 		{
 			file = File.Open (Application.persistentDataPath + "/savedData.phgm",FileMode.Create);

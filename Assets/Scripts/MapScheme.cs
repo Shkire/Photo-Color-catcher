@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class MapSchedule {
+public class MapScheme{
 
     public enum CellContent
     {
@@ -21,7 +21,7 @@ public class MapSchedule {
 
     private int size;
 
-    private List<CellContent>[,] schedule;
+    private List<CellContent>[,] scheme;
 
     public int mapSize
     {
@@ -38,7 +38,7 @@ public class MapSchedule {
     public void Config()
     {
 
-        schedule = new List<CellContent>[size, size];
+		scheme = new List<CellContent>[size, size];
 
     }
 
