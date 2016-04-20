@@ -137,6 +137,11 @@ public class ProcessedImage{
 		completed = i_completed;
 	}
 
+	public bool IsCompleted()
+	{
+		return completed;
+	}
+
 	public PersistentProcessedImage ToPersistent()
 	{
 		float[][] auxPixels = new float[pixels.Length][];
@@ -159,6 +164,17 @@ public class ProcessedImage{
 	{
 		Texture2D text = new Texture2D (width, height);
 		text.SetPixels (pixels);
+		text.Apply();
+		return text;
+	}
+
+	public Texture2D ToGrayscaleTexture2D()
+	{
+		Texture2D text = new Texture2D (width, height);
+		UnityEngine.Color[] tempPixels = new UnityEngine.Color[pixels.Length];
+		for (int i = 0; i < pixels.Length; i++)
+			tempPixels [i] = new UnityEngine.Color (pixels [i].grayscale, pixels [i].grayscale, pixels [i].grayscale);
+		text.SetPixels (tempPixels);
 		text.Apply();
 		return text;
 	}
