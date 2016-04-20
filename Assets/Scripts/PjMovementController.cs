@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Leap;
+using System.IO.Ports;
+using System;
+
 
 /// <summary>
 /// Controls the Pj movement.
@@ -31,6 +34,18 @@ public class PjMovementController : CharacterMovementController
 	[SerializeField]
 	int bottom;
 
+
+	SerialPort stream = new SerialPort("COM5", 9600); //Set the port (com4) and the baud rate (9600, is standard on most devices)
+	string lineRead;
+	int x;
+	int y;
+
+	void Start () {
+		stream.Open(); //Open the Serial Stream.
+		stream.ReadTimeout = 1;
+
+	}
+
 	void OnEnable()
 	{
 		LeapMotionController.CreateController (left,right,bottom,top);
@@ -38,6 +53,10 @@ public class PjMovementController : CharacterMovementController
 		
 	void FixedUpdate ()
 	{
+
+
+
+
 		LeapMotionController.UpdateFrames ();
 		LeapMotionController.UpdateY ();
 
@@ -58,5 +77,44 @@ public class PjMovementController : CharacterMovementController
 		float canJump = Input.GetAxis ("Vertical");
 		if (canJump > 0)
 			Jump ();
+
+
+		if (stream.IsOpen) {
+
+			try{
+
+
+				lineRead = stream.ReadLine();
+				dataCast(lineRead);
+
+				if(y < 514)
+					Move(1);
+				if(y > 514)
+					Move(-1);
+
+			}catch (System.Exception){
+
+			}
+
+		}
+
 	}
+
+
+	void dataCast (string data){
+	
+
+
+		string[] dataArray = data.Split ('|');
+
+		x = Convert.ToInt32(dataArray[0]);
+		y = Convert.ToInt32(dataArray[1]);
+
+				
+		
+	}
+
+
+
+
 }

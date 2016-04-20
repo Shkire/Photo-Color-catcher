@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.UI;
 
 /// <summary>
 /// Controls a character's (Pj or Enemy) health.
@@ -20,6 +21,17 @@ public class CharacterHealthController : MonoBehaviour
 	/// </summary>
 	[SerializeField]
 	private float responseTime;
+
+
+	[SerializeField]
+	private Image gameOver;
+	[SerializeField]
+	private Image hP1;
+	[SerializeField]
+	private Image hP2;
+	[SerializeField]
+	private Image hP3;
+
 
 	/// <summary>
 	/// TEMPORARY.
@@ -65,9 +77,27 @@ public class CharacterHealthController : MonoBehaviour
 				this.gameObject.GetComponent<SpriteRenderer> ().enabled = true;
 			}
 		}
-			
-		if (health <= 0.0) {
-			Destroy (gameObject);
+
+
+
+		if (health < 2 && health >= 1) {
+			if(hP3 != null)
+				hP3.gameObject.SetActive(false);
+
+		}else
+
+		if (health < 1 && health >= 0) {
+				if(hP2 != null)
+					hP2.gameObject.SetActive(false);
+		}else if (health <= 0.0) {
+				Destroy (gameObject);
+
+				if (gameOver != null) {
+					hP1.gameObject.SetActive(false);
+					gameOver.gameObject.SetActive (true);
+					Time.timeScale = 0;
+				}
+
 		}
 	}
 
