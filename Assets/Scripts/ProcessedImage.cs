@@ -97,11 +97,13 @@ public class ProcessedImage{
 		float redData=0;
 		float greenData=0;
 		float blueData=0;
+		float grayData = 0;
 		foreach (UnityEngine.Color pixel in pixels) 
 		{
 			redData += pixel.r;
 			greenData += pixel.g;
 			blueData += pixel.b;
+			grayData += pixel.grayscale;
 		}
 		float redSaturation = redData / pixels.Length;
 		float greenSaturation = greenData / pixels.Length;
@@ -110,8 +112,7 @@ public class ProcessedImage{
 		redData = redSaturation / totalData;
 		greenData = greenSaturation / totalData;
 		blueData = blueSaturation / totalData;
-		float blackLevel = totalData / 3;
-		return new ProcessedImageData (redData,greenData,blueData,redSaturation,greenSaturation,blueSaturation,blackLevel);
+		return new ProcessedImageData (redData,greenData,blueData,redSaturation,greenSaturation,blueSaturation,grayData);
 	}
 
 	public int GetId()

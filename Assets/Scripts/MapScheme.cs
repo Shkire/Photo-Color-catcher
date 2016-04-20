@@ -35,11 +35,16 @@ public class MapScheme{
         }
     }
 
+	public MapScheme(ProcessedImageData.LevelType i_levelType, int i_dificulty)
+	{
+		
+	}
+
     public void Config()
     {
 
 		scheme = new List<CellContent>[size, size];
 
     }
-
+		
 }
