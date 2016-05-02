@@ -10,6 +10,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 	public SpriteRenderer sprite;
 	private int count;
 	public Texture2D texturita;
+	public LevelConfigList levelConfigList;
 
 	protected ImgProcessManager () 
 	{

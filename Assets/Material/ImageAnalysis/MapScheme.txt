@@ -32,29 +32,30 @@ Nivel 1
 X X X X X X X X X X X X X X X X T X X X X X X X
 X                                             X
 X                                             X
+X X X X X X X X X X X E X X X X X X X X X X X X
 X                                             X
+X X X X X X X X X X X X E X X X X X X X X X X X
 X                                             X
+X X X X X X X X X X X E X X X X X X X X X X X X
 X                                             X
+X X X X X X X X X X X X E X X X X X X X X X X X
 X                                             X
+X X X X X X X X X X X E X X X X X X X X X X X X
 X                                             X
+X X X X X X X X X X X X E X X X X X X X X X X X
 X                                             X
+X X X X X X X X X X X E X X X X X X X X X X X X
 X                                             X
+X X X X X X X X X X X X E X X X X X X X X X X X
 X                                             X
+X X X X X X X X X X X E X X X X X X X X X X X X
 X                                             X
-X                                             X
-X                                             X
-X                                             X
-X                                             X
-X                                             X
-X                                             X
-X                                             X
-X                                             X
-X                                             X
-X                                             X
+X X X X X X X X X X X X E X X X X X X X X X X X
 T                                             T
 X X X X X X X X X X X X X X X X T X X X X X X X
 
 Numero de casillas teleport: 0-2 (1xZona maximo)
+Numero de piezas de plataforma: 210 (11xPlatMax,40 PlatMax)
 
 Nivel 2
 
