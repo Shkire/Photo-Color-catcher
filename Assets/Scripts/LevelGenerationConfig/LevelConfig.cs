@@ -8,8 +8,8 @@ public class LevelConfig {
 	public int teleportMin;
 	public int teleportMax;
 	public int maxTeleportNumBySide;
-	public int platformPiecesMin;
-	public int platformPiecesMax;
+	public int minPiecesByPlatform;
 	public int maxPiecesByPlatform;
+	public int minPlatforms;
 	public int maxPlatforms;
 }

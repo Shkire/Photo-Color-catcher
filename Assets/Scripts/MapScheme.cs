@@ -101,6 +101,12 @@ public class MapScheme{
 			if (!scheme [size - 1, 0].Contains (CellContent.Platform) && !scheme [size - 1, 0].Contains (CellContent.Teleport))
 				scheme [size - 1, 0].Add (CellContent.Platform);
 		}
+
+		int platformNumber = rnd.Next (i_levelConfig.minPlatforms, i_levelConfig.maxPlatforms + 1);
+		for (int i = 2; i < size-1; i++) 
+		{
+			
+		}
 	}
 
     public void Config()
