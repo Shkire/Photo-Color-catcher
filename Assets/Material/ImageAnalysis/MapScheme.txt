@@ -1,0 +1,319 @@
+Nivel 0
+
+X X X X X X X X X X X X X X X X X X X X X X X X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X X X X X X X X X X X X X X X X X X X X X X X X
+
+Numero de casillas teleport: 0
+
+Nivel 1
+
+X X X X X X X X X X X X X X X X T X X X X X X X
+X                                             X
+X                                             X
+X X X X X X X X X X X E X X X X X X X X X X X X
+X                                             X
+X X X X X X X X X X X X E X X X X X X X X X X X
+X                                             X
+X X X X X X X X X X X E X X X X X X X X X X X X
+X                                             X
+X X X X X X X X X X X X E X X X X X X X X X X X
+X                                             X
+X X X X X X X X X X X E X X X X X X X X X X X X
+X                                             X
+X X X X X X X X X X X X E X X X X X X X X X X X
+X                                             X
+X X X X X X X X X X X E X X X X X X X X X X X X
+X                                             X
+X X X X X X X X X X X X E X X X X X X X X X X X
+X                                             X
+X X X X X X X X X X X E X X X X X X X X X X X X
+X                                             X
+X X X X X X X X X X X X E X X X X X X X X X X X
+T                                             T
+X X X X X X X X X X X X X X X X T X X X X X X X
+
+Numero de casillas teleport: 0-2 (1xZona maximo)
+Numero de piezas de plataforma: 210 (11xPlatMax,40 PlatMax)
+
+Nivel 2
+
+X X X X X X T X X X X X X X X X T X X X X X X X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X X X X X X T X X X X X X X X X T X X X X X X X
+
+Numero de casillas teleport: 1-4 (3xZona maximo)
+
+Nivel 3
+
+X X X X X X T X X X X X X X X X T X X X X X X X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X X X X X X T X X X X X X X X X T X X X X X X X
+
+Numero de casillas teleport: 2-4 (2xZona maximo)
+
+Nivel 4
+
+X X T X X X T X X X X X X X X X T X X X X X X X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X X T X X X T X X X X X X X X X T X X X X X X X
+
+Numero de casillas teleport: 3-6 (3xZona maximo)
+
+Nivel 5
+
+X X T X X X T X X X X X X X X X T X X X X X X X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X X T X X X T X X X X X X X X X T X X X X X X X
+
+Numero de casillas teleport: 4-6 (3xZona maximo)
+
+Nivel 6
+
+X X T X X X T X X X X X T X X X T X X X X X X X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X X T X X X T X X X X X T X X X T X X X X X X X
+
+Numero de casillas teleport: 5-8 (4xZona maximo)
+
+Nivel 7
+
+X X T X X X T X X X X X T X X X T X X X X X X X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X X T X X X T X X X X X T X X X T X X X X X X X
+
+Numero de casillas teleport: 6-8 (4xZona maximo)
+
+Nivel 8
+
+X X T X X X T X X X X X T X X X T T X X X X X X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+T                                             T
+X X T X X X T X X X X X T X X X T T X X X X X X
+
+Numero de casillas teleport: 7-10 (5xZona maximo)
+
+Nivel 9
+
+X X T X X X T X X X X X T X X X T T X X X X X X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+T                                             T
+X X T X X X T X X X X X T X X X T T X X X X X X
+
+Numero de casillas teleport: 8-10 (5xZona maximo)
+
+Nivel 10
+
+X X T X X X T X X X X X T X X X T T X X X T X X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+X                                             X
+X                                             X
+X                                             X
+X                                             X
+T                                             T
+T                                             T
+X X T X X X T X X X X X T X X X T T X X X T X X
+
+Numero de casillas teleport: 8-12 (6xZona maximo)

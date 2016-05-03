@@ -63,7 +63,7 @@ public class ProcessedImageData{
 
 	public void CreateSchemes()
 	{
-		MapScheme tempScheme = new MapScheme (levelType, dificulty);
-		levelSchemes.Add (tempScheme);
+		//MapScheme tempScheme = new MapScheme (levelType, dificulty);
+		//levelSchemes.Add (tempScheme);
 	}
 }
