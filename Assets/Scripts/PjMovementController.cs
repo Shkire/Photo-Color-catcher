@@ -10,6 +10,13 @@ using System;
 /// </summary>
 public class PjMovementController : CharacterMovementController
 {
+
+	/// <summary>
+	/// .
+	/// </summary>
+	[SerializeField]
+	Animator animation;
+
 	/// <summary>
 	/// The LeapMotion left plane value.
 	/// </summary>
@@ -55,34 +62,38 @@ public class PjMovementController : CharacterMovementController
 	{
 
 
-
+		bool andando = false;
 
 		LeapMotionController.UpdateFrames ();
 		LeapMotionController.UpdateY ();
 
 		if (LeapMotionController.MoreThanOneHand())
 		{
-			if (LeapMotionController.Right())
+			if (LeapMotionController.Right ()) {
 				Move (1);
-
-			if (LeapMotionController.Left())
+				andando = true;
+			}
+			if (LeapMotionController.Left ()) {
 				Move (-1);
-
+				andando = true;
+			}
 			if (LeapMotionController.Bottom() && LeapMotionController.Top() && LeapMotionController.Range_y() )
 				Jump ();		
 		}
 	
 		float movement = Input.GetAxis ("Horizontal");
 		Move (movement);
+		if (movement != 0) {
+			andando = true;
+		}
 		float canJump = Input.GetAxis ("Vertical");
 		if (canJump > 0)
 			Jump ();
 
-
+		//joystick
 		if (stream.IsOpen) {
 
 			try{
-
 
 				lineRead = stream.ReadLine();
 				dataCast(lineRead);
@@ -95,26 +106,35 @@ public class PjMovementController : CharacterMovementController
 			}catch (System.Exception){
 
 			}
-
 		}
+
+		animation.SetBool ("Andando", andando);
 
 	}
 
 
 	void dataCast (string data){
-	
-
 
 		string[] dataArray = data.Split ('|');
 
 		x = Convert.ToInt32(dataArray[0]);
 		y = Convert.ToInt32(dataArray[1]);
-
-				
-		
+			
 	}
 
 
+	public void TriggerDamage (){
 
+		animation.SetTrigger ("Golpeado");
+		StartCoroutine ("Invulnerable");
+	}
+
+
+	IEnumerator Invulnerable()
+	{
+		this.gameObject.layer = LayerMask.NameToLayer ("Invulnerable");
+		yield return new WaitForSeconds (2f);
+		this.gameObject.layer = LayerMask.NameToLayer ("Player");
+	}
 
 }
