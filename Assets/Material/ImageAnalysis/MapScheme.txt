@@ -1,3 +1,75 @@
+Patrones plataformas:
+
+Línea:
+
+
+- - - - - - - - - - - - - - - - - - - - -
++ + + + + + + + - + + + + + + - + + + + +  
+- - - - - - - - - - - - - - - - - - - - -
+
+Tamaño: 3(2 sin contar inferior)
+
+
+Escalera:
+
+- - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - + + + + + + + + +
+- - - - - - - - - - - - - - - - - - - - -
+- - - - - + + + + + + + - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - -
++ + + + + - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - -
+
+Tamaño: 2xPlataformas+1(2xPlataformas sin contar inferior)
+
+
+ZigZag:
+
+- - - - - - - - - - - - - - - - - - - - -
++ + + + + + + - - - - - - + + + + + + + + 
+- - - - - - - - - - - - - - - - - - - - -
+- - - - - + + + + + + + - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - 
+
+Tamaño: 2xLineas+1(2xLineas sin contar inferior)
+
+
+Mimica:
+
+Copia con o sin espejo (vertical y horizontal) de n lineas del nivel
+
+Tamaño: n
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Nivel 0
 
 X X X X X X X X X X X X X X X X X X X X X X X X

@@ -5,16 +5,16 @@ using Random = UnityEngine.Random;
 using PlatformPattern = PlatformPatternConfig.PlatformPattern;
 using CellContent = MapScheme.CellContent;
 
-public class DACMapProblem: MonoBehaviour{
+public class DACMapSchemeProblem: MonoBehaviour{
 
 	private Vector2 freeRowsInterval;
 	private List<PlatformPatternConfig> availablePatterns;
-	private int minSize;
-	private int maxSize;
+	public int minSize;
+	public int maxSize;
 	private int mapSize;
 	private List<CellContent>[,] scheme;
 
-	public DACMapProblem(Vector2 i_freeRowsInterval, List<PlatformPatternConfig> i_availablePatterns, int i_mapSize, List<CellContent>[,] i_scheme)
+	public void Config(Vector2 i_freeRowsInterval, List<PlatformPatternConfig> i_availablePatterns, int i_mapSize, List<CellContent>[,] i_scheme)
 	{
 		freeRowsInterval = i_freeRowsInterval;
 		availablePatterns = i_availablePatterns;
@@ -24,7 +24,7 @@ public class DACMapProblem: MonoBehaviour{
 		scheme = i_scheme;
 	}
 
-	IEnumerator DivideAndConquer()
+	public IEnumerator DivideAndConquer()
 	{
 		foreach (PlatformPatternConfig patternConfig in availablePatterns) 
 		{
@@ -32,7 +32,11 @@ public class DACMapProblem: MonoBehaviour{
 			maxSize = (patternConfig.maxLines > maxSize) ? patternConfig.maxLines : maxSize;
 		}
 
-		if ((freeRowsInterval.y - freeRowsInterval.x+1 <= maxSize && Random.Range(0f,1f)>=0.5f) || (freeRowsInterval.y - freeRowsInterval.x+1 == minSize)) 
+		int intervalSize = (int)freeRowsInterval.y - (int)freeRowsInterval.x + 1;
+
+		float coin = Random.Range (0f, 1f);
+
+		if (((intervalSize <= maxSize) && (coin>=0.5f)) || (intervalSize == minSize) || (intervalSize<2*minSize)) 
 		{
 			yield return StartCoroutine(ResolveProblem ());
 		}
@@ -46,14 +50,15 @@ public class DACMapProblem: MonoBehaviour{
 	{
 		Vector2 firstSubInterval = Vector2.zero;
 		Vector2 secondSubInterval = Vector2.zero;
-		float division;
+		int division;
 		do 
 		{
-			division = Random.Range (0f, 1f);
-			firstSubInterval = new Vector2 (freeRowsInterval.x, Mathf.RoundToInt (Mathf.Lerp (freeRowsInterval.x, freeRowsInterval.y, division)));
-			secondSubInterval = new Vector2 (firstSubInterval.y + 1, freeRowsInterval.y);
+			division = Random.Range ((int)freeRowsInterval.x, (int)freeRowsInterval.y);
+			firstSubInterval = new Vector2 (freeRowsInterval.x, (float)division);
+			secondSubInterval = new Vector2 ((float)division + 1, freeRowsInterval.y);
+			yield return null;
 		}
-		while ((firstSubInterval.y - firstSubInterval.x + 1) >= minSize && (secondSubInterval.y - secondSubInterval.x + 1) >= minSize);
+		while ((firstSubInterval.y - firstSubInterval.x + 1) < minSize || (secondSubInterval.y - secondSubInterval.x + 1) < minSize);
 		List<PlatformPatternConfig> firstAvailablePatterns = new List<PlatformPatternConfig>();
 		List<PlatformPatternConfig> secondAvailablePatterns = new List<PlatformPatternConfig>();
 		foreach (PlatformPatternConfig patternConfig in availablePatterns) 
@@ -63,11 +68,16 @@ public class DACMapProblem: MonoBehaviour{
 			if (patternConfig.minLines <= (secondSubInterval.y - secondSubInterval.x + 1))
 				secondAvailablePatterns.Add (patternConfig);
 		}
-		DACMapProblem subProblem1 = new DACMapProblem (firstSubInterval, firstAvailablePatterns, mapSize, scheme);
-		DACMapProblem subProblem2 = new DACMapProblem (secondSubInterval, secondAvailablePatterns, mapSize, scheme);
+		GameObject go1 = new GameObject ();
+		GameObject go2 = new GameObject ();
+		DACMapSchemeProblem subProblem1 = go1.AddComponent<DACMapSchemeProblem> ();
+		DACMapSchemeProblem subProblem2 = go2.AddComponent<DACMapSchemeProblem> ();
+		yield return null;
+		subProblem1.Config (firstSubInterval, firstAvailablePatterns, mapSize, scheme);
+		subProblem2.Config (secondSubInterval, secondAvailablePatterns, mapSize, scheme);
 		YieldInstruction wait1 = StartCoroutine (subProblem1.DivideAndConquer ());
-		YieldInstruction wait2 = StartCoroutine (subProblem2.DivideAndConquer ());
 		yield return wait1;
+		YieldInstruction wait2 = StartCoroutine (subProblem2.DivideAndConquer ());
 		yield return wait2;
 	}
 
@@ -83,6 +93,8 @@ public class DACMapProblem: MonoBehaviour{
 				i--;
 			}
 		}
+
+		yield return null;
 
 		//Seleccionamos un patron
 		PlatformPatternConfig patternSelected = availablePatterns [Random.Range (0, availablePatterns.Count)];
@@ -133,6 +145,7 @@ public class DACMapProblem: MonoBehaviour{
 						//continua
 						canContinue = true;
 				}
+				yield return null;
 			}
 
 			//Colocamos el contador de huecos a 0
@@ -160,6 +173,8 @@ public class DACMapProblem: MonoBehaviour{
 					emptySize = mapSize - 2 - counter - emptyCounter;
 				emptyCounter += emptySize;
 				emptyList [0].Add (emptySize);
+
+				yield return null;
 			}
 
 			//Colocar las piezas
@@ -175,6 +190,7 @@ public class DACMapProblem: MonoBehaviour{
 							if (!scheme [xPos, i].Contains (CellContent.EmptySpace) && !scheme [xPos, i].Contains (CellContent.Platform))
 								scheme [xPos, i].Add (CellContent.EmptySpace);
 							xPos++;
+							yield return null;
 						}
 						if (j != emptyList [0].Count - 1)
 						{
@@ -183,6 +199,7 @@ public class DACMapProblem: MonoBehaviour{
 								if (!scheme [xPos, i].Contains (CellContent.EmptySpace) && !scheme [xPos, i].Contains (CellContent.Platform))
 									scheme [xPos, i].Add (CellContent.Platform);
 								xPos++;
+								yield return null;
 							}
 						}
 					}
@@ -193,6 +210,7 @@ public class DACMapProblem: MonoBehaviour{
 					{
 						if (!scheme [j, i].Contains (CellContent.EmptySpace) && !scheme [j, i].Contains (CellContent.Platform))
 							scheme [j, i].Add (CellContent.EmptySpace);
+						yield return null;
 					}
 				}
 			}
@@ -215,6 +233,7 @@ public class DACMapProblem: MonoBehaviour{
 				//Suma al contador la plataforma y el hueco tras ella (entre cada escalon hay minimo un hueco en x)
 				counter += platformSize + 1;
 			}
+			yield return null;
 			//Resetea el contador de huecos
 			emptyCounter = 0;
 			//Resetea el contador
@@ -240,6 +259,7 @@ public class DACMapProblem: MonoBehaviour{
 					emptySize = mapSize - 2 - counter - emptyCounter;
 				emptyCounter += emptySize;
 				emptyList [0].Add (emptySize);
+				yield return null;
 			}
 
 			//Colocar las piezas
@@ -258,6 +278,7 @@ public class DACMapProblem: MonoBehaviour{
 					{
 						if (!scheme [j, i].Contains (CellContent.EmptySpace) && !scheme [j, i].Contains (CellContent.Platform))
 							scheme [j, i].Add (CellContent.EmptySpace);
+						yield return null;
 					}
 					if (auxInt < emptyList [0].Count) 
 					{
@@ -266,6 +287,7 @@ public class DACMapProblem: MonoBehaviour{
 							if (!scheme [xPos, i].Contains (CellContent.EmptySpace) && !scheme [xPos, i].Contains (CellContent.Platform))
 								scheme [xPos, i].Add (CellContent.EmptySpace);
 							xPos++;
+							yield return null;
 						}
 					}
 					if (auxInt < platformSizeList [0].Count) 
@@ -275,6 +297,7 @@ public class DACMapProblem: MonoBehaviour{
 							if (!scheme [xPos, i].Contains (CellContent.EmptySpace) && !scheme [xPos, i].Contains (CellContent.Platform))
 								scheme [xPos, i].Add (CellContent.Platform);
 							xPos++;
+							yield return null;
 						}
 					}
 					auxInt++;
@@ -282,6 +305,7 @@ public class DACMapProblem: MonoBehaviour{
 					{
 						if (!scheme [j, i].Contains (CellContent.EmptySpace) && !scheme [j, i].Contains (CellContent.Platform))
 							scheme [j, i].Add (CellContent.EmptySpace);
+						yield return null;
 					}
 				} 
 				else
@@ -290,6 +314,7 @@ public class DACMapProblem: MonoBehaviour{
 					{
 						if (!scheme [j, i].Contains (CellContent.EmptySpace) && !scheme [j, i].Contains (CellContent.Platform))
 							scheme [j, i].Add (CellContent.EmptySpace);
+						yield return null;
 					}
 				}
 			}
@@ -323,6 +348,7 @@ public class DACMapProblem: MonoBehaviour{
 							//continua
 							canContinue = true;
 					}
+					yield return null;
 				}
 
 				//Colocamos el contador de huecos a 0
@@ -335,7 +361,7 @@ public class DACMapProblem: MonoBehaviour{
 				emptyList [i] = new List<int> ();
 
 				//Obtenemos los tamaños de los huecos
-				for (int j = 0; j <= platformSizeList [i].Count; i++) {
+				for (int j = 0; j <= platformSizeList [i].Count; j++) {
 					//Si es la primera pieza, tiene un hueco delante que puede ser 0
 					if (j == 0)
 						//El hueco va de 0 a el tamaño util del mapa - un hueco entre cada 2 plataformas y los huecos ya ocupados
@@ -349,6 +375,7 @@ public class DACMapProblem: MonoBehaviour{
 					emptyCounter += emptySize;
 					emptyList [i].Add (emptySize);
 				}
+				yield return null;
 			}
 
 			//Colocar las piezas
@@ -370,6 +397,7 @@ public class DACMapProblem: MonoBehaviour{
 							if (!scheme [xPos, i].Contains (CellContent.EmptySpace) && !scheme [xPos, i].Contains (CellContent.Platform))
 								scheme [xPos, i].Add (CellContent.EmptySpace);
 							xPos++;
+							yield return null;
 						}
 						if (j != emptyList [auxInt].Count - 1)
 						{
@@ -378,6 +406,7 @@ public class DACMapProblem: MonoBehaviour{
 								if (!scheme [xPos, i].Contains (CellContent.EmptySpace) && !scheme [xPos, i].Contains (CellContent.Platform))
 									scheme [xPos, i].Add (CellContent.Platform);
 								xPos++;
+								yield return null;
 							}
 						}
 					}
@@ -388,6 +417,7 @@ public class DACMapProblem: MonoBehaviour{
 					{
 						if (!scheme [j, i].Contains (CellContent.EmptySpace) && !scheme [j, i].Contains (CellContent.Platform))
 							scheme [j, i].Add (CellContent.EmptySpace);
+						yield return null;
 					}
 				}
 			}
