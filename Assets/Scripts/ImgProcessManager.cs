@@ -29,7 +29,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		PersistenceManager.LevelDataSave (tempDataDict);
 	}
 	void Start () {
-		ProccesAndIndexImage (imgPath);
+		//ProccesAndIndexImage (imgPath);
 		//PersistenceManager.LoadImageList ();
 		//images = new List<ProcessedImage> ();
 		//LoadImage (imgPath);
@@ -98,4 +98,8 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		sprtRend.sprite = spr;
 	}
 		
+	public void ProccesAndIndexImage()
+	{
+		ProccesAndIndexImage (imgPath);
+	}
 }
