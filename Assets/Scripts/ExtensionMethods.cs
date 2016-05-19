@@ -82,8 +82,31 @@ public static class ExtensionMethods
 	public static GameObject GetChild(this GameObject go, string name)
 	{
 		foreach (Transform aux in go.GetComponentsInChildren<Transform>())
-			if (aux.gameObject.GetInstanceID () != go.GetInstanceID () && aux.gameObject.name.Equals(name))
+			if (aux.gameObject.GetInstanceID () != go.GetInstanceID () && aux.gameObject.name.Equals (name))
 				return aux.gameObject;
 		return null;
+	}
+
+	public static Vector3 GetSize(this GameObject go)
+	{
+		Renderer rend = go.GetComponent<Renderer> ();
+		if (rend != null) 
+		{
+			return rend.bounds.extents * 2;
+		}
+		Collider coll = go.GetComponent<Collider> ();
+		if (coll != null) 
+		{
+			return coll.bounds.extents * 2;
+		}
+		return Vector3.zero;
+	}
+
+	public static void SetSize(this GameObject go, Vector3 i_size)
+	{
+		if (go.GetSize () != Vector3.zero) 
+		{
+			go.transform.localScale = new Vector3 (go.transform.localScale.x * (i_size.x / go.GetSize ().x), go.transform.localScale.y * (i_size.y / go.GetSize ().y), go.transform.localScale.z * (i_size.z / go.GetSize ().z));
+		}
 	}
 }

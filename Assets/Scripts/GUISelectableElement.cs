@@ -6,7 +6,7 @@ public class GUISelectableElement : GUIObject{
 	public override void Selected()
 	{
 		base.Selected ();
-		gameObject.SendMessage ("Execute");
+		gameObject.SendMessage ("Execute",SendMessageOptions.DontRequireReceiver);
 	}
 
 }
