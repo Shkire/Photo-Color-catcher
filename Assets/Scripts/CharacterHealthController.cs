@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Controls a character's (Pj or Enemy) health.
@@ -15,6 +16,10 @@ public class CharacterHealthController : MonoBehaviour
 	/// </summary>
 	[SerializeField]
 	private float health;
+
+	[SerializeField]
+	private UnityEngine.UI.Image gameOver;
+
 
 	void FixedUpdate ()
 	{
@@ -30,17 +35,51 @@ public class CharacterHealthController : MonoBehaviour
 	{
 			health -= damage;
 			PjMovementController pj = this.gameObject.GetComponent <PjMovementController>();
-			if (pj != null)
-				pj.TriggerDamage ();
+		if (pj != null) 
+			pj.TriggerDamage (health);
 		if (health <= 0)
 			DestroyCharacter ();
 	}
 
 	void DestroyCharacter()
 	{
-		Destroy (this.gameObject);
+		
 		PjMovementController pj = this.gameObject.GetComponent <PjMovementController>();
-		if (pj != null)
-			Application.Quit ();
+		if (pj != null) {
+			StartCoroutine (WaitGameOver ());
+		} else {
+
+			Destroy (this.gameObject);
+		}
+			
+	}
+
+	IEnumerator WaitGameOver(){
+
+		GameObject visualGo = this.gameObject.GetChild ("Visual");
+		if (visualGo != null)
+			visualGo.SetActive(false);
+		GameObject frameGo = this.gameObject.GetChild ("Frame");
+		if (frameGo != null)
+			frameGo.SetActive(false);
+		PjAttackController pjAC = this.gameObject.GetComponent<PjAttackController> ();
+		if (pjAC != null)
+			pjAC.enabled = false;
+		PjMovementController pjMC = this.gameObject.GetComponent<PjMovementController> ();
+		if (pjMC != null)
+			pjMC.enabled = false;
+
+		Debug.Log ("peste");
+		gameOver.enabled = true;
+
+		Debug.Log ("etsep");
+
+		yield return new WaitForSeconds (3f);
+
+		//SceneManager.LoadScene ("MenuInicio");
+		//Application.Quit();
+
+		Destroy (this.gameObject);
+
 	}
 }

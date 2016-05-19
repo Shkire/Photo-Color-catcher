@@ -3,13 +3,21 @@ using System.Collections;
 using Leap;
 using System.IO.Ports;
 using System;
-
+using UnityEngine.UI;
 
 /// <summary>
 /// Controls the Pj movement.
 /// </summary>
 public class PjMovementController : CharacterMovementController
 {
+
+	[SerializeField]
+	private UnityEngine.UI.Image camera1;
+	[SerializeField]
+	private UnityEngine.UI.Image camera2;
+	[SerializeField]
+	private UnityEngine.UI.Image camera3;
+
 
 	/// <summary>
 	/// .
@@ -123,7 +131,17 @@ public class PjMovementController : CharacterMovementController
 	}
 
 
-	public void TriggerDamage (){
+	public void TriggerDamage (float health){
+
+		Debug.Log (health);
+
+		if (health == 2.0)
+			camera3.enabled = false;
+		if (health == 1.0)
+			camera2.enabled = false;
+		if (health == 0)
+			camera1.enabled = false;
+
 
 		animation.SetTrigger ("Golpeado");
 		StartCoroutine ("Invulnerable");

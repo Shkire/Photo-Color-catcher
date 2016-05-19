@@ -78,4 +78,12 @@ public static class ExtensionMethods
 				auxList.Add (aux.gameObject);
 		return auxList.ToArray();
 	}
+
+	public static GameObject GetChild(this GameObject go, string name)
+	{
+		foreach (Transform aux in go.GetComponentsInChildren<Transform>())
+			if (aux.gameObject.GetInstanceID () != go.GetInstanceID () && aux.gameObject.name.Equals(name))
+				return aux.gameObject;
+		return null;
+	}
 }

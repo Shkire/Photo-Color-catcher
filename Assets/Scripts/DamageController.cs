@@ -13,14 +13,14 @@ public class DamageController : MonoBehaviour
 	private float damage;
 
 	//Change with stay
-	void OnCollisionEnter2D (Collision2D coll)
+	virtual protected void OnCollisionEnter2D (Collision2D coll)
 	{
 		if (coll.gameObject.GetComponent<CharacterHealthController> ()) {
 			coll.gameObject.GetComponent<CharacterHealthController> ().DoDamage (damage);
 		}
 	}
 
-	void OnTriggerEnter2D (Collider2D coll)
+	virtual protected void OnTriggerEnter2D (Collider2D coll)
 	{
 		if (coll.gameObject.GetComponent<CharacterHealthController> ()) {
 			coll.gameObject.GetComponent<CharacterHealthController> ().DoDamage (damage);
