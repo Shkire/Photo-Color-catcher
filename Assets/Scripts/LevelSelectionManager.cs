@@ -5,8 +5,7 @@ using System.Collections.Generic;
 
 public class LevelSelectionManager : Singleton<LevelSelectionManager> {
 
-	[SerializeField]
-	private int actualImage;
+	public int actualImage;
 
 	[SerializeField]
 	private float uiResponseTime;
@@ -24,9 +23,8 @@ public class LevelSelectionManager : Singleton<LevelSelectionManager> {
 
 	void Awake()
 	{
-		PersistenceManager.MainLoad ();
-		PersistenceManager.LevelDataLoad (actualImage);
-		InitLevelSelector ();
+		//PersistenceManager.LevelDataLoad (actualImage);
+		//InitLevelSelector ();
 
 	}
 
@@ -86,6 +84,7 @@ public class LevelSelectionManager : Singleton<LevelSelectionManager> {
 	}
 
 	public void InitLevelSelector(){
+		PersistenceManager.LevelDataLoad (actualImage);
 		positions = new Dictionary<Vector2, GameObject> ();
 		ProcessedImage tempImg =PersistenceManager.GetImage (actualImage);
 		ProcessedImage auxImg;

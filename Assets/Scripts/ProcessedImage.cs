@@ -18,30 +18,33 @@ public class ProcessedImage{
 
 	private bool completed;
 
-	public ProcessedImage(string i_path)
+	public ProcessedImage(string i_path, int i_id)
 	{
-		id = PersistenceManager.GetNewId();
-		Debug.Log ("Setting path");
+		//Le asigno un id
+		id = i_id;
+		//Le asigno su path
 		path = i_path;
-		Debug.Log ("Creating text");
+		//Creo una textura auxiliar
 		Texture2D tempText = new Texture2D(1,1);
-		Debug.Log ("Reading image");
+		//Leo la imagen correspondiente
 		byte[] imgRead = System.IO.File.ReadAllBytes (Application.persistentDataPath+"/"+path);
+		//Cargo la imagen en la textura
 		tempText.LoadImage (imgRead);
-		Debug.Log ("Setting width");
+		//Le asigno su ancho
 		width = tempText.width;
-		Debug.Log ("Setting height");
+		//Le asigno su ancho
 		height = tempText.height;
-		Debug.Log ("Setting pixels");
+		//Obtengo sus pixels y los guardo
 		pixels = tempText.GetPixels();
-		Debug.Log ("Initiating children");
+		//Inicializo su diccionario de hijos
 		children = new Dictionary<Vector2, int> ();
+		//No está superada
 		completed = false;
 	}
 
-	public ProcessedImage(UnityEngine.Color[] i_pixels, int i_width, int i_height)
+	public ProcessedImage(UnityEngine.Color[] i_pixels, int i_width, int i_height, int i_id)
 	{
-		id = PersistenceManager.GetNewId();
+		id = i_id;
 		path = string.Empty;
 		width = i_width;
 		height = i_height;
@@ -60,36 +63,54 @@ public class ProcessedImage{
 		completed = i_completed;
 	}
 
-	public void Divide(int i_divisionFactor)
+	//Sacar al ProcessManager para que lo haga con un DAC a ser posible
+	public List<ProcessedImage> Divide(int i_divisionFactor, int[] i_idList)
 	{
+		//Si ya se ha divido
 		if (children != null && children.Count > 0)
-			return;
+			//Sale
+			return null;
+		//Calcula el ancho de cada hijo
 		int childrenWidth = Mathf.CeilToInt ((float)width / i_divisionFactor);
+		//Calcula el alto de cada hijo
 		int childrenHeight = Mathf.CeilToInt ((float)height / i_divisionFactor);
+		//Crea una lista auxiliar de imagenes
 		List<ProcessedImage> tempChildren = new List<ProcessedImage> ();
+		//Crea una textura auxiliar
 		Texture2D tempText = new Texture2D (width, height);
+		//Le asigno los pixeles de la imagen padre
 		tempText.SetPixels (pixels);
+		//Aplico los cambios en la textura
 		tempText.Apply ();
+		//Aplico un reescalado bilineal
 		tempText = tempText.ResizeBilinear (childrenWidth * i_divisionFactor, childrenHeight * i_divisionFactor);
+		//Saco todos los pixeles de la textura
 		UnityEngine.Color[] tempPixels = tempText.GetPixels ();
+		//Para cada hijo
 		for (int x = 0; x < i_divisionFactor; x++) 
 		{
 			for (int y = 0; y < i_divisionFactor; y++) 
 			{
+				//Creo una lista de pixeles auxiliar
 				UnityEngine.Color[] auxPixels = new UnityEngine.Color[childrenWidth * childrenHeight];
+				//Para cada pixel
 				for (int i = 0; i < childrenWidth; i++) {
 					for (int j = 0; j < childrenHeight; j++) 
 					{
+						//Obtengo su posicion y obtengo el color correspondiente
 						int origPos = x * childrenWidth + y * i_divisionFactor * childrenWidth * childrenHeight + i + j * childrenWidth * i_divisionFactor;
 						auxPixels [i + j*childrenWidth] = new UnityEngine.Color(tempPixels [origPos].r,tempPixels [origPos].g,tempPixels [origPos].b,tempPixels [origPos].a);
 					}
 				}
-				ProcessedImage auxImg = new ProcessedImage(auxPixels,childrenWidth,childrenHeight);
+				//Creo una imagen auxiliar
+				ProcessedImage auxImg = new ProcessedImage(auxPixels,childrenWidth,childrenHeight,i_idList[x*i_divisionFactor+y]);
+				//Añado el hijo al diccionario de hijos del padre
 				children.Add (new Vector2 (x, y), auxImg.id);
+				//Añado el hijo a la lista de hijos
 				tempChildren.Add(auxImg);
 			}
 		}
-		PersistenceManager.ProcessedLevelSave (this,tempChildren);
+		return tempChildren;
 	}
 
 	public ProcessedImageData GetImageData()
@@ -112,6 +133,7 @@ public class ProcessedImage{
 		redData = redSaturation / totalData;
 		greenData = greenSaturation / totalData;
 		blueData = blueSaturation / totalData;
+		grayData = grayData / (width * height);
 		return new ProcessedImageData (redData,greenData,blueData,redSaturation,greenSaturation,blueSaturation,grayData);
 	}
 

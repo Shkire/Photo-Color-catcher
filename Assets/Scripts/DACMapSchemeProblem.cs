@@ -44,6 +44,7 @@ public class DACMapSchemeProblem: MonoBehaviour{
 		{
 			yield return StartCoroutine(GenerateSubProblems ());
 		}
+		Destroy (this.gameObject);
 	}
 
 	IEnumerator GenerateSubProblems()

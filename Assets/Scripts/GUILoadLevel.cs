@@ -4,11 +4,16 @@ using UnityEngine.SceneManagement;
 
 public class GUILoadLevel : GUITool {
 
-	private int id;
+	public int id;
+
+	public bool isParent;
 
 	public override void Execute()
 	{
-		LevelLoader.Instance.LoadAndConfig(id);
+		if (isParent)
+			LevelLoader.Instance.LoadLevelSelector (id);
+		else
+			LevelLoader.Instance.LoadLevel (id);
 	}
 
 	public void SetId(int i_id)

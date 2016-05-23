@@ -18,17 +18,40 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		
 	// Use this for initialization
 
-	public void ProccesAndIndexImage(string i_path)
+	public IEnumerator ProccesAndIndexImage(string i_path)
 	{
-		PersistenceManager.MainLoad ();
-		ProcessedImage img = new ProcessedImage (i_path);
-		img.Divide (divisionFactor);
+		//Cojo una nueva id para la imagen
+		int id = PersistenceManager.GetNewId();
+		//Creo la imagen a partir de su path
+		ProcessedImage img = new ProcessedImage (i_path, id);
+		//Cojo una lista de ids para los hijos
+		int[] idList = PersistenceManager.GetNewIdList(divisionFactor*divisionFactor);
+		//La divido
+		List<ProcessedImage> tempList = img.Divide (divisionFactor,idList);
+		//Guardo las imagenes procesadas
+		PersistenceManager.ProcessedLevelSave(img,tempList);
+		//Creo el diccionario de datos de imágenes
 		Dictionary<int,ProcessedImageData> tempDataDict = new Dictionary<int,ProcessedImageData> ();
-		foreach (int id in img.GetChildrenId())
-			tempDataDict.Add(id,PersistenceManager.GetImage (id).GetImageData ());
+		List<Coroutine> wait = new List<Coroutine> ();
+		//Para cada imagen
+		foreach (ProcessedImage auxImg in tempList)
+		{
+			//Proceso sus datos
+			ProcessedImageData tempImgData = null;
+			wait.Add(StartCoroutine (ProcessImageData (auxImg, tempImgData)));
+			tempDataDict.Add(auxImg.GetId(),tempImgData);
+		}
+		foreach (Coroutine waitCor in wait) 
+		{
+			yield return waitCor;
+		}
+		//Guardo los datos de las imagenes procesadas
 		PersistenceManager.LevelDataSave (tempDataDict);
 	}
+
+
 	void Start () {
+		PersistenceManager.MainLoad ();
 		//ProccesAndIndexImage (imgPath);
 		//PersistenceManager.LoadImageList ();
 		//images = new List<ProcessedImage> ();
@@ -67,17 +90,21 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 	}
 	*/
 
+	/*
 	void LoadImage(string path)
 	{
 		images.Add (new ProcessedImage (path));
 	}
+	*/
 
+	/*
 	void DivideImage (int idx)
 	{
 		if (images [idx] != null)
 			//StartCoroutine(images [idx].Divide (divisionFactor));
 			images[idx].Divide(divisionFactor);
 	}
+	*/
 
 	void DidImageInit()
 	{
@@ -100,6 +127,19 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		
 	public void ProccesAndIndexImage()
 	{
-		ProccesAndIndexImage (imgPath);
+		StartCoroutine(ProccesAndIndexImage (imgPath));
+	}
+
+	IEnumerator ProcessImageData (ProcessedImage i_img, ProcessedImageData i_imgData)
+	{
+		//Saco todos los datos necesarios
+		i_imgData = i_img.GetImageData();
+		//Aplico el DAC
+		GameObject dacController = new GameObject("DAC Controller");
+		DACMapSchemeProblem dacProblem = dacController.AddComponent<DACMapSchemeProblem> ();
+		dacProblem.Config (new Vector2(1f,21f),new List<PlatformPatternConfig> (levelConfigList.GetPatterns(i_imgData.GetDificulty())),24,i_imgData.GetScheme());
+		//dacProblem.Config (new Vector2(1f,21f),new List<PlatformPatternConfig> (levelConfigList.GetPatterns(0)),24,i_imgData.GetScheme());
+		yield return StartCoroutine(dacProblem.DivideAndConquer ());
 	}
 }
+

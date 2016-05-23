@@ -5,6 +5,37 @@ using UnityEngine.UI;
 
 public class LevelLoader : Singleton<LevelLoader> {
 
+	public int state = -1;
+	private AsyncOperation asyncLoad;
+	private int p_id;
+
+	void Update()
+	{
+		if (!asyncLoad.isDone)
+			Debug.Log ("Progreso:"+asyncLoad.progress);
+		else if (state == 1) 
+		{
+			Debug.Log ("Asigno el numero de imagen");
+			LevelSelectionManager.Instance.actualImage = p_id;
+			Debug.Log ("Inicializo el selector");
+			LevelSelectionManager.Instance.InitLevelSelector ();
+			Debug.Log ("FIN");
+			state = -1;
+			this.enabled = false;
+
+		}
+	}
+
+	public void LoadLevelSelector(int id)
+	{
+		DontDestroyOnLoad (this.gameObject);
+		asyncLoad = SceneManager.LoadSceneAsync ("LevelSelection");
+		state = 1;
+		p_id = id;
+		this.enabled = true;
+		asyncLoad.allowSceneActivation = true;
+	}
+
 	public void LoadAndConfig(int id)
 	{
 		StartCoroutine (LoadLevel (id));

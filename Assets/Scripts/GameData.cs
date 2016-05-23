@@ -67,6 +67,8 @@ public class GameData{
 
 	public void AddDataInfo(Dictionary<int,ProcessedImageData> i_imgDataDict)
 	{
+		if (imgDataDict == null)
+			imgDataDict = new Dictionary<int, ProcessedImageData> ();
 		foreach (int id in i_imgDataDict.Keys)
 		{
 			if (imgDataDict.ContainsKey (id))

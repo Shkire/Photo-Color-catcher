@@ -13,9 +13,15 @@ public static class PersistenceManager
 	//Guardado de imagen al indexarla, se guardan los datos de color de ella y sus hijas
 	//Guardado de imagen completada, se guarda en playerprefs si está completada o no
 
+	/// <summary>
+	/// The starting main load. Loads all information needed to show the processed
+	/// images and process new images (list of parent images)
+	/// </summary>
 	public static void MainLoad()
 	{
+		//Inicializo los datos
 		currentData = new GameData ();
+		//Si hay datos guardados los cargo
 		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
 		{
 			FileStream file = File.Open(Application.persistentDataPath + "/savedData.phgm",FileMode.Open);
@@ -51,6 +57,11 @@ public static class PersistenceManager
 		}
 	}
 
+	/// <summary>
+	/// Saves the data of the level and his children
+	/// </summary>
+	/// <param name="i_img">Level image.</param>
+	/// <param name="i_children">List of children images.</param>
 	public static void ProcessedLevelSave(ProcessedImage i_img, List<ProcessedImage> i_children)
 	{
 		GameData loadedData = new GameData ();
@@ -64,6 +75,7 @@ public static class PersistenceManager
 		}
 		loadedData.AddParent (i_img);
 		loadedData.AddImages (i_children);
+		loadedData.SetAvailableIds (currentData.GetLastId(),currentData.GetOtherAvail());
 		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
 		{
 			file = File.Open (Application.persistentDataPath + "/savedData.phgm",FileMode.Create);
@@ -75,6 +87,10 @@ public static class PersistenceManager
 		file.Close();
 	}
 
+	/// <summary>
+	/// Saves the data info of the group of levels on given dictionary
+	/// </summary>
+	/// <param name="i_imgDict">Dictionary with level ids and image data.</param>
 	public static void LevelDataSave(Dictionary<int,ProcessedImageData> i_imgDict)
 	{
 		GameData loadedData = new GameData ();
@@ -132,6 +148,16 @@ public static class PersistenceManager
 			currentData.NextLastId ();
 		}
 		return id;
+	}
+
+	public static int[] GetNewIdList(int i_idNumber)
+	{
+		int[] idList = new int[i_idNumber];
+		for (int i = 0; i < i_idNumber; i++) 
+		{
+			idList [i] = GetNewId ();
+		}
+		return idList;
 	}
 
 	public static ProcessedImage GetImage(int id)

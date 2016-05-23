@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using CellContent = MapScheme.CellContent;
 
 [System.Serializable]
 public class ProcessedImageData{
@@ -58,12 +59,22 @@ public class ProcessedImageData{
 		else
 			levelType = LevelType.BossBattle;
 		levelSchemes = new List<MapScheme> ();
-		CreateSchemes ();
+		levelSchemes.Add (new MapScheme());
 	}
 
 	public void CreateSchemes()
 	{
 		//MapScheme tempScheme = new MapScheme (levelType, dificulty);
 		//levelSchemes.Add (tempScheme);
+	}
+
+	public int GetDificulty()
+	{
+		return dificulty;
+	}
+
+	public List<CellContent>[,] GetScheme()
+	{
+		return levelSchemes [0].GetScheme ();
 	}
 }

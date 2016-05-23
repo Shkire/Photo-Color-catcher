@@ -45,6 +45,19 @@ public class MapScheme{
         }
     }
 
+	public MapScheme()
+	{
+		size = 24;
+		scheme = new List<CellContent>[size, size];
+		for (int i = 0; i < size; i++) 
+		{
+			for (int j = 0; j < size; j++) 
+			{
+				scheme [i, j] = new List<CellContent> ();
+			}	
+		}
+	}
+
 	/*
 	public MapScheme(int i_difficulty, int i_size, LevelConfig i_levelConfig)
 	{
@@ -243,4 +256,9 @@ public class MapScheme{
 		scheme = new List<CellContent>[size, size];
 
     }
+
+	public List<CellContent>[,] GetScheme()
+	{
+		return scheme;
+	}
 }
