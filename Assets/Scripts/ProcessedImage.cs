@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+[System.Serializable]
 public class ProcessedImage{
 
 	private int id;
@@ -106,6 +107,7 @@ public class ProcessedImage{
 				ProcessedImage auxImg = new ProcessedImage(auxPixels,childrenWidth,childrenHeight,i_idList[x*i_divisionFactor+y]);
 				//Añado el hijo al diccionario de hijos del padre
 				children.Add (new Vector2 (x, y), auxImg.id);
+				Debug.Log (x+","+y+"="+auxImg.id);
 				//Añado el hijo a la lista de hijos
 				tempChildren.Add(auxImg);
 			}
@@ -164,20 +166,7 @@ public class ProcessedImage{
 	{
 		return completed;
 	}
-
-	public PersistentProcessedImage ToPersistent()
-	{
-		float[][] auxPixels = new float[pixels.Length][];
-		for (int i=0; i<pixels.Length; i++)
-			auxPixels[i]=new float[4]{pixels[i].r,pixels[i].g,pixels[i].b,pixels[i].a};
-		Dictionary<int[],int> auxChildren = new Dictionary<int[], int>();
-		if (children!=null && children.Count>0)
-			foreach (Vector2 index in children.Keys)
-				auxChildren.Add (new int[2]{Mathf.FloorToInt(index.x),Mathf.FloorToInt(index.y)},children[index]);
-		PersistentProcessedImage img = new PersistentProcessedImage (id, path, auxPixels, width, height, auxChildren);
-		return img;
-	}
-
+		
 	public int GetChildId(int x, int y)
 	{
 		return children [new Vector2 ((float)x, (float)y)];

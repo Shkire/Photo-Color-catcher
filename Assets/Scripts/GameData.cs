@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+[System.Serializable]
 public class GameData{
 
 	private List<int> parentImgs;
@@ -103,13 +104,8 @@ public class GameData{
 		lastId++;
 	}
 
-	public PersistentGameData ToPersistent()
+	public bool HasImage(int i_id)
 	{
-		Dictionary<int,PersistentProcessedImage> auxImgDict = new Dictionary<int, PersistentProcessedImage> ();
-		if (imgDict!=null && imgDict.Count>0)
-			foreach (int index in imgDict.Keys)
-				auxImgDict.Add (index,imgDict[index].ToPersistent());
-		PersistentGameData auxData = new PersistentGameData (parentImgs,auxImgDict,lastId,otherAvailId);
-		return auxData;
+		return imgDict.ContainsKey (i_id);
 	}
 }

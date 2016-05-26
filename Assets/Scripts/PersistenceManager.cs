@@ -3,6 +3,8 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using Color = UnityEngine.Color;
 
 public static class PersistenceManager
 {
@@ -26,7 +28,13 @@ public static class PersistenceManager
 		{
 			FileStream file = File.Open(Application.persistentDataPath + "/savedData.phgm",FileMode.Open);
 			BinaryFormatter bf = new BinaryFormatter();
-			GameData loadedData = ((PersistentGameData)(bf.Deserialize (file))).ToNonPersistent ();
+			SurrogateSelector ss = new SurrogateSelector();
+			ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate ();
+			Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate ();
+			ss.AddSurrogate (typeof(Color), new StreamingContext (StreamingContextStates.All), colorSs);
+			ss.AddSurrogate (typeof(Vector2), new StreamingContext (StreamingContextStates.All), v2ss);
+			bf.SurrogateSelector = ss;
+			GameData loadedData = ((GameData)(bf.Deserialize (file)));
 			currentData.SetParents(loadedData.GetParents());
 			currentData.SetAvailableIds (loadedData.GetLastId(), loadedData.GetOtherAvail());
 			Dictionary<int,ProcessedImage> images = new Dictionary<int, ProcessedImage> ();
@@ -44,7 +52,13 @@ public static class PersistenceManager
 		{
 			FileStream file = File.Open(Application.persistentDataPath + "/savedData.phgm",FileMode.Open);
 			BinaryFormatter bf = new BinaryFormatter();
-			GameData loadedData = ((PersistentGameData)(bf.Deserialize (file))).ToNonPersistent ();
+			SurrogateSelector ss = new SurrogateSelector();
+			ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate ();
+			Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate ();
+			ss.AddSurrogate (typeof(Color), new StreamingContext (StreamingContextStates.All), colorSs);
+			ss.AddSurrogate (typeof(Vector2), new StreamingContext (StreamingContextStates.All), v2ss);
+			bf.SurrogateSelector = ss;
+			GameData loadedData = ((GameData)(bf.Deserialize (file)));
 			List<int> parent = new List<int> ();
 			parent.Add (i_index);
 			currentData.SetParents(parent);
@@ -67,10 +81,16 @@ public static class PersistenceManager
 		GameData loadedData = new GameData ();
 		FileStream file; 
 		BinaryFormatter bf = new BinaryFormatter();
+		SurrogateSelector ss = new SurrogateSelector();
+		ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate ();
+		Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate ();
+		ss.AddSurrogate (typeof(Color), new StreamingContext (StreamingContextStates.All), colorSs);
+		ss.AddSurrogate (typeof(Vector2), new StreamingContext (StreamingContextStates.All), v2ss);
+		bf.SurrogateSelector = ss;
 		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
 		{
 			file = File.Open(Application.persistentDataPath + "/savedData.phgm",FileMode.Open);
-			loadedData = ((PersistentGameData)(bf.Deserialize (file))).ToNonPersistent ();
+			loadedData = ((GameData)(bf.Deserialize (file)));
 			file.Close();
 		}
 		loadedData.AddParent (i_img);
@@ -79,11 +99,11 @@ public static class PersistenceManager
 		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
 		{
 			file = File.Open (Application.persistentDataPath + "/savedData.phgm",FileMode.Create);
-			bf.Serialize(file,loadedData.ToPersistent());
+			bf.Serialize(file,loadedData);
 		}
 		else
 			file = File.Create (Application.persistentDataPath + "/savedData.phgm");
-		bf.Serialize(file,loadedData.ToPersistent());
+		bf.Serialize(file,loadedData);
 		file.Close();
 	}
 
@@ -96,21 +116,27 @@ public static class PersistenceManager
 		GameData loadedData = new GameData ();
 		FileStream file; 
 		BinaryFormatter bf = new BinaryFormatter();
+		SurrogateSelector ss = new SurrogateSelector();
+		ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate ();
+		Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate ();
+		ss.AddSurrogate (typeof(Color), new StreamingContext (StreamingContextStates.All), colorSs);
+		ss.AddSurrogate (typeof(Vector2), new StreamingContext (StreamingContextStates.All), v2ss);
+		bf.SurrogateSelector = ss;
 		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
 		{
 			file = File.Open(Application.persistentDataPath + "/savedData.phgm",FileMode.Open);
-			loadedData = ((PersistentGameData)(bf.Deserialize (file))).ToNonPersistent ();
+			loadedData = ((GameData)(bf.Deserialize (file)));
 			file.Close();
 		}
 		loadedData.AddDataInfo (i_imgDict);
 		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
 		{
 			file = File.Open (Application.persistentDataPath + "/savedData.phgm",FileMode.Create);
-			bf.Serialize(file,loadedData.ToPersistent());
+			bf.Serialize(file,loadedData);
 		}
 		else
 			file = File.Create (Application.persistentDataPath + "/savedData.phgm");
-		bf.Serialize(file,loadedData.ToPersistent());
+		bf.Serialize(file,loadedData);
 		file.Close();
 	}
 
@@ -119,10 +145,16 @@ public static class PersistenceManager
 		GameData loadedData = new GameData ();
 		FileStream file; 
 		BinaryFormatter bf = new BinaryFormatter();
+		SurrogateSelector ss = new SurrogateSelector();
+		ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate ();
+		Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate ();
+		ss.AddSurrogate (typeof(Color), new StreamingContext (StreamingContextStates.All), colorSs);
+		ss.AddSurrogate (typeof(Vector2), new StreamingContext (StreamingContextStates.All), v2ss);
+		bf.SurrogateSelector = ss;
 		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
 		{
 			file = File.Open(Application.persistentDataPath + "/savedData.phgm",FileMode.Open);
-			loadedData = ((PersistentGameData)(bf.Deserialize (file))).ToNonPersistent ();
+			loadedData = ((GameData)(bf.Deserialize (file)));
 			file.Close();
 		}
 		loadedData.SetCompleted (i_index, i_completed);
@@ -132,7 +164,7 @@ public static class PersistenceManager
 		}
 		else
 			file = File.Create (Application.persistentDataPath + "/savedData.phgm");
-		bf.Serialize(file,loadedData.ToPersistent());
+		bf.Serialize(file,loadedData);
 		file.Close();
 	}
 
@@ -163,8 +195,17 @@ public static class PersistenceManager
 	public static ProcessedImage GetImage(int id)
 	{
 		ProcessedImage img=null;
-		if (currentData != null)
-			img=currentData.GetImage (id);
+		if (currentData != null) 
+		{
+			for (int i=0; i<currentData.GetParents().Count; i++)
+			{
+				PersistenceManager.MainLoad ();
+				PersistenceManager.LevelDataLoad (currentData.GetParents () [i]);
+				if (currentData.HasImage (id))
+					break;
+			}
+		}
+		img=currentData.GetImage (id);
 		return img;
 	}
 
