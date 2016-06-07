@@ -86,27 +86,28 @@ public class LevelSelectionManager : Singleton<LevelSelectionManager> {
 	public void InitLevelSelector(){
 		PersistenceManager.LevelDataLoad (actualImage);
 		positions = new Dictionary<Vector2, GameObject> ();
-		ProcessedImage tempImg =PersistenceManager.GetImage (actualImage);
+		List<ChildImgInfo> childrenInfo = PersistenceManager.GetChildrenInfo ();
 		ProcessedImage auxImg;
 		Image img;
 		Sprite spr;
 		GameObject currentGo;
 		GameObject childOnGUI;
-		for (int i = 0; i < (int)Mathf.Sqrt (tempImg.GetChildrenCount ()); i++)
-			for (int j = 0; j < (int)Mathf.Sqrt (tempImg.GetChildrenCount ()); j++) 
+		for (int i = 0; i < (int)Mathf.Sqrt (childrenInfo.Count); i++)
+			for (int j = 0; j < (int)Mathf.Sqrt (childrenInfo.Count); j++) 
 			{
 				currentGo = new GameObject ("LevelPos"+i+"-"+j);
 				currentGo.AddComponent<RectTransform> ();
 				currentGo.transform.SetParent (parentTransform);
-				((RectTransform)currentGo.transform).anchorMin = new Vector2 (i*(1/Mathf.Sqrt (tempImg.GetChildrenCount ())),1-((j+1)/Mathf.Sqrt (tempImg.GetChildrenCount ())));
-				((RectTransform)currentGo.transform).anchorMax = new Vector2 ((i+1)*(1/Mathf.Sqrt (tempImg.GetChildrenCount ())),1-(j/Mathf.Sqrt (tempImg.GetChildrenCount ())));
+				((RectTransform)currentGo.transform).anchorMin = new Vector2 (i*(1/Mathf.Sqrt (childrenInfo.Count)),1-((j+1)/Mathf.Sqrt (childrenInfo.Count)));
+				((RectTransform)currentGo.transform).anchorMax = new Vector2 ((i+1)*(1/Mathf.Sqrt (childrenInfo.Count)),1-(j/Mathf.Sqrt (childrenInfo.Count)));
 				((RectTransform)currentGo.transform).localScale = Vector3.one;
 				((RectTransform)currentGo.transform).offsetMax = -Vector2.one;
 				((RectTransform)currentGo.transform).offsetMin = Vector2.one;
 				currentGo.AddComponent<Image> ();
 				currentGo.AddComponent<GUISelectableElement> ();
 				currentGo.AddComponent<GUILoadLevel> ();
-				auxImg=PersistenceManager.GetImage(tempImg.GetChildId (i,((int)Mathf.Sqrt (tempImg.GetChildrenCount ())-(j+1))));
+				auxImg = PersistenceManager.GetImage(i,((int)Mathf.Sqrt (childrenInfo.Count)-(j+1)));
+				//Debug.Log (i+","+((int)Mathf.Sqrt (tempImg.GetChildrenCount ())-(j+1)));
 				currentGo.GetComponent<GUILoadLevel> ().SetId(auxImg.GetId());
 				spr = new Sprite ();
 				if (auxImg.IsCompleted())

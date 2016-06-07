@@ -190,4 +190,14 @@ public class ProcessedImage{
 		text.Apply();
 		return text;
 	}
+
+	public List<Vector2> GetChildrenPos()
+	{
+		return new List<Vector2> (children.Keys);
+	}
+
+	public Color[] GetPixels()
+	{
+		return pixels;
+	}
 }

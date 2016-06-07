@@ -29,7 +29,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		//La divido
 		List<ProcessedImage> tempList = img.Divide (divisionFactor,idList);
 		//Guardo las imagenes procesadas
-		PersistenceManager.ProcessedLevelSave(img,tempList);
+		PersistenceManager.PushImgAndChildren(img,tempList);
 		//Creo el diccionario de datos de imágenes
 		Dictionary<int,ProcessedImageData> tempDataDict = new Dictionary<int,ProcessedImageData> ();
 		List<Coroutine> wait = new List<Coroutine> ();
@@ -46,7 +46,9 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 			yield return waitCor;
 		}
 		//Guardo los datos de las imagenes procesadas
-		PersistenceManager.LevelDataSave (tempDataDict);
+		PersistenceManager.PushImgData (tempDataDict);
+		PersistenceManager.MainDataFlush ();
+		PersistenceManager.ImgDataFlush ();
 	}
 
 

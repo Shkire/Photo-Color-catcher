@@ -8,7 +8,12 @@ using Color = UnityEngine.Color;
 
 public static class PersistenceManager
 {
-	private static GameData currentData;
+	private static MainGameData currentData;
+	private static PersistentImageData currentImg;
+
+	const string ROOT_PATH = "/";
+	const string MAIN_DATA_EXT = ".phgm";
+	const string IMG_DATA_EXT = ".phdt";
 
 	//Carga inicial se cargan las imagenes padre que hay indexadas y las configuraciones
 	//Carga de nivel se cargan los datos de la imagen principal y de las hijas
@@ -22,89 +27,91 @@ public static class PersistenceManager
 	public static void MainLoad()
 	{
 		//Inicializo los datos
-		currentData = new GameData ();
+		currentData = new MainGameData ();
 		//Si hay datos guardados los cargo
-		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
+		if (File.Exists (Application.persistentDataPath + ROOT_PATH +"/savedData" + MAIN_DATA_EXT))
 		{
-			FileStream file = File.Open(Application.persistentDataPath + "/savedData.phgm",FileMode.Open);
+			FileStream file = File.Open(Application.persistentDataPath + ROOT_PATH + "/savedData" + MAIN_DATA_EXT,FileMode.Open);
 			BinaryFormatter bf = new BinaryFormatter();
 			SurrogateSelector ss = new SurrogateSelector();
 			ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate ();
-			Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate ();
 			ss.AddSurrogate (typeof(Color), new StreamingContext (StreamingContextStates.All), colorSs);
-			ss.AddSurrogate (typeof(Vector2), new StreamingContext (StreamingContextStates.All), v2ss);
 			bf.SurrogateSelector = ss;
-			GameData loadedData = ((GameData)(bf.Deserialize (file)));
-			currentData.SetParents(loadedData.GetParents());
-			currentData.SetAvailableIds (loadedData.GetLastId(), loadedData.GetOtherAvail());
-			Dictionary<int,ProcessedImage> images = new Dictionary<int, ProcessedImage> ();
-			foreach (int imgIndex in currentData.GetParents())
-				images.Add (imgIndex,loadedData.GetImage(imgIndex));
-			currentData.SetImages(images);
+			currentData = ((MainGameData)(bf.Deserialize (file)));
 			file.Close();
 		}
 	}
 
 	public static void LevelDataLoad(int i_index)
 	{
-		currentData = new GameData ();
-		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
-		{
-			FileStream file = File.Open(Application.persistentDataPath + "/savedData.phgm",FileMode.Open);
-			BinaryFormatter bf = new BinaryFormatter();
-			SurrogateSelector ss = new SurrogateSelector();
+		string path = currentData.GetPath (i_index);
+		if (File.Exists (Application.persistentDataPath + ROOT_PATH + path + IMG_DATA_EXT)) {
+			FileStream file = File.Open (Application.persistentDataPath + ROOT_PATH + path + IMG_DATA_EXT,FileMode.Open);
+			BinaryFormatter bf = new BinaryFormatter ();
+			SurrogateSelector ss = new SurrogateSelector ();
+			StreamingContext sc = new StreamingContext (StreamingContextStates.All);
 			ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate ();
 			Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate ();
-			ss.AddSurrogate (typeof(Color), new StreamingContext (StreamingContextStates.All), colorSs);
-			ss.AddSurrogate (typeof(Vector2), new StreamingContext (StreamingContextStates.All), v2ss);
+			ss.AddSurrogate (typeof(Color), sc, colorSs);
+			ss.AddSurrogate (typeof(Vector2), sc, v2ss);
 			bf.SurrogateSelector = ss;
-			GameData loadedData = ((GameData)(bf.Deserialize (file)));
-			List<int> parent = new List<int> ();
-			parent.Add (i_index);
-			currentData.SetParents(parent);
-			Dictionary<int,ProcessedImage> images = new Dictionary<int, ProcessedImage> ();
-			foreach (int index in loadedData.GetImage(i_index).GetChildrenId())
-				images.Add (index, loadedData.GetImage (index));
-			images.Add (i_index, loadedData.GetImage (i_index));
-			currentData.SetImages(images);
-			file.Close();
-		}
+			currentImg = ((PersistentImageData)(bf.Deserialize (file)));
+			file.Close ();
+		} else
+			Debug.LogError ("The file you're looking for doesn't exist or has been moved");
 	}
 
-	/// <summary>
-	/// Saves the data of the level and his children
-	/// </summary>
-	/// <param name="i_img">Level image.</param>
-	/// <param name="i_children">List of children images.</param>
-	public static void ProcessedLevelSave(ProcessedImage i_img, List<ProcessedImage> i_children)
+	public static void MainDataFlush()
 	{
-		GameData loadedData = new GameData ();
+		FileStream file; 
+		BinaryFormatter bf = new BinaryFormatter();
+		SurrogateSelector ss = new SurrogateSelector();
+		ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate ();
+		ss.AddSurrogate (typeof(Color), new StreamingContext (StreamingContextStates.All), colorSs);
+		bf.SurrogateSelector = ss;
+		if (File.Exists (Application.persistentDataPath + ROOT_PATH + "/savedData" + MAIN_DATA_EXT)) {
+			file = File.Open (Application.persistentDataPath + ROOT_PATH + "/savedData" + MAIN_DATA_EXT, FileMode.Create);
+		} else {
+			file = File.Create (Application.persistentDataPath + ROOT_PATH + "/savedData" + MAIN_DATA_EXT);
+		}
+		bf.Serialize (file, currentData);
+		file.Close();
+	}
+		
+	public static void ImgDataFlush()
+	{
 		FileStream file; 
 		BinaryFormatter bf = new BinaryFormatter();
 		SurrogateSelector ss = new SurrogateSelector();
 		ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate ();
 		Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate ();
-		ss.AddSurrogate (typeof(Color), new StreamingContext (StreamingContextStates.All), colorSs);
-		ss.AddSurrogate (typeof(Vector2), new StreamingContext (StreamingContextStates.All), v2ss);
+		StreamingContext sc = new StreamingContext (StreamingContextStates.All); 
+		ss.AddSurrogate (typeof(Color), sc, colorSs);
+		ss.AddSurrogate (typeof(Vector2), sc, v2ss);
 		bf.SurrogateSelector = ss;
-		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
-		{
-			file = File.Open(Application.persistentDataPath + "/savedData.phgm",FileMode.Open);
-			loadedData = ((GameData)(bf.Deserialize (file)));
-			file.Close();
+		if (File.Exists (Application.persistentDataPath + ROOT_PATH + currentImg.path + IMG_DATA_EXT)) {
+			file = File.Open (Application.persistentDataPath + ROOT_PATH + currentImg.path + IMG_DATA_EXT, FileMode.Create);
+		} else {
+			file = File.Create (Application.persistentDataPath + ROOT_PATH + currentImg.path + IMG_DATA_EXT);
 		}
-		loadedData.AddParent (i_img);
-		loadedData.AddImages (i_children);
-		loadedData.SetAvailableIds (currentData.GetLastId(),currentData.GetOtherAvail());
-		if (File.Exists (Application.persistentDataPath + "/savedData.phgm"))
-		{
-			file = File.Open (Application.persistentDataPath + "/savedData.phgm",FileMode.Create);
-			bf.Serialize(file,loadedData);
-		}
-		else
-			file = File.Create (Application.persistentDataPath + "/savedData.phgm");
-		bf.Serialize(file,loadedData);
+		bf.Serialize (file, currentImg);
 		file.Close();
+	}
+
+
+
+
+	public static void PushImgAndChildren(ProcessedImage i_img, List<ProcessedImage> i_children)
+	{
+		string path = GenerateNewPath ();
+		currentImg = new PersistentImageData (i_img, i_children,path);
+		ImgPersistanceInfo info = new ImgPersistanceInfo (path, i_img.GetChildrenId (), i_img.GetPixels ());
+		currentData.AddParent (i_img.GetId (), info);
+	}
+
+	public static void PushImgData (Dictionary<int,ProcessedImageData> i_imgData)
+	{
+		currentImg.AddData (i_imgData);
 	}
 
 	/// <summary>
@@ -192,6 +199,34 @@ public static class PersistenceManager
 		return idList;
 	}
 
+	public static void LoadLevelPack(int i_id)
+	{
+		if (currentData.HasParent (i_id)) 
+		{
+			FileStream file; 
+			BinaryFormatter bf = new BinaryFormatter();
+			SurrogateSelector ss = new SurrogateSelector();
+			ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate ();
+			Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate ();
+			StreamingContext sc = new StreamingContext (StreamingContextStates.All); 
+			ss.AddSurrogate (typeof(Color), sc, colorSs);
+			ss.AddSurrogate (typeof(Vector2), sc, v2ss);
+			bf.SurrogateSelector = ss;
+			string path = currentData.GetParentPath (i_id);
+			if (File.Exists (Application.persistentDataPath + ROOT_PATH + path + IMG_DATA_EXT)) {
+				file = File.Open (Application.persistentDataPath + ROOT_PATH + path + IMG_DATA_EXT, FileMode.Open);
+				currentImg = (PersistentImageData)bf.Deserialize (file);
+				file.Close();
+			}
+		}
+	}
+
+	public static void LoadLevelParent(int i_id)
+	{
+		LoadLevelPack (currentData.GetParent (i_id));
+	}
+
+	/*
 	public static ProcessedImage GetImage(int id)
 	{
 		ProcessedImage img=null;
@@ -207,6 +242,48 @@ public static class PersistenceManager
 		}
 		img=currentData.GetImage (id);
 		return img;
+	}
+	*/
+
+	public static string GenerateNewPath()
+	{
+		string path;
+		do
+		{
+			path = Path.GetRandomFileName ();
+			path = path.Split(new char[]{'.'},2)[0];
+		}
+		while (!UnusedPath (path));
+		return path;
+	}
+
+	public static bool UnusedPath(string i_path)
+	{
+		if (currentData.GetPaths ().Contains (i_path))
+			return false;
+		return true;
+	}
+
+	public static ProcessedImage GetImage(int i_id)
+	{
+		if (currentImg != null)
+			return currentImg.GetChild (i_id);
+		return null;
+	}
+
+	public static List<ChildImgInfo> GetChildrenInfo()
+	{
+		return currentImg.GetChildrenInfo ();
+	}
+
+	public static ProcessedImage GetImage(int x, int y)
+	{
+		foreach (ChildImgInfo info in GetChildrenInfo()) 
+		{
+			if (info.pos.Equals (new Vector2 ((float)x, (float)y)))
+				return info.img;
+		}
+		return null;
 	}
 
 	/*
