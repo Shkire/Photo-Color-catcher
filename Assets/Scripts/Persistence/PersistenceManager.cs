@@ -118,6 +118,7 @@ public static class PersistenceManager
 	/// Saves the data info of the group of levels on given dictionary
 	/// </summary>
 	/// <param name="i_imgDict">Dictionary with level ids and image data.</param>
+	/*
 	public static void LevelDataSave(Dictionary<int,ProcessedImageData> i_imgDict)
 	{
 		GameData loadedData = new GameData ();
@@ -174,6 +175,7 @@ public static class PersistenceManager
 		bf.Serialize(file,loadedData);
 		file.Close();
 	}
+	*/
 
 	public static int GetNewId()
 	{
