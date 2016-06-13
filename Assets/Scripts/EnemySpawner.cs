@@ -27,7 +27,7 @@ public class EnemySpawner : MonoBehaviour
 	{
 		leftSpawnTime -= Time.fixedDeltaTime;
 		if (leftSpawnTime <= 0) {
-			int randomEnemy = rnd.Next (0, enemies.Length + 1);
+			int randomEnemy = rnd.Next (0, enemies.Length);
 			Instantiate (enemies [randomEnemy], this.transform.position, enemies [randomEnemy].transform.rotation);
 			leftSpawnTime = (float)(rnd.NextDouble () * (maxSpawnTime - minSpawnTime)) + minSpawnTime;
 		}
