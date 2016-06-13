@@ -13,7 +13,7 @@ public class GUILoadLevel : GUITool {
 		if (isParent)
 			LevelLoader.Instance.LoadLevelSelector (id);
 		else
-			LevelLoader.Instance.LoadLevel (id);
+			LevelLoader.Instance.LoadAndConfig(id);
 	}
 
 	public void SetId(int i_id)

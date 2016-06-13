@@ -20,6 +20,7 @@ sealed class ColorSerializationSurrogate : ISerializationSurrogate
 		color.r = (float)info.GetValue ("r", typeof(float));
 		color.g = (float)info.GetValue ("g", typeof(float));
 		color.b = (float)info.GetValue ("b", typeof(float));
+		color.a = 1f;
 		obj = color;
 		return obj;
 	}
