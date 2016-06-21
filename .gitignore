@@ -3,3 +3,5 @@
 /obj
 /Assets/Material.meta
 /Assets/Material/**/*.meta
+.userprefs
+.sln
