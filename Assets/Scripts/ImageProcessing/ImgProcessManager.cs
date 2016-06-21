@@ -18,7 +18,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		
 	// Use this for initialization
 
-	public IEnumerator ProccesAndIndexImage(string i_path)
+	public IEnumerator ProccesAndIndexImageCor(string i_path)
 	{
 		//Cojo una nueva id para la imagen
 		int id = PersistenceManager.GetNewId();
@@ -75,9 +75,9 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		sprtRend.sprite = spr;
 	}
 		
-	public void ProccesAndIndexImage()
+	public void ProccesAndIndexImage(string i_path)
 	{
-		StartCoroutine(ProccesAndIndexImage (imgPath));
+		StartCoroutine(ProccesAndIndexImageCor (i_path));
 	}
 
 	IEnumerator ProcessImageData (ProcessedImage i_img, ProcessedImageData i_imgData)

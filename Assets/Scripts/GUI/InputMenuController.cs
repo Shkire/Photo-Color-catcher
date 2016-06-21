@@ -100,7 +100,7 @@ public class InputMenuController : MonoBehaviour {
 						actualElem.SendMessage ("Focused");
 						leftUiResponseTime = uiResponseTime;
 					}
-				} else if (Input.GetKey (KeyCode.Return)) {
+				} else if (Input.GetKeyDown (KeyCode.Return)) {
 					actualElem.SendMessage ("Selected");
 					leftUiResponseTime = uiResponseTime;
 				}
