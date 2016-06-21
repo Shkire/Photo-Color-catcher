@@ -55,6 +55,7 @@ public class InputMenuController : MonoBehaviour {
 			uiMap.Add (go, elem);
 		}
 		actualElem = startingElem;
+		actualElem.SendMessage ("Focused",SendMessageOptions.DontRequireReceiver);
 		Debug.Log ("Actual elem "+actualElem);
 		foreach (GameObject go in uiMap.Keys) 
 		{

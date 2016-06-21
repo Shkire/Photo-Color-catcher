@@ -1,9 +1,12 @@
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using System.IO;
 
 public static class CustomAssetUtility
 {
+	#if UNITY_EDITOR
     public static void CreateAsset<T> () where T : ScriptableObject
     {
         T asset = ScriptableObject.CreateInstance<T> ();
@@ -26,4 +29,5 @@ public static class CustomAssetUtility
         EditorUtility.FocusProjectWindow ();
         Selection.activeObject = asset;
     }
+	#endif
 }

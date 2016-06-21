@@ -69,13 +69,11 @@ public class CharacterHealthController : MonoBehaviour
 		if (pjMC != null)
 			pjMC.enabled = false;
 
-		Debug.Log ("peste");
 		gameOver.enabled = true;
-
-		Debug.Log ("etsep");
 
 		yield return new WaitForSeconds (3f);
 
+		SceneManager.LoadScene ("intro");
 		//SceneManager.LoadScene ("MenuInicio");
 		//Application.Quit();
 
