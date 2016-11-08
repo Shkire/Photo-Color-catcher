@@ -109,4 +109,20 @@ public static class ExtensionMethods
 			go.transform.localScale = new Vector3 (go.transform.localScale.x * (i_size.x / go.GetSize ().x), go.transform.localScale.y * (i_size.y / go.GetSize ().y), go.transform.localScale.z * (i_size.z / go.GetSize ().z));
 		}
 	}
+
+	public static Texture2D ToGray(this Texture2D texture)
+	{
+		Texture2D resTexture = new Texture2D (texture.width, texture.height);
+		UnityEngine.Color[] temp = texture.GetPixels ();
+		for (int i = 0; i < temp.Length; i++) 
+		{
+			float gray = temp [i].grayscale;
+			temp [i].r = gray;
+			temp [i].g = gray;
+			temp [i].b = gray;
+		}
+		resTexture.SetPixels (temp);
+		resTexture.Apply ();
+		return resTexture;
+	}
 }
