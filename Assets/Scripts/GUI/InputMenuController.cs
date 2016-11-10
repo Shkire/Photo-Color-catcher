@@ -12,7 +12,7 @@ public class GUIElementMap
 
 public class InputMenuController : MonoBehaviour {
 
-	public GameObject[] uiElements;
+	public List<GameObject> uiElements;
 	public GameObject startingElem;
 	private Dictionary<GameObject,GUIElementMap> uiMap;
 	private GameObject actualElem;

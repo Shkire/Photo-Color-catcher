@@ -259,6 +259,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loadedImages: []
   modelButton: {fileID: 1477649145}
+  menuController: {fileID: 1206466183}
 --- !u!1 &107299232
 GameObject:
   m_ObjectHideFlags: 0
@@ -1988,11 +1989,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a57dcc83ab9c6d74995403efc2f8e37b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiElements:
-  - {fileID: 1453285990}
-  - {fileID: 1258959784}
-  - {fileID: 1372319716}
-  startingElem: {fileID: 1453285990}
+  uiElements: []
+  startingElem: {fileID: 0}
   uiResponseTime: 0.2
 --- !u!1 &1258959784
 GameObject:
@@ -2622,11 +2620,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1477649145}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f469a556a28917a4681bd3d1c01011f1, type: 3}
+  m_Script: {fileID: 11500000, guid: a7a55af840832d34e8357f1e76c85a3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 0
-  isParent: 1
+  path: 
 --- !u!114 &1477649148
 MonoBehaviour:
   m_ObjectHideFlags: 0

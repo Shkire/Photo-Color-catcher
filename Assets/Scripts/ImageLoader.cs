@@ -18,6 +18,9 @@ public class ImageLoader : MonoBehaviour
 	[SerializeField]
 	private GameObject modelButton;
 
+	[SerializeField]
+	private InputMenuController menuController;
+
 	void Awake()
 	{
 		loadedImages = new List<Texture2D> ();
@@ -37,6 +40,15 @@ public class ImageLoader : MonoBehaviour
 			imageButton.transform.SetParent (modelButton.transform.parent,false);
 			(imageButton.transform as RectTransform).anchorMin = new Vector2((0.5f+(counter%4)*1.5f)/6.5f,1-((1.5f+(counter/4)*1.5f)/7f));
 			(imageButton.transform as RectTransform).anchorMax = new Vector2((1.5f+(counter%4)*1.5f)/6.5f,1-((0.5f+(counter/4)*1.5f)/7f));
+			string[] splitPath = loadingFile.Split ('/');
+			imageButton.GetComponent<GUIProcessImage> ().path = splitPath [splitPath.Length - 1];
+			if (counter == 0) 
+			{
+				if (menuController.uiElements == null)
+					menuController.uiElements = new List<GameObject>();
+				menuController.startingElem = imageButton;
+			}
+			menuController.uiElements.Add (imageButton);
 			counter++;
 			loadedImages.Add (tempText);
 		}
