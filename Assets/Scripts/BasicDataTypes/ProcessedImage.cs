@@ -19,24 +19,18 @@ public class ProcessedImage{
 
 	private bool completed;
 
-	public ProcessedImage(string i_path, int i_id)
+	public ProcessedImage(int i_id, string i_path, Texture2D i_texture)
 	{
 		//Le asigno un id
 		id = i_id;
 		//Le asigno su path
 		path = i_path;
-		//Creo una textura auxiliar
-		Texture2D tempText = new Texture2D(1,1);
-		//Leo la imagen correspondiente
-		byte[] imgRead = System.IO.File.ReadAllBytes (Application.persistentDataPath+"/"+path);
-		//Cargo la imagen en la textura
-		tempText.LoadImage (imgRead);
 		//Le asigno su ancho
-		width = tempText.width;
+		width = i_texture.width;
 		//Le asigno su ancho
-		height = tempText.height;
+		height = i_texture.height;
 		//Obtengo sus pixels y los guardo
-		pixels = tempText.GetPixels();
+		pixels = i_texture.GetPixels();
 		//Inicializo su diccionario de hijos
 		children = new Dictionary<Vector2, int> ();
 		//No está superada

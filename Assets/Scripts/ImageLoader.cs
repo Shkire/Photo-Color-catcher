@@ -35,6 +35,7 @@ public class ImageLoader : MonoBehaviour
 			Texture2D tempText = new Texture2D (108, 109);
 			tempText.LoadImage (loadingBytes);
 			GameObject imageButton = (GameObject)Instantiate (modelButton);
+			imageButton.SetActive (true);
 			imageButton.GetChild ("FocusedButton Background").GetComponent<Image> ().sprite = Sprite.Create(tempText,new Rect(0,0,tempText.width,tempText.height),Vector2.zero);
 			imageButton.GetChild ("UnfocusedButton Background").GetComponent<Image> ().sprite = Sprite.Create(tempText.ToGray(),new Rect(0,0,tempText.width,tempText.height),Vector2.zero);
 			imageButton.transform.SetParent (modelButton.transform.parent,false);
