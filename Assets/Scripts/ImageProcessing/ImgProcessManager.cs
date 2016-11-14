@@ -32,7 +32,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 
 		//La divido
 		//List<ProcessedImage> tempList = img.Divide (divisionFactor,idList);
-		List<ProcessedImage> tempList = DivideImage (divisionFactor,idList);
+		List<ProcessedImage> tempList = DivideImage (img,divisionFactor,idList);
 
 		//Guardo las imagenes procesadas
 		PersistenceManager.PushImgAndChildren(img,tempList);
@@ -113,23 +113,22 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		return resImg;
 	}
 
-	List<ProcessedImage> DivideImage (int i_divisionFactor, int[] i_idList)
+	List<ProcessedImage> DivideImage (ProcessedImage i_img, int i_divisionFactor, int[] i_idList)
 	{
-		/*
 		//Si ya se ha divido
-		if (children != null && children.Count > 0)
+		if (i_img.GetChildrenCount() > 0)
 			//Sale
 			return null;
 		//Calcula el ancho de cada hijo
-		int childrenWidth = Mathf.CeilToInt ((float)width / i_divisionFactor);
+		int childrenWidth = Mathf.CeilToInt ((float)i_img.width / i_divisionFactor);
 		//Calcula el alto de cada hijo
-		int childrenHeight = Mathf.CeilToInt ((float)height / i_divisionFactor);
+		int childrenHeight = Mathf.CeilToInt ((float)i_img.height / i_divisionFactor);
 		//Crea una lista auxiliar de imagenes
 		List<ProcessedImage> tempChildren = new List<ProcessedImage> ();
 		//Crea una textura auxiliar
-		Texture2D tempText = new Texture2D (width, height);
+		Texture2D tempText = new Texture2D (i_img.width, i_img.height);
 		//Le asigno los pixeles de la imagen padre
-		tempText.SetPixels (pixels);
+		tempText.SetPixels (i_img.pixels);
 		//Aplico los cambios en la textura
 		tempText.Apply ();
 		//Aplico un reescalado bilineal
@@ -155,15 +154,13 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 				//Creo una imagen auxiliar
 				ProcessedImage auxImg = new ProcessedImage(auxPixels,childrenWidth,childrenHeight,i_idList[x*i_divisionFactor+y]);
 				//Añado el hijo al diccionario de hijos del padre
-				children.Add (new Vector2 (x, y), auxImg.id);
+				i_img.AddChild (new Vector2 (x, y), auxImg.id);
 				Debug.Log (x+","+y+"="+auxImg.id);
 				//Añado el hijo a la lista de hijos
 				tempChildren.Add(auxImg);
 			}
 		}
 		return tempChildren;
-		*/
-		return null;
 	}
 }
 

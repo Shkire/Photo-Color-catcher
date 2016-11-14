@@ -5,15 +5,47 @@ using System.Collections.Generic;
 [System.Serializable]
 public class ProcessedImage{
 
-	private int id;
+	private int p_id;
+
+	public int id
+	{
+		get
+		{
+			return p_id;
+		}
+	}
 
 	private string path;
 
-	private UnityEngine.Color[] pixels;
+	private UnityEngine.Color[] p_pixels;
 
-	private int width;
+	public UnityEngine.Color[] pixels
+	{
+		get
+		{
+			return p_pixels;
+		}
+	}
 
-	private int height;
+	private int p_width;
+
+	public int width
+	{
+		get
+		{
+			return p_width;
+		}
+	}
+
+	private int p_height;
+
+	public int height
+	{
+		get
+		{
+			return p_height;
+		}
+	}
 
 	private Dictionary<Vector2,int> children;
 
@@ -22,15 +54,15 @@ public class ProcessedImage{
 	public ProcessedImage(int i_id, string i_path, Texture2D i_texture)
 	{
 		//Le asigno un id
-		id = i_id;
+		p_id = i_id;
 		//Le asigno su path
 		path = i_path;
 		//Le asigno su ancho
-		width = i_texture.width;
+		p_width = i_texture.width;
 		//Le asigno su ancho
-		height = i_texture.height;
+		p_height = i_texture.height;
 		//Obtengo sus pixels y los guardo
-		pixels = i_texture.GetPixels();
+		p_pixels = i_texture.GetPixels();
 		//Inicializo su diccionario de hijos
 		children = new Dictionary<Vector2, int> ();
 		//No está superada
@@ -39,74 +71,23 @@ public class ProcessedImage{
 
 	public ProcessedImage(UnityEngine.Color[] i_pixels, int i_width, int i_height, int i_id)
 	{
-		id = i_id;
+		p_id = i_id;
 		path = string.Empty;
-		width = i_width;
-		height = i_height;
-		pixels = i_pixels;
+		p_width = i_width;
+		p_height = i_height;
+		p_pixels = i_pixels;
 		children = null;
 		completed = false;
 	}
 	public ProcessedImage(int i_id, string i_path, UnityEngine.Color[] i_pixels, int i_width, int i_height, Dictionary<Vector2,int> i_children, bool i_completed)
 	{
-		id = i_id;
+		p_id = i_id;
 		path = i_path;
-		pixels = i_pixels;
-		width = i_width;
-		height = i_height;
+		p_pixels = i_pixels;
+		p_width = i_width;
+		p_height = i_height;
 		children = i_children;
 		completed = i_completed;
-	}
-
-	//Sacar al ProcessManager para que lo haga con un DAC a ser posible
-	public List<ProcessedImage> Divide(int i_divisionFactor, int[] i_idList)
-	{
-		//Si ya se ha divido
-		if (children != null && children.Count > 0)
-			//Sale
-			return null;
-		//Calcula el ancho de cada hijo
-		int childrenWidth = Mathf.CeilToInt ((float)width / i_divisionFactor);
-		//Calcula el alto de cada hijo
-		int childrenHeight = Mathf.CeilToInt ((float)height / i_divisionFactor);
-		//Crea una lista auxiliar de imagenes
-		List<ProcessedImage> tempChildren = new List<ProcessedImage> ();
-		//Crea una textura auxiliar
-		Texture2D tempText = new Texture2D (width, height);
-		//Le asigno los pixeles de la imagen padre
-		tempText.SetPixels (pixels);
-		//Aplico los cambios en la textura
-		tempText.Apply ();
-		//Aplico un reescalado bilineal
-		tempText = tempText.ResizeBilinear (childrenWidth * i_divisionFactor, childrenHeight * i_divisionFactor);
-		//Saco todos los pixeles de la textura
-		UnityEngine.Color[] tempPixels = tempText.GetPixels ();
-		//Para cada hijo
-		for (int x = 0; x < i_divisionFactor; x++) 
-		{
-			for (int y = 0; y < i_divisionFactor; y++) 
-			{
-				//Creo una lista de pixeles auxiliar
-				UnityEngine.Color[] auxPixels = new UnityEngine.Color[childrenWidth * childrenHeight];
-				//Para cada pixel
-				for (int i = 0; i < childrenWidth; i++) {
-					for (int j = 0; j < childrenHeight; j++) 
-					{
-						//Obtengo su posicion y obtengo el color correspondiente
-						int origPos = x * childrenWidth + y * i_divisionFactor * childrenWidth * childrenHeight + i + j * childrenWidth * i_divisionFactor;
-						auxPixels [i + j*childrenWidth] = new UnityEngine.Color(tempPixels [origPos].r,tempPixels [origPos].g,tempPixels [origPos].b,tempPixels [origPos].a);
-					}
-				}
-				//Creo una imagen auxiliar
-				ProcessedImage auxImg = new ProcessedImage(auxPixels,childrenWidth,childrenHeight,i_idList[x*i_divisionFactor+y]);
-				//Añado el hijo al diccionario de hijos del padre
-				children.Add (new Vector2 (x, y), auxImg.id);
-				Debug.Log (x+","+y+"="+auxImg.id);
-				//Añado el hijo a la lista de hijos
-				tempChildren.Add(auxImg);
-			}
-		}
-		return tempChildren;
 	}
 
 	public ProcessedImageData GetImageData()
@@ -115,27 +96,27 @@ public class ProcessedImage{
 		float greenData=0;
 		float blueData=0;
 		float grayData = 0;
-		foreach (UnityEngine.Color pixel in pixels) 
+		foreach (UnityEngine.Color pixel in p_pixels) 
 		{
 			redData += pixel.r;
 			greenData += pixel.g;
 			blueData += pixel.b;
 			grayData += pixel.grayscale;
 		}
-		float redSaturation = redData / pixels.Length;
-		float greenSaturation = greenData / pixels.Length;
-		float blueSaturation = blueData / pixels.Length;
+		float redSaturation = redData / p_pixels.Length;
+		float greenSaturation = greenData / p_pixels.Length;
+		float blueSaturation = blueData / p_pixels.Length;
 		float totalData = redSaturation + greenSaturation + blueSaturation;
 		redData = redSaturation / totalData;
 		greenData = greenSaturation / totalData;
 		blueData = blueSaturation / totalData;
-		grayData = grayData / (width * height);
+		grayData = grayData / (p_width * p_height);
 		return new ProcessedImageData (redData,greenData,blueData,redSaturation,greenSaturation,blueSaturation,grayData);
 	}
 
 	public int GetId()
 	{
-		return id;
+		return p_id;
 	}
 
 	public List<int> GetChildrenId()
@@ -168,18 +149,18 @@ public class ProcessedImage{
 
 	public Texture2D ToTexture2D()
 	{
-		Texture2D text = new Texture2D (width, height);
-		text.SetPixels (pixels);
+		Texture2D text = new Texture2D (p_width, p_height);
+		text.SetPixels (p_pixels);
 		text.Apply();
 		return text;
 	}
 
 	public Texture2D ToGrayscaleTexture2D()
 	{
-		Texture2D text = new Texture2D (width, height);
-		UnityEngine.Color[] tempPixels = new UnityEngine.Color[pixels.Length];
-		for (int i = 0; i < pixels.Length; i++)
-			tempPixels [i] = new UnityEngine.Color (pixels [i].grayscale, pixels [i].grayscale, pixels [i].grayscale);
+		Texture2D text = new Texture2D (p_width, p_height);
+		UnityEngine.Color[] tempPixels = new UnityEngine.Color[p_pixels.Length];
+		for (int i = 0; i < p_pixels.Length; i++)
+			tempPixels [i] = new UnityEngine.Color (p_pixels [i].grayscale, p_pixels [i].grayscale, p_pixels [i].grayscale);
 		text.SetPixels (tempPixels);
 		text.Apply();
 		return text;
@@ -192,6 +173,13 @@ public class ProcessedImage{
 
 	public Color[] GetPixels()
 	{
-		return pixels;
+		return p_pixels;
+	}
+
+	public void AddChild(Vector2 i_pos, int i_id)
+	{
+		if (children == null)
+			children = new Dictionary<Vector2, int> ();
+		children.Add (i_pos, i_id);
 	}
 }
