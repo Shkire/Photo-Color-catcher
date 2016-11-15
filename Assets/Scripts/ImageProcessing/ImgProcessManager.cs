@@ -12,6 +12,11 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 	public Texture2D texturita;
 	public LevelConfigList levelConfigList;
 
+	private ProcessedImage p_img;
+	private List<ProcessedImage> p_imgList;
+	private UnityEngine.Color[] p_tempPixels;
+	private int[] p_idList;
+
 	protected ImgProcessManager () 
 	{
 	}
@@ -23,26 +28,34 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		//Cojo una nueva id para la imagen
 		int id = PersistenceManager.GetNewId();
 
+		yield return null;
+
 		//Creo la imagen a partir de su path
-		//ProcessedImage img = new ProcessedImage (i_path, id);
-		ProcessedImage img = CreateImage(i_path, id);
+		yield return (StartCoroutine(CreateImage(i_path, id)));
+
+		yield return null;
 
 		//Cojo una lista de ids para los hijos
-		int[] idList = PersistenceManager.GetNewIdList(divisionFactor*divisionFactor);
+		p_idList = PersistenceManager.GetNewIdList(divisionFactor*divisionFactor);
+
+		yield return null;
 
 		//La divido
-		//List<ProcessedImage> tempList = img.Divide (divisionFactor,idList);
-		List<ProcessedImage> tempList = DivideImage (img,divisionFactor,idList);
+		yield return StartCoroutine(DivideImage(divisionFactor));
+
+		yield return null;
 
 		//Guardo las imagenes procesadas
-		PersistenceManager.PushImgAndChildren(img,tempList);
+		PersistenceManager.PushImgAndChildren(p_img,p_imgList);
+
+		yield return null;
 
 		//Creo el diccionario de datos de imágenes
 		Dictionary<int,ProcessedImageData> tempDataDict = new Dictionary<int,ProcessedImageData> ();
 		List<Coroutine> wait = new List<Coroutine> ();
 
 		//Para cada imagen
-		foreach (ProcessedImage auxImg in tempList)
+		foreach (ProcessedImage auxImg in p_imgList)
 		{
 			//Proceso sus datos
 			ProcessedImageData tempImgData = null;
@@ -101,66 +114,101 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		yield return StartCoroutine(dacProblem.DivideAndConquer ());
 	}
 
-	ProcessedImage CreateImage (string i_path, int i_id)
+	IEnumerator CreateImage (string i_path, int i_id)
 	{
 		//Creo una textura auxiliar
 		Texture2D tempText = new Texture2D(1,1);
+
+		yield return null;
+
 		//Leo la imagen correspondiente
 		byte[] imgRead = System.IO.File.ReadAllBytes (Application.persistentDataPath+"/"+i_path);
+
+		yield return null;
+
 		//Cargo la imagen en la textura
 		tempText.LoadImage (imgRead);
-		ProcessedImage resImg = new ProcessedImage (i_id, i_path, tempText);
-		return resImg;
+
+		yield return null;
+
+		p_img = new ProcessedImage (i_id, i_path, tempText);
 	}
 
-	List<ProcessedImage> DivideImage (ProcessedImage i_img, int i_divisionFactor, int[] i_idList)
+	IEnumerator DivideImage (int i_divisionFactor)
 	{
 		//Si ya se ha divido
-		if (i_img.GetChildrenCount() > 0)
+		if (p_img.GetChildrenCount() > 0)
 			//Sale
-			return null;
+			yield break;
+		
 		//Calcula el ancho de cada hijo
-		int childrenWidth = Mathf.CeilToInt ((float)i_img.width / i_divisionFactor);
+		int childrenWidth = Mathf.CeilToInt ((float)p_img.width / i_divisionFactor);
 		//Calcula el alto de cada hijo
-		int childrenHeight = Mathf.CeilToInt ((float)i_img.height / i_divisionFactor);
+		int childrenHeight = Mathf.CeilToInt ((float)p_img.height / i_divisionFactor);
 		//Crea una lista auxiliar de imagenes
-		List<ProcessedImage> tempChildren = new List<ProcessedImage> ();
+		p_imgList = new List<ProcessedImage> ();
+
+		yield return null;
+
 		//Crea una textura auxiliar
-		Texture2D tempText = new Texture2D (i_img.width, i_img.height);
+		Texture2D tempText = new Texture2D (p_img.width, p_img.height);
 		//Le asigno los pixeles de la imagen padre
-		tempText.SetPixels (i_img.pixels);
+		tempText.SetPixels (p_img.pixels);
 		//Aplico los cambios en la textura
 		tempText.Apply ();
+
+		yield return null;
+
 		//Aplico un reescalado bilineal
 		tempText = tempText.ResizeBilinear (childrenWidth * i_divisionFactor, childrenHeight * i_divisionFactor);
+
+		yield return null;
+
 		//Saco todos los pixeles de la textura
-		UnityEngine.Color[] tempPixels = tempText.GetPixels ();
+		p_tempPixels = tempText.GetPixels ();
+
+		yield return null;
+
+		List<Coroutine> waitChildren = new List<Coroutine> ();
 		//Para cada hijo
 		for (int x = 0; x < i_divisionFactor; x++) 
 		{
 			for (int y = 0; y < i_divisionFactor; y++) 
 			{
-				//Creo una lista de pixeles auxiliar
-				UnityEngine.Color[] auxPixels = new UnityEngine.Color[childrenWidth * childrenHeight];
-				//Para cada pixel
-				for (int i = 0; i < childrenWidth; i++) {
-					for (int j = 0; j < childrenHeight; j++) 
-					{
-						//Obtengo su posicion y obtengo el color correspondiente
-						int origPos = x * childrenWidth + y * i_divisionFactor * childrenWidth * childrenHeight + i + j * childrenWidth * i_divisionFactor;
-						auxPixels [i + j*childrenWidth] = new UnityEngine.Color(tempPixels [origPos].r,tempPixels [origPos].g,tempPixels [origPos].b,tempPixels [origPos].a);
-					}
-				}
-				//Creo una imagen auxiliar
-				ProcessedImage auxImg = new ProcessedImage(auxPixels,childrenWidth,childrenHeight,i_idList[x*i_divisionFactor+y]);
-				//Añado el hijo al diccionario de hijos del padre
-				i_img.AddChild (new Vector2 (x, y), auxImg.id);
-				Debug.Log (x+","+y+"="+auxImg.id);
-				//Añado el hijo a la lista de hijos
-				tempChildren.Add(auxImg);
+				waitChildren.Add (StartCoroutine (CreateChild (x, y, childrenWidth, childrenHeight, i_divisionFactor)));
 			}
 		}
-		return tempChildren;
+
+		foreach (Coroutine wait in waitChildren) 
+		{
+			yield return wait;
+		}
+	}
+
+	IEnumerator CreateChild(int i_x, int i_y, int i_width, int i_height, int i_divisionFactor)
+	{
+		//Creo una lista de pixeles auxiliar
+		UnityEngine.Color[] auxPixels = new UnityEngine.Color[i_width * i_height];
+		//Para cada pixel
+		for (int i = 0; i < i_width; i++) {
+			for (int j = 0; j < i_height; j++) 
+			{
+				//Obtengo su posicion y obtengo el color correspondiente
+				int origPos = i_x * i_width + i_y * i_divisionFactor * i_width * i_height + i + j * i_width * i_divisionFactor;
+				auxPixels [i + j*i_width] = new UnityEngine.Color(p_tempPixels [origPos].r,p_tempPixels [origPos].g,p_tempPixels [origPos].b,p_tempPixels [origPos].a);
+
+				yield return null;
+			}
+		}
+		//Creo una imagen auxiliar
+		ProcessedImage auxImg = new ProcessedImage(auxPixels,i_width,i_height,p_idList[i_x*i_divisionFactor+i_y]);
+		//Añado el hijo al diccionario de hijos del padre
+		p_img.AddChild (new Vector2 (i_x, i_y), auxImg.id);
+		Debug.Log (i_x+","+i_y+"="+auxImg.id);
+		//Añado el hijo a la lista de hijos
+		p_imgList.Add(auxImg);
+
+		yield return null;
 	}
 }
 
