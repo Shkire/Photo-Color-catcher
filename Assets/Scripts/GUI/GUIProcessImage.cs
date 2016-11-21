@@ -7,7 +7,7 @@ public class GUIProcessImage : GUITool {
 
 	public override void Execute()
 	{
-		ImgProcessManager.Instance.ProccesAndIndexImage (path);
+		ImgProcessManager.Instance.ProcessAndIndexImage (path);
 	}
 
 }

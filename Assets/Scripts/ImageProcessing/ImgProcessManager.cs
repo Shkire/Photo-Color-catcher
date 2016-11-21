@@ -5,64 +5,132 @@ using Random = UnityEngine.Random;
 using PlatformPattern = PlatformPatternConfig.PlatformPattern;
 using CellContent = MapScheme.CellContent;
 
+/// <summary>
+/// Auxiliary class for solving "Divide and Conquer" problem of image data analysis and processing.
+/// </summary>
 public class ProcessData_DAC_Problem{
 
+	/// <summary>
+	/// The interval of rows to fill.
+	/// </summary>
 	public Vector2 freeRowsInterval;
+	/// <summary>
+	/// The available patterns for filling the rows.
+	/// </summary>
 	public List<PlatformPatternConfig> availablePatterns;
+	/// <summary>
+	/// The minimum size of the available patterns.
+	/// </summary>
 	public int minSize;
+	/// <summary>
+	/// The maximum size of the available patterns.
+	/// </summary>
 	public int maxSize;
+	/// <summary>
+	/// The size of the map.
+	/// </summary>
 	public int mapSize;
+	/// <summary>
+	/// The scheme of cells on map.
+	/// </summary>
 	public List<CellContent>[,] scheme;
+
 }
 
+/// <summary>
+/// Singleton object for image processing.
+/// </summary>
 public class ImgProcessManager : Singleton<ImgProcessManager> {
 
+	/// <summary>
+	/// The max pixels processed per frame.
+	/// </summary>
 	public int maxPixelsProcessedPerFrame;
+	/// <summary>
+	/// The number of images in which to divide per column and row (n x n images in total).
+	/// </summary>
 	public int divisionFactor;
-	public string imgPath;
-	public List<ProcessedImage> images;
-	public SpriteRenderer sprite;
-	private int count;
-	public Texture2D texturita;
+
 	public LevelConfigList levelConfigList;
 
 	#region PrivateVarForCoroutines
-	private ProcessedImage p_img;
-	private List<ProcessedImage> p_imgList;
-	private UnityEngine.Color[] p_tempPixels;
-	private int[] p_idList;
+
+	//A EVALUAR
 	private List<ProcessData_DAC_Problem> p_problems;
 	#endregion
 
+	//Protected constructor of singleton
 	protected ImgProcessManager () 
 	{
 	}
 
-
-	public IEnumerator ProccesAndIndexImageCor(string i_path)
+	/// <summary>
+	/// Processes and indexes the image of the path.
+	/// </summary>
+	/// <param name="i_path">Image path.</param>
+	public void ProcessAndIndexImage(string i_path)
 	{
-		//Cojo una nueva id para la imagen
+		StartCoroutine(ProcessAndIndexImageCor (i_path));
+	}
+
+	void Start () {
+		PersistenceManager.MainLoad ();
+	}
+
+	/*
+	void DidImageInit()
+	{
+		//StartCoroutine (imagen.ToTexture2D(this.gameObject));
+	}
+
+	void DidImageToTexture(object text)
+	{
+		sprite.sprite = Sprite.Create((Texture2D)text,new Rect(0,0,10,10),new Vector2(0,0));
+		Debug.Log ("¡YA TENGO SPRITEEEE!");
+	}
+
+	public void Instantiate(int index,string name){
+		GameObject go = new GameObject(name);
+		SpriteRenderer sprtRend = go.AddComponent<SpriteRenderer> ();
+		Sprite spr = new Sprite ();
+		//spr = Sprite.Create (PersistenceManager.GetImage (index).ToTexture2D (), new Rect (0, 0, 25,25), new Vector2 (0, 0));
+		sprtRend.sprite = spr;
+	}
+	*/
+
+	#region ImageProcessingAndDivision
+
+	/// <summary>
+	/// Coroutine that processes and indexes the image.
+	/// </summary>
+	/// <param name="i_path">The path of the image to process.</param>
+	public IEnumerator ProcessAndIndexImageCor(string i_path)
+	{
+		ProcessedImage parentImg = null;
+		List<ProcessedImage> imgList = null;
+
+		//Get a new ID
 		int id = PersistenceManager.GetNewId();
 
 		yield return null;
 
-		//Creo la imagen a partir de su path
-		yield return (StartCoroutine(CreateImage(i_path, id)));
+		//Start image creation coroutine and wait until finished
+		yield return (StartCoroutine(CreateImage(i_path, id, parentImg)));
 
 		yield return null;
 
-		//Cojo una lista de ids para los hijos
-		p_idList = PersistenceManager.GetNewIdList(divisionFactor*divisionFactor);
+		//Get list with IDs for children
+		int[] idList = PersistenceManager.GetNewIdList(divisionFactor*divisionFactor);
 
 		yield return null;
 
-		//La divido
-		yield return StartCoroutine(DivideImage(divisionFactor));
+		//Start image division coroutine and wait until finished
+		yield return StartCoroutine(DivideImage(divisionFactor, idList, parentImg, imgList));
 
 		yield return null;
 
-		//Guardo las imagenes procesadas
-		PersistenceManager.PushImgAndChildren(p_img,p_imgList);
+		//Push parent and children images info
+		PersistenceManager.PushImgAndChildren(parentImg,imgList);
 
 		yield return null;
 
@@ -74,7 +142,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 
 		Debug.Log("Bucle for para cada imagen a analizar");
 		//Para cada imagen
-		foreach (ProcessedImage auxImg in p_imgList)
+		foreach (ProcessedImage auxImg in imgList)
 		{
 			Debug.Log("Lanzo una corrutina de procesamiento de datos de imagen");
 			//Proceso sus datos
@@ -96,37 +164,149 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		PersistenceManager.ImgDataFlush ();
 		Debug.Log("Datos guardados");
 	}
-
-
-	void Start () {
-		PersistenceManager.MainLoad ();
-	}
-
-	void DidImageInit()
+		
+	/// <summary>
+	/// Coroutine that creates the processed image from image path.
+	/// </summary>
+	/// <param name="i_path">Path of the image.</param>
+	/// <param name="i_id">ID of the image.</param>
+	/// <param name="i_img">Image object, that will be written.</param>
+	IEnumerator CreateImage (string i_path, int i_id, ProcessedImage i_img)
 	{
-		//StartCoroutine (imagen.ToTexture2D(this.gameObject));
-	}
+		//Creates auxiliary Texture2D
+		Texture2D tempText = new Texture2D(1,1);
 
-	void DidImageToTexture(object text)
-	{
-		sprite.sprite = Sprite.Create((Texture2D)text,new Rect(0,0,10,10),new Vector2(0,0));
-		Debug.Log ("¡YA TENGO SPRITEEEE!");
-	}
+		yield return null;
 
-	public void Instantiate(int index,string name){
-		GameObject go = new GameObject(name);
-		SpriteRenderer sprtRend = go.AddComponent<SpriteRenderer> ();
-		Sprite spr = new Sprite ();
-		//spr = Sprite.Create (PersistenceManager.GetImage (index).ToTexture2D (), new Rect (0, 0, 25,25), new Vector2 (0, 0));
-		sprtRend.sprite = spr;
+		//Reads image bytes from file path
+		byte[] imgRead = System.IO.File.ReadAllBytes (Application.persistentDataPath+"/"+i_path);
+
+		yield return null;
+
+		//Loads image into Texture
+		tempText.LoadImage (imgRead);
+
+		yield return null;
+
+		//Creates the ProcessedImage
+		i_img = new ProcessedImage (i_id, i_path, tempText);
 	}
 		
-	public void ProccesAndIndexImage(string i_path)
+	/// <summary>
+	/// Coroutine that divides the image into children images.
+	/// </summary>
+	/// <param name="i_divisionFactor">Number of children per row and column.</param>
+	/// <param name="i_idList">List of IDs for children.</param>
+	/// <param name="i_img">Parent image.</param>
+	/// <param name="i_imgList">List of images where children will be added.</param>
+	IEnumerator DivideImage (int i_divisionFactor, int[] i_idList, ProcessedImage i_img, List<ProcessedImage> i_imgList)
 	{
-		Debug.Log("Lanzo corrutina de procesamiento");
-		StartCoroutine(ProccesAndIndexImageCor (i_path));
-		Debug.Log("Corrutina lanzada");
+		//If it has ben divided yet
+		if (i_img.GetChildrenCount() > 0)
+			//Breaks
+			yield break;
+
+		//Calculates child width
+		int childrenWidth = Mathf.CeilToInt ((float)i_img.width / i_divisionFactor);
+		//Calculates child height
+		int childrenHeight = Mathf.CeilToInt ((float)i_img.height / i_divisionFactor);
+		//Initializes img list
+		i_imgList = new List<ProcessedImage> ();
+
+		yield return null;
+
+		//Creates auxiliar texture with parent image size
+		Texture2D tempText = new Texture2D (i_img.width, i_img.height);
+		//Loads parent image into texture
+		tempText.SetPixels (i_img.pixels);
+		//Apply texture changes
+		tempText.Apply ();
+
+		yield return null;
+
+		//Resizes texture
+		tempText = tempText.ResizeBilinear (childrenWidth * i_divisionFactor, childrenHeight * i_divisionFactor);
+
+		yield return null;
+
+		//Gets texture pixels
+		UnityEngine.Color[] tempPixels = tempText.GetPixels ();
+
+		yield return null;
+
+		//List of coroutines to wait
+		List<Coroutine> waitChildren = new List<Coroutine> ();
+
+		for (int x = 0; x < i_divisionFactor; x++) 
+		{
+			for (int y = 0; y < i_divisionFactor; y++) 
+			{
+				//Start child creation coroutine and adds it to coroutine list
+				waitChildren.Add (StartCoroutine (CreateChild (new Vector2((float)x,(float)y), childrenWidth, childrenHeight, i_divisionFactor,i_idList,i_img,i_imgList,tempPixels)));
+			}
+		}
+
+		//Waits for all coroutines
+		foreach (Coroutine wait in waitChildren) 
+		{
+			yield return wait;
+		}
 	}
+
+	//Problema de escritura de hijos??
+	//Guardar bytes en vez de pixels??
+	//Guardar imagen original en vez de partida??
+	/// <summary>
+	/// Coroutine that creates a child image.
+	/// </summary>
+	/// <param name="i_pos">Child image position.</param>
+	/// <param name="i_width">Child image width.</param>
+	/// <param name="i_height">Child image height.</param>
+	/// <param name="i_divisionFactor">Number of children per row and column.</param>
+	/// <param name="i_idList">List of IDs for child creation.</param>
+	/// <param name="i_img">Parent image.</param>
+	/// <param name="i_imgList">Children image list.</param>
+	/// <param name="i_tempPixels">Parent image pixels.</param>
+	IEnumerator CreateChild(Vector2 i_pos, int i_width, int i_height, int i_divisionFactor, int[] i_idList, ProcessedImage i_img, List<ProcessedImage> i_imgList, UnityEngine.Color[] i_tempPixels)
+	{
+		//Auxiliary pixel array for pixel copy
+		UnityEngine.Color[] auxPixels = new UnityEngine.Color[i_width * i_height];
+
+		int counter = 0;
+		for (int i = 0; i < i_width; i++) {
+			for (int j = 0; j < i_height; j++,counter++) 
+			{
+				//Calculates pixel position on parent image
+				int origPos = (int)i_pos.x * i_width + (int)i_pos.y * i_divisionFactor * i_width * i_height + i + j * i_width * i_divisionFactor;
+				//Copies pixel to child position in auxiliary array
+				auxPixels [i + j*i_width] = new UnityEngine.Color(i_tempPixels [origPos].r,i_tempPixels [origPos].g,i_tempPixels [origPos].b,i_tempPixels [origPos].a);
+
+				//If number of pixels copied this frame is maxPixelsProcessedPerFrame continues in next frame
+				if (counter % maxPixelsProcessedPerFrame == maxPixelsProcessedPerFrame-1) 
+				{
+					yield return null;
+				}	
+
+			}
+		}
+
+		yield return null;
+
+		//Creates an auxiliay child image
+		ProcessedImage auxImg = new ProcessedImage(auxPixels,i_width,i_height,i_idList[(int)i_pos.x*i_divisionFactor+(int)i_pos.y]);
+
+		//Adds child image ID to parent's children ID dict
+		i_img.AddChild (i_pos, auxImg.id);
+
+		//Adds child image to children list
+		i_imgList.Add(auxImg);
+
+		yield return null;
+	}
+
+	#endregion
+
+	#region ImageDataAnalysis
 
 	IEnumerator ProcessImageData (ProcessedImage i_img, ProcessedImageData i_imgData)
 	{
@@ -139,113 +319,6 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		ProcessData_DAC_Config (0, new Vector2(1f,21f),new List<PlatformPatternConfig> (levelConfigList.GetPatterns(i_imgData.GetDificulty())),24,i_imgData.GetScheme());
 		//dacProblem.Config (new Vector2(1f,21f),new List<PlatformPatternConfig> (levelConfigList.GetPatterns(0)),24,i_imgData.GetScheme());
 		yield return StartCoroutine(ProcessDataDivideAndConquer (0));
-	}
-
-	IEnumerator CreateImage (string i_path, int i_id)
-	{
-		//Creo una textura auxiliar
-		Texture2D tempText = new Texture2D(1,1);
-
-		yield return null;
-
-		//Leo la imagen correspondiente
-		byte[] imgRead = System.IO.File.ReadAllBytes (Application.persistentDataPath+"/"+i_path);
-
-		yield return null;
-
-		//Cargo la imagen en la textura
-		tempText.LoadImage (imgRead);
-
-		yield return null;
-
-		p_img = new ProcessedImage (i_id, i_path, tempText);
-	}
-
-	IEnumerator DivideImage (int i_divisionFactor)
-	{
-		//Si ya se ha divido
-		if (p_img.GetChildrenCount() > 0)
-			//Sale
-			yield break;
-
-		//Calcula el ancho de cada hijo
-		int childrenWidth = Mathf.CeilToInt ((float)p_img.width / i_divisionFactor);
-		//Calcula el alto de cada hijo
-		int childrenHeight = Mathf.CeilToInt ((float)p_img.height / i_divisionFactor);
-		//Crea una lista auxiliar de imagenes
-		p_imgList = new List<ProcessedImage> ();
-
-		yield return null;
-
-		//Crea una textura auxiliar
-		Texture2D tempText = new Texture2D (p_img.width, p_img.height);
-		//Le asigno los pixeles de la imagen padre
-		tempText.SetPixels (p_img.pixels);
-		//Aplico los cambios en la textura
-		tempText.Apply ();
-
-		yield return null;
-
-		//Aplico un reescalado bilineal
-		tempText = tempText.ResizeBilinear (childrenWidth * i_divisionFactor, childrenHeight * i_divisionFactor);
-
-		yield return null;
-
-		//Saco todos los pixeles de la textura
-		p_tempPixels = tempText.GetPixels ();
-
-		yield return null;
-
-		List<Coroutine> waitChildren = new List<Coroutine> ();
-		//Para cada hijo
-		for (int x = 0; x < i_divisionFactor; x++) 
-		{
-			for (int y = 0; y < i_divisionFactor; y++) 
-			{
-				waitChildren.Add (StartCoroutine (CreateChild (x, y, childrenWidth, childrenHeight, i_divisionFactor)));
-			}
-		}
-
-		foreach (Coroutine wait in waitChildren) 
-		{
-			yield return wait;
-		}
-	}
-
-	IEnumerator CreateChild(int i_x, int i_y, int i_width, int i_height, int i_divisionFactor)
-	{
-		//Creo una lista de pixeles auxiliar
-		UnityEngine.Color[] auxPixels = new UnityEngine.Color[i_width * i_height];
-
-		//Para cada pixel
-		int counter = 0;
-		for (int i = 0; i < i_width; i++) {
-			for (int j = 0; j < i_height; j++,counter++) 
-			{
-				//Obtengo su posicion y obtengo el color correspondiente
-				int origPos = i_x * i_width + i_y * i_divisionFactor * i_width * i_height + i + j * i_width * i_divisionFactor;
-				auxPixels [i + j*i_width] = new UnityEngine.Color(p_tempPixels [origPos].r,p_tempPixels [origPos].g,p_tempPixels [origPos].b,p_tempPixels [origPos].a);
-
-				if (counter % maxPixelsProcessedPerFrame == maxPixelsProcessedPerFrame-1) 
-				{
-					yield return null;
-				}	
-
-			}
-		}
-
-		yield return null;
-
-		//Creo una imagen auxiliar
-		ProcessedImage auxImg = new ProcessedImage(auxPixels,i_width,i_height,p_idList[i_x*i_divisionFactor+i_y]);
-
-		//Añado el hijo al diccionario de hijos del padre
-		p_img.AddChild (new Vector2 (i_x, i_y), auxImg.id);
-
-		//Añado el hijo a la lista de hijos
-		p_imgList.Add(auxImg);
-
-		yield return null;
 	}
 
 	public IEnumerator ProcessDataDivideAndConquer(int i_pos)
@@ -662,4 +735,6 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 
 		yield return null;
 	}
+
+	#endregion
 }
