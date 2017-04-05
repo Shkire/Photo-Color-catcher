@@ -36,7 +36,7 @@ public class ProcessData_DAC_Problem{
 	public List<CellContent>[,] scheme;
 
 }
-
+	
 /// <summary>
 /// Singleton object for image processing.
 /// </summary>
@@ -50,6 +50,11 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 	/// The number of images in which to divide per column and row (n x n images in total).
 	/// </summary>
 	public int divisionFactor;
+
+	/// <summary>
+	/// The size of the map.
+	/// </summary>
+	public int mapSize;
 
 	public LevelConfigList levelConfigList;
 
@@ -311,14 +316,181 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 	IEnumerator ProcessImageData (ProcessedImage i_img, ProcessedImageData i_imgData)
 	{
 		//Saco todos los datos necesarios
-		i_imgData = i_img.GetImageData();
+		//i_imgData = i_img.GetImageData();
 		//Aplico el DAC
-		GameObject dacController = new GameObject("DAC Controller");
+		//GameObject dacController = new GameObject("DAC Controller");
+		float redPercentage = 0;
+		float greenPercentage = 0;
+		float bluePercentage = 0;
+		float grayAverage = 0;
+		float maxValueAverage = 0;
+		foreach (UnityEngine.Color pixel in i_img.pixels) 
+		{
+			redPercentage += pixel.r;
+			greenPercentage += pixel.g;
+			bluePercentage += pixel.b;
+			grayAverage += pixel.grayscale;
+			maxValueAverage += pixel.maxColorComponent;
+		}
+		float redSaturation = redPercentage / i_img.pixels.Length;
+		float greenSaturation = greenPercentage / i_img.pixels.Length;
+		float blueSaturation = bluePercentage / i_img.pixels.Length;
+		float totalData = redSaturation + greenSaturation + blueSaturation;
+		redPercentage = redSaturation / totalData;
+		greenPercentage = greenSaturation / totalData;
+		bluePercentage = blueSaturation / totalData;
+		grayAverage = grayAverage / i_img.pixels;
+		maxValueAverage = maxValueAverage / i_img.pixels;
+
+
+
+
+
+		//Para que???
+		i_imgData = new ProcessedImageData (redData,greenData,blueData,redSaturation,greenSaturation,blueSaturation,grayData);
+		/*
 		p_problems = new List<ProcessData_DAC_Problem> ();
 		p_problems.Add (new ProcessData_DAC_Problem ());
 		ProcessData_DAC_Config (0, new Vector2(1f,21f),new List<PlatformPatternConfig> (levelConfigList.GetPatterns(i_imgData.GetDificulty())),24,i_imgData.GetScheme());
 		//dacProblem.Config (new Vector2(1f,21f),new List<PlatformPatternConfig> (levelConfigList.GetPatterns(0)),24,i_imgData.GetScheme());
 		yield return StartCoroutine(ProcessDataDivideAndConquer (0));
+		*/
+		//Dividir en tantas piezas como extension tenga el mapa
+		/*
+		 * Coger cada hijo como en createchild y calcular media
+		 * Almacenar en array los valores medios de los hijos
+		 * Calcular medias por columna
+		 * for que rellene plataformas
+		 * */
+		Texture2D auxText = new Texture2D (i_img.width, i_img.height);
+		auxText.SetPixels (i_img.pixels);
+		auxText.Apply;
+		int cellWidth = Mathf.CeilToInt ((float)auxText.width / (mapSize-2));
+		int cellHeight = Mathf.CeilToInt ((float)auxText.height / (mapSize-2));
+		auxText = auxText.ResizeBilinear (cellWidth*(mapSize-2),cellHeight*(mapSize-2));
+
+		float[,] cellsData = new float[mapSize-2,mapSize-2]();
+
+		//List of coroutines to wait
+		List<Coroutine> waitCells = new List<Coroutine> ();
+
+		for (int x = 0; x < mapSize-2; x++) 
+		{
+			for (int y = 0; y < mapSize-2; y++) 
+			{
+				//Start child creation coroutine and adds it to coroutine list
+				waitCells.Add (StartCoroutine (GetCellsData (new Vector2((float)x,(float)y), auxText.width, auxText.height, mapSize-2,auxText.GetPixels(),)));
+			}
+		}
+
+		//Waits for all coroutines
+		foreach (Coroutine wait in waitCells) 
+		{
+			yield return wait;
+		}
+
+		List<CellContent>[,] scheme = new List<CellContent>[mapSize,mapSize]();
+		float[] columnData = new float[mapSize-2]();
+		float[] rowData = new float[mapSize-2]();
+
+		for (int i = 0; i<mapSize-2; i++)
+		{
+			for (int j = 0; j<mapSize-2; j++)
+			{
+				columnData[i] += cellsData[i,j]/(mapSize-2);
+				rowData[j] += cellsData[i,j]/(mapSize-2);
+			}
+		}
+
+		for (int i = 0; i<mapSize-2; i++)
+		{
+			for (int j = 0; j<mapSize-2; j++)
+			{
+				if (scheme[i+1,j+1] != null)
+				{
+					scheme[i+1,j+1] = new List<CellContent>();
+					if (cellsData[i,j] >= rowData[j])
+					{
+						scheme[i+1,j+1].Add(CellContent.Platform);
+						scheme[i+1,j+2] = new List<CellContent>();
+						scheme[i+1,j+2].Add(CellContent.EmptySpace);
+					}
+					else
+					{
+						scheme[i+1,j+1].Add(CellContent.EmptySpace);	
+					}
+				}
+			}
+		}
+
+		scheme[0,0] = new List<CellContent>();
+		scheme[0,0].Add(CellContent.Platform);
+		scheme[0,mapSize-1] = new List<CellContent>();
+		scheme[0,mapSize-1].Add(CellContent.Platform);
+		scheme[mapSize-1,0] = new List<CellContent>();
+		scheme[mapSize-1,0].Add(CellContent.Platform);
+		scheme[mapSize-1,mapSize-1] = new List<CellContent>();
+		scheme[mapSize-1,mapSize-1].Add(CellContent.Platform);
+
+		float columnValue;
+
+		for (int i=0; i<columnData.Length; i++)
+		{
+			columnValue += columnData[i]/columnData.Length;
+		}
+
+		float rowValue;
+
+		for (int i=0; i<rowData.Length; i++)
+		{
+			rowValue += rowData[i]/columnData.Length;
+		}
+
+		for (int i=0; i<columnData.Length; i++)
+		{
+			scheme[i+1,0] = new List<CellContent>();
+			scheme[i+1,mapSize-1] = new List<CellContent>();
+			if (columnData[i]>=columnValue)
+			{
+				scheme[i+1,0].Add(CellContent.Platform);
+				scheme[i+1,mapSize-1].Add(CellContent.Platform);
+			}
+			else
+			{
+				if (columnData[i]>=columnValue)
+				{
+					scheme[i+1,0].Add(CellContent.EmptySpace);
+					scheme[i+1,mapSize-1].Add(CellContent.EmptySpace);
+				}
+			}
+		}
+
+		//Ir rellenando array de plataformas
+	}
+
+	public IEnumerator GetCellsData(Vector2 i_pos, int i_width, int i_height, int i_mapSize, UnityEngine.Color[] i_tempPixels, float[,] i_cellsData)
+	{
+
+		//int counter = 0;
+		int i;
+		int j;
+		for (i = 0; i < i_width; i++) {
+			for (j = 0; j < i_height; j++/*,counter++*/) 
+			{
+				//Calculates pixel position on parent image
+				int origPos = (int)i_pos.x * i_width + (int)i_pos.y * i_mapSize * i_width * i_height + i + j * i_width * i_mapSize;
+				i_cellsData [i_pos.x, i_pos.y] += (i_tempPixels [origPos].r + i_tempPixels [origPos].g + i_tempPixels [origPos].b) / 3;
+
+				/*
+				//If number of pixels copied this frame is maxPixelsProcessedPerFrame continues in next frame
+				if (counter % maxPixelsProcessedPerFrame == maxPixelsProcessedPerFrame-1) 
+				{
+					yield return null;
+				}
+				*/
+			}
+		}
+		i_cellsData [i_pos.x, i_pos.y] = i_cellsData [i_pos.x, i_pos.y] / (i * j);
 	}
 
 	public IEnumerator ProcessDataDivideAndConquer(int i_pos)
