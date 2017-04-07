@@ -301,15 +301,15 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		redPercentage = redSaturation / totalData;
 		greenPercentage = greenSaturation / totalData;
 		bluePercentage = blueSaturation / totalData;
-		grayAverage = grayAverage / i_img.pixels;
-		maxValueAverage = maxValueAverage / i_img.pixels;
+		grayAverage = grayAverage / i_img.pixels.Length;
+		maxValueAverage = maxValueAverage / i_img.pixels.Length;
 
 
 
 
 
 		//Para que???
-		i_imgData = new ProcessedImageData (redData,greenData,blueData,redSaturation,greenSaturation,blueSaturation,grayData);
+		//i_imgData = new ProcessedImageData (redData,greenData,blueData,redSaturation,greenSaturation,blueSaturation,grayData);
 		/*
 		p_problems = new List<ProcessData_DAC_Problem> ();
 		p_problems.Add (new ProcessData_DAC_Problem ());
@@ -328,12 +328,12 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		 * */
 		Texture2D auxText = new Texture2D (i_img.width, i_img.height);
 		auxText.SetPixels (i_img.pixels);
-		auxText.Apply;
+		auxText.Apply();
 		int cellWidth = Mathf.CeilToInt ((float)auxText.width / (mapSize-2));
 		int cellHeight = Mathf.CeilToInt ((float)auxText.height / (mapSize-2));
 		auxText = auxText.ResizeBilinear (cellWidth*(mapSize-2),cellHeight*(mapSize-2));
 
-		float[,] cellsData = new float[mapSize-2,mapSize-2]();
+		float[,] cellsData = new float[mapSize-2,mapSize-2];
 
 		//List of coroutines to wait
 		List<Coroutine> waitCells = new List<Coroutine> ();
@@ -343,7 +343,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 			for (int y = 0; y < mapSize-2; y++) 
 			{
 				//Start child creation coroutine and adds it to coroutine list
-				waitCells.Add (StartCoroutine (GetCellsData (new Vector2((float)x,(float)y), auxText.width, auxText.height, mapSize-2,auxText.GetPixels())));
+				waitCells.Add (StartCoroutine (GetCellsData (new Vector2((float)x,(float)y), auxText.width, auxText.height, mapSize-2,auxText.GetPixels(),cellsData)));
 			}
 		}
 
@@ -353,9 +353,9 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 			yield return wait;
 		}
 
-		List<CellContent>[,] scheme = new List<CellContent>[mapSize,mapSize]();
-		float[] columnData = new float[mapSize-2]();
-		float[] rowData = new float[mapSize-2]();
+		List<CellContent>[,] scheme = new List<CellContent>[mapSize,mapSize];
+		float[] columnData = new float[mapSize-2];
+		float[] rowData = new float[mapSize-2];
 
 		for (int i = 0; i<mapSize-2; i++)
 		{
@@ -396,14 +396,14 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		scheme[mapSize-1,mapSize-1] = new List<CellContent>();
 		scheme[mapSize-1,mapSize-1].Add(CellContent.Platform);
 
-		float columnValue;
+		float columnValue = 0;
 
 		for (int i=0; i<columnData.Length; i++)
 		{
 			columnValue += columnData[i]/columnData.Length;
 		}
 
-		float rowValue;
+		float rowValue = 0;
 
 		for (int i=0; i<rowData.Length; i++)
 		{
@@ -436,14 +436,14 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 	{
 
 		//int counter = 0;
-		int i;
-		int j;
+		int i = 0;
+		int j = 0;
 		for (i = 0; i < i_width; i++) {
 			for (j = 0; j < i_height; j++/*,counter++*/) 
 			{
 				//Calculates pixel position on parent image
 				int origPos = (int)i_pos.x * i_width + (int)i_pos.y * i_mapSize * i_width * i_height + i + j * i_width * i_mapSize;
-				i_cellsData [i_pos.x, i_pos.y] += (i_tempPixels [origPos].r + i_tempPixels [origPos].g + i_tempPixels [origPos].b) / 3;
+				i_cellsData [(int)i_pos.x, (int)i_pos.y] += ((i_tempPixels [origPos].r + i_tempPixels [origPos].g + i_tempPixels [origPos].b) / 3);
 
 				/*
 				//If number of pixels copied this frame is maxPixelsProcessedPerFrame continues in next frame
@@ -454,7 +454,9 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 				*/
 			}
 		}
-		i_cellsData [i_pos.x, i_pos.y] = i_cellsData [i_pos.x, i_pos.y] / (i * j);
+		i_cellsData [(int)i_pos.x, (int)i_pos.y] = i_cellsData [(int)i_pos.x, (int)i_pos.y] / (i * j);
+
+		yield return null;
 	}
 		
 

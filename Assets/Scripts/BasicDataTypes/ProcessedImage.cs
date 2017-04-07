@@ -111,7 +111,8 @@ public class ProcessedImage{
 		greenData = greenSaturation / totalData;
 		blueData = blueSaturation / totalData;
 		grayData = grayData / (p_width * p_height);
-		return new ProcessedImageData (redData,greenData,blueData,redSaturation,greenSaturation,blueSaturation,grayData);
+		//return new ProcessedImageData (redData,greenData,blueData,redSaturation,greenSaturation,blueSaturation,grayData);
+		return null;
 	}
 
 	public int GetId()
