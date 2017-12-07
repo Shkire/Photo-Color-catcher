@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Leap;
 using System.IO.Ports;
 using System;
 using UnityEngine.UI;
@@ -63,7 +62,7 @@ public class PjMovementController : CharacterMovementController
 
 	void OnEnable()
 	{
-		LeapMotionController.CreateController (left,right,bottom,top);
+
 	}
 		
 	void FixedUpdate ()
@@ -72,23 +71,6 @@ public class PjMovementController : CharacterMovementController
 
 		bool andando = false;
 
-		LeapMotionController.UpdateFrames ();
-		LeapMotionController.UpdateY ();
-
-		if (LeapMotionController.MoreThanOneHand())
-		{
-			if (LeapMotionController.Right ()) {
-				Move (1);
-				andando = true;
-			}
-			if (LeapMotionController.Left ()) {
-				Move (-1);
-				andando = true;
-			}
-			if (LeapMotionController.Bottom() && LeapMotionController.Top() && LeapMotionController.Range_y() )
-				Jump ();		
-		}
-	
 		float movement = Input.GetAxis ("Horizontal");
 		Move (movement);
 		if (movement != 0) {

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Leap;
 
 /// <summary>
 /// Pj attack controller.
@@ -42,25 +41,22 @@ public class PjAttackController : MonoBehaviour
 
 	void OnEnable ()
 	{
-		LeapMotionController.CreateController (front, back);
+		
 	}
 
 	void FixedUpdate ()
 	{
-		LeapMotionController.UpdateFrames ();
-		LeapMotionController.UpdateZ ();
-
 		if (active) {
 			frame.GetComponent<Collider2D> ().enabled = false;
 			active = false;
 		}
 
-		if (Input.GetKeyDown (KeyCode.Space) || (LeapMotionController.PreparePhoto () && LeapMotionController.Range_z ())) {
+		if (Input.GetKeyDown (KeyCode.Space)) {
 			frame.GetComponent<SpriteRenderer> ().enabled = true;
 			range = true;
 		}
 			
-		if (Input.GetKeyUp (KeyCode.Space) || (LeapMotionController.Photo ()) && range) {
+		if (Input.GetKeyUp (KeyCode.Space) && range) {
 			frame.GetComponent<SpriteRenderer> ().enabled = false;
 			frame.GetComponent<Collider2D> ().enabled = true;
 			Vector2 min = Camera.main.WorldToScreenPoint (frame.GetComponent<Collider2D> ().bounds.min);
