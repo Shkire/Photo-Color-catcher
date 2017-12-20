@@ -7,6 +7,7 @@ public class GUIDecoration : GUIObject {
 	{
 		WhenFocused,
 		WhenNonFocused,
+		WhenSelected,
 		Always,
 		Never
 	}
@@ -38,7 +39,7 @@ public class GUIDecoration : GUIObject {
 	public override void NonFocused()
 	{
 		base.NonFocused ();
-		if (behaviour.Equals (DecorationContext.WhenNonFocused)) {
+		if (behaviour.Equals (DecorationContext.Always) || behaviour.Equals (DecorationContext.WhenNonFocused)) {
 			foreach (MonoBehaviour script in GetComponents<MonoBehaviour>())
 				script.enabled = true;
 			foreach (Renderer rend in GetComponents<Renderer>())
@@ -53,6 +54,19 @@ public class GUIDecoration : GUIObject {
 				rend.enabled = false;
 			foreach (Behaviour comp in GetComponents<Behaviour>())
 				comp.enabled = false;
+		}
+	}
+
+	public override void Selected()
+	{
+		base.Selected ();
+		if (behaviour.Equals (DecorationContext.WhenSelected)) {
+			foreach (MonoBehaviour script in GetComponents<MonoBehaviour>())
+				script.enabled = true;
+			foreach (Renderer rend in GetComponents<Renderer>())
+				rend.enabled = true;
+			foreach (Behaviour comp in GetComponents<Behaviour>())
+				comp.enabled = true;
 		}
 	}
 }
