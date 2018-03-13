@@ -1,0 +1,7 @@
+1-Movimiento pj
+2-Comportamiento enemigos
+3-Captura y guardado imágenes
+4-IU
+5-Guardado de datos
+6-Coleccionables
+7-Diseño responsive

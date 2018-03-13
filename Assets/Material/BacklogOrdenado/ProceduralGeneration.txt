@@ -1,4 +1,0 @@
-1-Carga de imágenes
-2-Análisis de imágenes
-3-Creación de niveles a partir de imágenes
-4-Spawneo de enemigos a partir de imágenes

@@ -1,9 +1,0 @@
-Porcentaje total rojo/verde/azul
-Random(0-1)
-
-Nivel combate
-Nivel contrarreloj
-Nivel ¿jefe?
-
-Porcentaje de oscuridad total 
-Random(0-Porc blanco)*coef blanco + Random(0-Porc negro)*coef negro = dificultad nivel

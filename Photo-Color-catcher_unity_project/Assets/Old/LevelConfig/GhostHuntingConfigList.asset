@@ -1,0 +1,131 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d69b14da54a16394e8815d8f20f2c1fd, type: 3}
+  m_Name: GhostHuntingConfigList
+  m_EditorClassIdentifier: 
+  levelConfigList:
+  - level: 0
+    teleportMin: 0
+    teleportMax: 0
+    maxTeleportNumBySide: 0
+    minPiecesByPlatform: 0
+    maxPiecesByPlatform: 0
+    minPlatforms: 0
+    maxPlatforms: 0
+    patternConfigList:
+    - pattern: 1
+      minLines: 2
+      maxLines: 4
+      minPiecesByPlatform: 3
+      maxPiecesByPlatform: 5
+      maxPlatforms: 7
+    - pattern: 2
+      minLines: 4
+      maxLines: 8
+      minPiecesByPlatform: 3
+      maxPiecesByPlatform: 5
+      maxPlatforms: 7
+    - pattern: 3
+      minLines: 4
+      maxLines: 8
+      minPiecesByPlatform: 3
+      maxPiecesByPlatform: 5
+      maxPlatforms: 7
+  - level: 1
+    teleportMin: 0
+    teleportMax: 2
+    maxTeleportNumBySide: 1
+    minPiecesByPlatform: 7
+    maxPiecesByPlatform: 11
+    minPlatforms: 15
+    maxPlatforms: 20
+    patternConfigList: []
+  - level: 2
+    teleportMin: 1
+    teleportMax: 4
+    maxTeleportNumBySide: 2
+    minPiecesByPlatform: 0
+    maxPiecesByPlatform: 0
+    minPlatforms: 0
+    maxPlatforms: 0
+    patternConfigList: []
+  - level: 3
+    teleportMin: 2
+    teleportMax: 4
+    maxTeleportNumBySide: 2
+    minPiecesByPlatform: 0
+    maxPiecesByPlatform: 0
+    minPlatforms: 0
+    maxPlatforms: 0
+    patternConfigList: []
+  - level: 4
+    teleportMin: 3
+    teleportMax: 6
+    maxTeleportNumBySide: 3
+    minPiecesByPlatform: 0
+    maxPiecesByPlatform: 0
+    minPlatforms: 0
+    maxPlatforms: 0
+    patternConfigList: []
+  - level: 5
+    teleportMin: 4
+    teleportMax: 6
+    maxTeleportNumBySide: 3
+    minPiecesByPlatform: 0
+    maxPiecesByPlatform: 0
+    minPlatforms: 0
+    maxPlatforms: 0
+    patternConfigList: []
+  - level: 6
+    teleportMin: 5
+    teleportMax: 8
+    maxTeleportNumBySide: 4
+    minPiecesByPlatform: 0
+    maxPiecesByPlatform: 0
+    minPlatforms: 0
+    maxPlatforms: 0
+    patternConfigList: []
+  - level: 7
+    teleportMin: 6
+    teleportMax: 8
+    maxTeleportNumBySide: 4
+    minPiecesByPlatform: 0
+    maxPiecesByPlatform: 0
+    minPlatforms: 0
+    maxPlatforms: 0
+    patternConfigList: []
+  - level: 8
+    teleportMin: 7
+    teleportMax: 10
+    maxTeleportNumBySide: 5
+    minPiecesByPlatform: 0
+    maxPiecesByPlatform: 0
+    minPlatforms: 0
+    maxPlatforms: 0
+    patternConfigList: []
+  - level: 9
+    teleportMin: 8
+    teleportMax: 10
+    maxTeleportNumBySide: 5
+    minPiecesByPlatform: 0
+    maxPiecesByPlatform: 0
+    minPlatforms: 0
+    maxPlatforms: 0
+    patternConfigList: []
+  - level: 10
+    teleportMin: 8
+    teleportMax: 12
+    maxTeleportNumBySide: 6
+    minPiecesByPlatform: 0
+    maxPiecesByPlatform: 0
+    minPlatforms: 0
+    maxPlatforms: 0
+    patternConfigList: []
