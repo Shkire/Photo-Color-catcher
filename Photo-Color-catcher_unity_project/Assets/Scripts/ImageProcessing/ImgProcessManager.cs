@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
-using PlatformPattern = PlatformPatternConfig.PlatformPattern;
-using CellContent = MapScheme.CellContent;
 
 /// <summary>
 /// Singleton object for image processing.
@@ -14,10 +12,6 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 	/// The max pixels processed per frame.
 	/// </summary>
 	public int maxPixelsProcessedPerFrame;
-	/// <summary>
-	/// The number of images in which to divide per column and row (n x n images in total).
-	/// </summary>
-	public int divisionFactor;
 
 	/// <summary>
 	/// The size of the map.
@@ -29,6 +23,84 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 	//Protected constructor of singleton
 	protected ImgProcessManager () 
 	{
+	}
+
+	private IEnumerator DivideImage(OnMatrixImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnMatrixImage> o_childrenImages)
+	{
+		//Calculates child width (width/columns)
+		int childrenWidth = Mathf.CeilToInt ((float)i_img.width / i_columns);
+		//Calculates child height (height/rows)
+		int childrenHeight = Mathf.CeilToInt ((float)i_img.height / i_rows);
+
+		//Resizes texture if needed
+		i_img.ResizeBilinear(childrenWidth * i_columns, childrenHeight * i_rows);
+
+		yield return null;
+
+		//Creates children image dictionary and initializes it
+		o_childrenImages = new Dictionary<Vector2, OnMatrixImage>();
+		for (int x = 0; x < i_columns; x++) 
+		{
+			for (int y = 0; y < i_rows; y++) 
+			{
+				o_childrenImages.Add (new Vector2 ((float)x, (float)y), new OnMatrixImage (childrenWidth, childrenHeight));
+			}
+		}
+
+		//For every pixel
+		int counter = 0;
+		OnMatrixImage childImage;
+		int column;
+		int row;
+		int childFirstPos;
+		int childPixelPos;
+		while (counter < i_img.pixels.Length) 
+		{
+			column = ((counter / childrenWidth) % i_columns);
+			row = counter / (childrenHeight * i_img.width);
+			childImage = o_childrenImages [new Vector2 ((float)column, (float)row)];
+			for (int i = 0; i < childrenWidth; i++) 
+			{
+				childFirstPos = row * childrenHeight * i_img.width + column * childrenWidth;
+				childPixelPos = ((counter + i - childFirstPos) / i_img.width) * childrenWidth + ((counter + i - childFirstPos) % i_img.width);
+				childImage.pixels [childPixelPos] = i_img.pixels [counter + i];
+			}
+			counter += childrenWidth;
+
+			//Copies a child image row per frame
+			yield return null;
+		}
+	}
+
+	private IEnumerator DivideImageAndProcessCellData(OnMatrixImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnMatrixImage> o_childrenImages)
+	{
+		yield return (StartCoroutine (DivideImage (i_img, i_rows, i_columns, o_childrenImages)));
+
+		//Get color average and grayscale from cell
+		foreach (Vector2 pos in o_childrenImages.Keys) 
+		{
+			OnMatrixImage img = o_childrenImages [pos];
+			img.average = new Color ();
+			for (int i = 0; i < img.pixels.Length; i++) 
+			{
+				img.average.r += img.pixels [i].r / img.pixels.Length;
+				img.average.g += img.pixels [i].g / img.pixels.Length;
+				img.average.b += img.pixels [i].b / img.pixels.Length;
+				img.grayscale += img.pixels [i].grayscale / img.pixels.Length;
+			}
+
+			yield return null;
+		}
+	}
+
+	public void StartDivideImage(OnMatrixImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnMatrixImage> o_childrenImages)
+	{
+		StartCoroutine (DivideImage (i_img, i_rows, i_columns, o_childrenImages));
+	}
+
+	public void StartDivideImageAndProcessCellData(OnMatrixImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnMatrixImage> o_childrenImages)
+	{
+		StartCoroutine (DivideImageAndProcessCellData (i_img, i_rows, i_columns, o_childrenImages));
 	}
 
 	/// <summary>
