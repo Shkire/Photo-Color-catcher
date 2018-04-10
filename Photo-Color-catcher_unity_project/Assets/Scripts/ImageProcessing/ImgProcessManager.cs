@@ -80,7 +80,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 		foreach (Vector2 pos in o_childrenImages.Keys) 
 		{
 			OnMatrixImage img = o_childrenImages [pos];
-			img.average = new Color ();
+            img.average = Color.black;
 			for (int i = 0; i < img.pixels.Length; i++) 
 			{
 				img.average.r += img.pixels [i].r / img.pixels.Length;
@@ -92,6 +92,52 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 			yield return null;
 		}
 	}
+
+    private IEnumerator GenerateLevel(Dictionary<Vector2,OnMatrixImage> i_cellImages)
+    {
+        Dictionary<Vector3,RGB_Content> sampleColors = new Dictionary<Vector3, RGB_Content>();
+
+        CieLabColor aux = Color.red.ToCieLab();
+        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, false, false));
+        aux = Color.green.ToCieLab();
+        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(false, true, false));
+        aux = Color.blue.ToCieLab();
+        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(false, false, true));
+        aux = (new Color(1, 1, 0)).ToCieLab();
+        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, true, false));
+        aux = (new Color(1, 0, 1)).ToCieLab();
+        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, false, true));
+        aux = (new Color(0, 1, 1)).ToCieLab();
+        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(false, true, true));
+        aux = (new Color(1, 1, 1)).ToCieLab();
+        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, true, true));
+
+        yield return null;
+
+        Vector3 goal = Vector3.zero;
+        Vector3 average;
+        float distance = -1;
+        RGB_Content rgbSample;
+        foreach (Vector2 pos in i_cellImages.Keys)
+        {
+            aux=i_cellImages[pos].average.ToCieLab();
+            average = new Vector3(aux.l, aux.a, aux.b);
+            foreach (Vector3 sample in sampleColors.Keys)
+            {
+                if (distance == -1 || (Vector3.Distance(average, sample) < distance))
+                {
+                    goal = sample;
+                    distance = Vector3.Distance(average, goal);
+                }
+            }
+            rgbSample = sampleColors[goal];
+            i_cellImages[pos].goal = new RGB_Content(rgbSample.r, rgbSample.g, rgbSample.b);
+
+            yield return null;
+
+            //comparar todas las celdas para ver cuales tienen una diferencia de escala de grises >= 0.5
+        }
+    }
 
 	public void StartDivideImage(OnMatrixImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnMatrixImage> o_childrenImages)
 	{

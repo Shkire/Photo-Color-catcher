@@ -3,6 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 
 [System.Serializable]
+public class RGB_Content
+{
+    public bool r;
+
+    public bool g;
+
+    public bool b;
+
+    public RGB_Content(bool i_r, bool i_g, bool i_b)
+    {
+        r = i_r;
+        g = i_g;
+        b = i_b;
+    }
+}
+
+[System.Serializable]
 public class OnMatrixImage{
 
 	public UnityEngine.Color[] pixels;
@@ -14,6 +31,8 @@ public class OnMatrixImage{
 	public UnityEngine.Color average;
 
 	public float grayscale;
+
+    public RGB_Content goal;
 
 	public OnMatrixImage(int i_width, int i_height)
 	{
