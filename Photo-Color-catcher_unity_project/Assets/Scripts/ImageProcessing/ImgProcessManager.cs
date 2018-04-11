@@ -135,6 +135,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager> {
 
             yield return null;
 
+
             //comparar todas las celdas para ver cuales tienen una diferencia de escala de grises >= 0.5
         }
     }

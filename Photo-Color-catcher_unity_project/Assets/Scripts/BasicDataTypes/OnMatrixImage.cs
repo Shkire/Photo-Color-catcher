@@ -20,47 +20,48 @@ public class RGB_Content
 }
 
 [System.Serializable]
-public class OnMatrixImage{
+public class OnMatrixImage
+{
 
-	public UnityEngine.Color[] pixels;
+    public UnityEngine.Color[] pixels;
 
-	public int width;
+    public int width;
 
-	public int height;
+    public int height;
 
-	public UnityEngine.Color average;
+    public UnityEngine.Color average;
 
-	public float grayscale;
+    public float grayscale;
 
     public RGB_Content goal;
 
-	public OnMatrixImage(int i_width, int i_height)
-	{
-		width = i_width;
-		height = i_height;
-		pixels = new Color[width * height];
-	}
+    public OnMatrixImage(int i_width, int i_height)
+    {
+        width = i_width;
+        height = i_height;
+        pixels = new Color[width * height];
+    }
 
-	public void ResizeBilinear(int i_newWidth, int i_newHeight)
-	{
-		if (i_newWidth != width || i_newHeight != height) 
-		{
-			//Creates auxiliar texture
-			Texture2D tempText = new Texture2D (width, height);
-			//Loads parent image
-			tempText.SetPixels (pixels);
-			//Apply texture changes
-			tempText.Apply ();
-			//Resizes texture
-			tempText = tempText.ResizeBilinear (i_newWidth, i_newHeight);
-			//Gets OnMatrixImage
-			pixels = tempText.GetPixels();
-			width = tempText.width;
-			height = tempText.height;
-		}
-	}
+    public void ResizeBilinear(int i_newWidth, int i_newHeight)
+    {
+        if (i_newWidth != width || i_newHeight != height)
+        {
+            //Creates auxiliar texture
+            Texture2D tempText = new Texture2D(width, height);
+            //Loads parent image
+            tempText.SetPixels(pixels);
+            //Apply texture changes
+            tempText.Apply();
+            //Resizes texture
+            tempText = tempText.ResizeBilinear(i_newWidth, i_newHeight);
+            //Gets OnMatrixImage
+            pixels = tempText.GetPixels();
+            width = tempText.width;
+            height = tempText.height;
+        }
+    }
 
-	/*
+    /*
 	{
 		get
 		{
