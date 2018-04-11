@@ -140,7 +140,6 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
             yield return null;
         }
 
-        //comparar todas las celdas para ver cuales tienen una diferencia de escala de grises >= 0.5
         int max = (int)Mathf.Pow(levelGraph.vertices.Count, 0.5f);
         for (int y = 0; y < max; y++)
         {
@@ -151,6 +150,76 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                 if (x < max - 1 && Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x, (float)y + 1)].grayscale) >= 0.5f)
                     levelGraph.AddAdjacent(new Vector2((float)x, (float)y), new Vector2((float)x, (float)y + 1));
             }
+        }
+
+        List<List<Vector2>> connectedVertices = levelGraph.GetConnectedVertices();
+        float minGrayDif;
+        Vector2 vertex = Vector2.zero;
+        Vector2 adjacent = Vector2.zero;
+        bool notConnected;
+        int foundVertices;
+        while (connectedVertices.Count > 1)
+        {
+            minGrayDif = 2f;
+            for (int y = 0; y < max; y++)
+            {
+                for (int x = 0; x < max; x++)
+                {
+                    if (x < max - 1)
+                    {
+                        notConnected = true;
+                        foundVertices = 0;
+                        for (int i = 0; i < connectedVertices.Count; i++)
+                        {
+                            if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) && connectedVertices[i].Contains(new Vector2((float)x + 1, (float)y)))
+                            {
+                                notConnected = false;
+                                break;
+                            }
+                            if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) || connectedVertices[i].Contains(new Vector2((float)x + 1, (float)y)))
+                            {
+                                foundVertices++;
+                                if (foundVertices == 2)
+                                    break;
+                            }
+                        }
+                        if (Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x + 1, (float)y)].grayscale) < minGrayDif)
+                        {
+                            minGrayDif = Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x + 1, (float)y)].grayscale);
+                            vertex = new Vector2((float)x, (float)y);
+                            adjacent = new Vector2((float)x + 1, (float)y);
+                        }
+                    }
+                    if (y < max - 1)
+                    {
+                        notConnected = true;
+                        foundVertices = 0;
+                        for (int i = 0; i < connectedVertices.Count; i++)
+                        {
+                            if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) && connectedVertices[i].Contains(new Vector2((float)x, (float)y + 1)))
+                            {
+                                notConnected = false;
+                                break;
+                            }
+                            if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) || connectedVertices[i].Contains(new Vector2((float)x, (float)y + 1)))
+                            {
+                                foundVertices++;
+                                if (foundVertices == 2)
+                                    break;
+                            }
+                        }
+                        if (Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x, (float)y + 1)].grayscale) < minGrayDif)
+                        {
+                            minGrayDif = Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x, (float)y + 1)].grayscale);
+                            vertex = new Vector2((float)x, (float)y);
+                            adjacent = new Vector2((float)x, (float)y + 1);
+                        }
+                    }
+
+                }
+            }
+            levelGraph.AddAdjacent(vertex, adjacent);
+            connectedVertices = levelGraph.GetConnectedVertices();
         }
     }
 
