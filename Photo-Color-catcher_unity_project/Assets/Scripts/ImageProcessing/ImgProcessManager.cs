@@ -2,13 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
+using CIE_Color;
 
 /// <summary>
 /// Singleton object for image processing.
 /// </summary>
 public class ImgProcessManager : Singleton<ImgProcessManager>
 {
-
     /// <summary>
     /// The max pixels processed per frame.
     /// </summary>
@@ -26,7 +26,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
     {
     }
 
-    private IEnumerator DivideImage(OnMatrixImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnMatrixImage> o_childrenImages)
+    private IEnumerator DivideImage(OnArrayImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnArrayImage> o_childrenImages)
     {
         //Calculates child width (width/columns)
         int childrenWidth = Mathf.CeilToInt((float)i_img.width / i_columns);
@@ -39,18 +39,18 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         yield return null;
 
         //Creates children image dictionary and initializes it
-        o_childrenImages = new Dictionary<Vector2, OnMatrixImage>();
+        o_childrenImages = new Dictionary<Vector2, OnArrayImage>();
         for (int x = 0; x < i_columns; x++)
         {
             for (int y = 0; y < i_rows; y++)
             {
-                o_childrenImages.Add(new Vector2((float)x, (float)y), new OnMatrixImage(childrenWidth, childrenHeight));
+                o_childrenImages.Add(new Vector2((float)x, (float)y), new OnArrayImage(childrenWidth, childrenHeight));
             }
         }
 
         //For every pixel
         int counter = 0;
-        OnMatrixImage childImage;
+        OnArrayImage childImage;
         int column;
         int row;
         int childFirstPos;
@@ -73,14 +73,14 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         }
     }
 
-    private IEnumerator DivideImageAndProcessCellData(OnMatrixImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnMatrixImage> o_childrenImages)
+    private IEnumerator DivideImageAndProcessCellData(OnArrayImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnArrayImage> o_childrenImages)
     {
         yield return (StartCoroutine(DivideImage(i_img, i_rows, i_columns, o_childrenImages)));
 
         //Get color average and grayscale from cell
         foreach (Vector2 pos in o_childrenImages.Keys)
         {
-            OnMatrixImage img = o_childrenImages[pos];
+            OnArrayImage img = o_childrenImages[pos];
             img.average = Color.black;
             for (int i = 0; i < img.pixels.Length; i++)
             {
@@ -94,23 +94,28 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         }
     }
 
-    private IEnumerator GenerateLevel(Dictionary<Vector2,OnMatrixImage> i_cellImages)
+    /// <summary>
+    /// Generates a level using the processed cells of the image.
+    /// </summary>
+    /// <param name="i_cellImages">Image divided into cells.</param>
+    /// <param name="o_levelGraph">OUT: Level graph.</param>
+    private IEnumerator GenerateLevel(Dictionary<Vector2,OnArrayImage> i_cellImages, GraphType<Vector2> o_levelGraph)
     {
+        //Stores the sample colors: all posible combinations of RGB components.
         Dictionary<Vector3,RGB_Content> sampleColors = new Dictionary<Vector3, RGB_Content>();
-
-        CieLabColor aux = Color.red.ToCieLab();
+        CIE_LabColor aux = Color.red.ToCIE_Lab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, false, false));
-        aux = Color.green.ToCieLab();
+        aux = Color.green.ToCIE_Lab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(false, true, false));
-        aux = Color.blue.ToCieLab();
+        aux = Color.blue.ToCIE_Lab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(false, false, true));
-        aux = (new Color(1, 1, 0)).ToCieLab();
+        aux = (new Color(1, 1, 0)).ToCIE_Lab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, true, false));
-        aux = (new Color(1, 0, 1)).ToCieLab();
+        aux = (new Color(1, 0, 1)).ToCIE_Lab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, false, true));
-        aux = (new Color(0, 1, 1)).ToCieLab();
+        aux = (new Color(0, 1, 1)).ToCIE_Lab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(false, true, true));
-        aux = (new Color(1, 1, 1)).ToCieLab();
+        aux = (new Color(1, 1, 1)).ToCIE_Lab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, true, true));
 
         yield return null;
@@ -119,12 +124,15 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         Vector3 average;
         float distance = -1;
         RGB_Content rgbSample;
-        GraphType<Vector2> levelGraph = new GraphType<Vector2>();
+        o_levelGraph = new GraphType<Vector2>();
 
+        //For every cell.
         foreach (Vector2 pos in i_cellImages.Keys)
         {
-            aux = i_cellImages[pos].average.ToCieLab();
+            aux = i_cellImages[pos].average.ToCIE_Lab();
             average = new Vector3(aux.l, aux.a, aux.b);
+
+            //Compares the average color with all the samples.
             foreach (Vector3 sample in sampleColors.Keys)
             {
                 if (distance == -1 || (Vector3.Distance(average, sample) < distance))
@@ -134,33 +142,53 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                 }
             }
             rgbSample = sampleColors[goal];
-            i_cellImages[pos].goal = new RGB_Content(rgbSample.r, rgbSample.g, rgbSample.b);
-            levelGraph.AddVertex(pos);
+
+            //Assigns the RGB combination of the most similar sample.
+            i_cellImages[pos].rgbComponents = new RGB_Content(rgbSample.r, rgbSample.g, rgbSample.b);
+
+            //Adds the vertex to the graph.
+            o_levelGraph.AddVertex(pos);
 
             yield return null;
         }
+            
+        int max = (int)Mathf.Pow(o_levelGraph.vertices.Count, 0.5f);
 
-        int max = (int)Mathf.Pow(levelGraph.vertices.Count, 0.5f);
+        //For each cell
         for (int y = 0; y < max; y++)
         {
             for (int x = 0; x < max; x++)
             {
-                if (x < max - 1 && Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x + 1, (float)y)].grayscale) >= 0.5f)
-                    levelGraph.AddAdjacent(new Vector2((float)x, (float)y), new Vector2((float)x + 1, (float)y));
-                if (x < max - 1 && Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x, (float)y + 1)].grayscale) >= 0.5f)
-                    levelGraph.AddAdjacent(new Vector2((float)x, (float)y), new Vector2((float)x, (float)y + 1));
+
+                //Checks if grayscale difference between the cell and adjacent < 0.5.
+                if (x < max - 1 && Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x + 1, (float)y)].grayscale) < 0.5f)
+
+                    //Makes the vertices adjacent: no barrier between cells.
+                    o_levelGraph.AddAdjacent(new Vector2((float)x, (float)y), new Vector2((float)x + 1, (float)y));
+
+                //Checks if grayscale difference between the cell and adjacent < 0.5.
+                if (x < max - 1 && Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x, (float)y + 1)].grayscale) < 0.5f)
+
+                    //Makes the vertices adjacent: no barrier between cells.
+                    o_levelGraph.AddAdjacent(new Vector2((float)x, (float)y), new Vector2((float)x, (float)y + 1));
             }
         }
 
-        List<List<Vector2>> connectedVertices = levelGraph.GetConnectedVertices();
+        yield return null;
+
+        List<List<Vector2>> connectedVertices = o_levelGraph.GetConnectedVertices();
         float minGrayDif;
         Vector2 vertex = Vector2.zero;
         Vector2 adjacent = Vector2.zero;
         bool notConnected;
         int foundVertices;
+
+        //While the graph is not fully connected.
         while (connectedVertices.Count > 1)
         {
             minGrayDif = 2f;
+
+            //For each vertex.
             for (int y = 0; y < max; y++)
             {
                 for (int x = 0; x < max; x++)
@@ -169,21 +197,31 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                     {
                         notConnected = true;
                         foundVertices = 0;
+
+                        //For each list of connected vertices.
                         for (int i = 0; i < connectedVertices.Count; i++)
                         {
-                            if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) && connectedVertices[i].Contains(new Vector2((float)x + 1, (float)y)))
+                            
+                            //If the vertices are connected (on the same list).
+                            if (foundVertices == 0 && connectedVertices[i].Contains(new Vector2((float)x, (float)y)) && connectedVertices[i].Contains(new Vector2((float)x + 1, (float)y)))
                             {
                                 notConnected = false;
                                 break;
                             }
+
+                            //If one of the vertex is on the list.
                             if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) || connectedVertices[i].Contains(new Vector2((float)x + 1, (float)y)))
                             {
                                 foundVertices++;
+
+                                //If both vertices have been found on lists.
                                 if (foundVertices == 2)
                                     break;
                             }
                         }
-                        if (Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x + 1, (float)y)].grayscale) < minGrayDif)
+
+                        //If the cells are not connected and the grayscale difference between both is lower.
+                        if (notConnected && Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x + 1, (float)y)].grayscale) < minGrayDif)
                         {
                             minGrayDif = Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x + 1, (float)y)].grayscale);
                             vertex = new Vector2((float)x, (float)y);
@@ -194,21 +232,31 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                     {
                         notConnected = true;
                         foundVertices = 0;
+
+                        //For each list of connected vertices.
                         for (int i = 0; i < connectedVertices.Count; i++)
                         {
-                            if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) && connectedVertices[i].Contains(new Vector2((float)x, (float)y + 1)))
+
+                            //If the vertices are connected (on the same list).
+                            if (foundVertices == 0 && connectedVertices[i].Contains(new Vector2((float)x, (float)y)) && connectedVertices[i].Contains(new Vector2((float)x, (float)y + 1)))
                             {
                                 notConnected = false;
                                 break;
                             }
+
+                            //If one of the vertex is on the list.
                             if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) || connectedVertices[i].Contains(new Vector2((float)x, (float)y + 1)))
                             {
                                 foundVertices++;
+
+                                //If both vertices have been found on lists.
                                 if (foundVertices == 2)
                                     break;
                             }
                         }
-                        if (Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x, (float)y + 1)].grayscale) < minGrayDif)
+
+                        //If the cells are not connected and the grayscale difference between both is lower.
+                        if (notConnected && Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x, (float)y + 1)].grayscale) < minGrayDif)
                         {
                             minGrayDif = Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x, (float)y + 1)].grayscale);
                             vertex = new Vector2((float)x, (float)y);
@@ -218,19 +266,34 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
 
                 }
             }
-            levelGraph.AddAdjacent(vertex, adjacent);
-            connectedVertices = levelGraph.GetConnectedVertices();
+
+            //Makes the vertices adjacent
+            o_levelGraph.AddAdjacent(vertex, adjacent);
+
+            yield return null;
+
+            connectedVertices = o_levelGraph.GetConnectedVertices();
         }
     }
 
-    public void StartDivideImage(OnMatrixImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnMatrixImage> o_childrenImages)
+    public void StartDivideImage(OnArrayImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnArrayImage> o_childrenImages)
     {
         StartCoroutine(DivideImage(i_img, i_rows, i_columns, o_childrenImages));
     }
 
-    public void StartDivideImageAndProcessCellData(OnMatrixImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnMatrixImage> o_childrenImages)
+    public void StartDivideImageAndProcessCellData(OnArrayImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnArrayImage> o_childrenImages)
     {
         StartCoroutine(DivideImageAndProcessCellData(i_img, i_rows, i_columns, o_childrenImages));
+    }
+
+    /// <summary>
+    /// Starts the GenerateLevel coroutine.
+    /// </summary>
+    /// <param name="i_cellImages">Image divided into cells.</param>
+    /// <param name="o_levelGraph">OUT: Level graph.</param>
+    public void StartGenerateLevel(Dictionary<Vector2,OnArrayImage> i_cellImages, GraphType<Vector2> o_levelGraph)
+    {
+        StartCoroutine(GenerateLevel(i_cellImages, o_levelGraph));
     }
 
     /// <summary>

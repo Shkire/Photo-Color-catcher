@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using CIE_Color;
 
 /// <summary>
 /// Extension methods.
@@ -87,17 +88,23 @@ public static class ExtensionMethods
         resTexture.Apply();
         return resTexture;
     }
-
-    public static CieXyzColor ToCieXyz(this Color color)
+        
+    /// <summary>
+    /// Transforms the UnityEngine.Color into CIE_Color.CIE_XYZ_Color.
+    /// </summary>
+    /// <returns>The CIE XYZ value of the Color.</returns>
+    public static CIE_XYZ_Color ToCIE_XYZ(this Color color)
     {
-        CieXyzColor cieXyz = new CieXyzColor();
+        //Ecuations: http://www.brucelindbloom.com/
+
+        CIE_XYZ_Color cieXyz = new CIE_XYZ_Color();
 
         //Inverse companding
         float auxR = color.r <= 0.04045f ? color.r / 12.92f : Mathf.Pow((color.r + 0.055f) / 1.055f, 2.4f);
         float auxG = color.g <= 0.04045f ? color.g / 12.92f : Mathf.Pow((color.g + 0.055f) / 1.055f, 2.4f);
         float auxB = color.b <= 0.04045f ? color.b / 12.92f : Mathf.Pow((color.b + 0.055f) / 1.055f, 2.4f);
 
-        //Linear rgb to XYZ
+        //Linear RGB to XYZ
         float[][] transformationMatrix =
             {
                 new float[] { 0.4124564f, 0.3575761f, 0.1804375f },
@@ -115,30 +122,60 @@ public static class ExtensionMethods
 		float[][] cieXyzMatrix = MathMatrix.MatrixMultiplication(transformationMatrix,rgbMatrix);
 
 		cieXyz.x = cieXyzMatrix[0][0];
-		cieXyz.x = cieXyzMatrix[1][0];
-		cieXyz.x = cieXyzMatrix[2][0];
+		cieXyz.x = cieXyzMatrix[0][1];
+		cieXyz.x = cieXyzMatrix[0][2];
 
 		return cieXyz;
 	}
 
-	public static CieLabColor ToCieLab (this Color color)
+    /// <summary>
+    /// Transforms the UnityEngine.Color into CIE_Color.CIE_LabColor.
+    /// </summary>
+    /// <returns>The CIE Lab value of the Color.</returns>
+	public static CIE_LabColor ToCIE_Lab (this Color color)
 	{
-		CieXyzColor cieXyz = color.ToCieXyz ();
+        //Ecuations: http://www.brucelindbloom.com/
 
-		CieXyzColor referenceWhite = Color.white.ToCieXyz ();
+		CIE_XYZ_Color cieXyz = color.ToCIE_XYZ ();
 
+		CIE_XYZ_Color referenceWhite = Color.white.ToCIE_XYZ ();
+
+        //xr = X / Xr
 		float auxX = cieXyz.x / referenceWhite.x;
+
+        //yr = Y / Yr
 		float auxY = cieXyz.y / referenceWhite.y;
+
+        //zr = Z / Zr
 		float auxZ = cieXyz.z / referenceWhite.z;
 
+        //if xr > 0.008856
+        //  fx = xr ^ 1/3
+        //else
+        //  fx = (903.3 * xr + 16) / 116
 		auxX = (auxX > 0.008856f) ? Mathf.Pow (auxX, 1 / 3f) : ((903.3f * auxX + 16) / 116f);
+
+        //if yr > 0.008856
+        //  fy = yr ^ 1/3
+        //else
+        //  fy = (903.3 * yr + 16) / 116
 		auxY = (auxY > 0.008856f) ? Mathf.Pow (auxY, 1 / 3f) : ((903.3f * auxY + 16) / 116f);
+
+        //if zr > 0.008856
+        //  fz = zr ^ 1/3
+        //else
+        //  fz = (903.3 * zr + 16) / 116
 		auxZ = (auxZ > 0.008856f) ? Mathf.Pow (auxZ, 1 / 3f) : ((903.3f * auxZ + 16) / 116f);
 
-		CieLabColor cieLab = new CieLabColor ();
+		CIE_LabColor cieLab = new CIE_LabColor ();
 
+        //L = 116 * fy -16
 		cieLab.l = 116 * auxY - 16;
+
+        //a = 500 * (fx - fy)
 		cieLab.a = 500 * (auxX - auxY);
+
+        //b = 200 * (fy - fz)
 		cieLab.b = 200 * (auxY - auxZ);
 
 		return cieLab;
