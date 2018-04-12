@@ -2,46 +2,101 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Data type used to store RGB components combinations.
+/// </summary>
 [System.Serializable]
-public class OnMatrixImage{
+public class RGB_Content
+{
+    /// <summary>
+    /// Contains R component.
+    /// </summary>
+    public bool r;
 
-	public UnityEngine.Color[] pixels;
+    /// <summary>
+    /// Contains G component.
+    /// </summary>
+    public bool g;
 
-	public int width;
+    /// <summary>
+    /// Contains B component.
+    /// </summary>
+    public bool b;
 
-	public int height;
+    public RGB_Content(bool i_r, bool i_g, bool i_b)
+    {
+        r = i_r;
+        g = i_g;
+        b = i_b;
+    }
+}
 
-	public UnityEngine.Color average;
+/// <summary>
+/// Data type used to store an image fit on an array and other relevant info.
+/// </summary>
+[System.Serializable]
+public class OnArrayImage
+{
+    /// <summary>
+    /// Pixel array.
+    /// </summary>
+    public Color[] pixels;
 
-	public float grayscale;
+    /// <summary>
+    /// Image width.
+    /// </summary>
+    public int width;
 
-	public OnMatrixImage(int i_width, int i_height)
-	{
-		width = i_width;
-		height = i_height;
-		pixels = new Color[width * height];
-	}
+    /// <summary>
+    /// Image height.
+    /// </summary>
+    public int height;
 
-	public void ResizeBilinear(int i_newWidth, int i_newHeight)
-	{
-		if (i_newWidth != width || i_newHeight != height) 
-		{
-			//Creates auxiliar texture
-			Texture2D tempText = new Texture2D (width, height);
-			//Loads parent image
-			tempText.SetPixels (pixels);
-			//Apply texture changes
-			tempText.Apply ();
-			//Resizes texture
-			tempText = tempText.ResizeBilinear (i_newWidth, i_newHeight);
-			//Gets OnMatrixImage
-			pixels = tempText.GetPixels();
-			width = tempText.width;
-			height = tempText.height;
-		}
-	}
+    /// <summary>
+    /// Average color of image.
+    /// </summary>
+    public Color average;
 
-	/*
+    /// <summary>
+    /// Average grayscale of image.
+    /// </summary>
+    public float grayscale;
+
+    /// <summary>
+    /// RGB components combination assigned to the image.
+    /// </summary>
+    public RGB_Content rgbComponents;
+
+    public OnArrayImage(int i_width, int i_height)
+    {
+        width = i_width;
+        height = i_height;
+        pixels = new Color[width * height];
+    }
+
+    /// <summary>
+    /// Applies a bilinear resize to the image.
+    /// </summary>
+    /// <param name="i_newWidth">New width.</param>
+    /// <param name="i_newHeight">New height.</param>
+    public void ResizeBilinear(int i_newWidth, int i_newHeight)
+    {
+        if (i_newWidth != width || i_newHeight != height)
+        {
+            //Creates auxiliar texture with the image.
+            Texture2D tempText = new Texture2D(width, height);
+            tempText.SetPixels(pixels);
+            tempText.Apply();
+
+            //Resizes texture
+            tempText = tempText.ResizeBilinear(i_newWidth, i_newHeight);
+            pixels = tempText.GetPixels();
+            width = tempText.width;
+            height = tempText.height;
+        }
+    }
+
+    /*
 	{
 		get
 		{
