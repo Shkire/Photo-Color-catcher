@@ -52,11 +52,13 @@ public abstract class CharacterMovementController : MonoBehaviour
 	/// </summary>
 	protected void Jump ()
 	{
+        /*
 		if (onFloor)
 			this.gameObject.GetComponent<Rigidbody2D> ().ResetAndAddForce (Vector2.up * jumpMagnitude);
 		onFloor = false;
 
 		SendMessage ("DidJump");	
+  */      
 	}
 
 	/// <summary>

@@ -339,6 +339,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
     /// <param name="i_path">The path of the image to process.</param>
     public IEnumerator ProcessAndIndexImageCor(string i_path)
     {
+        /*
         ProcessedImage parentImg = null;
         List<ProcessedImage> imgList = null;
 
@@ -423,6 +424,8 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
 
         //Creates the ProcessedImage
         i_img = new ProcessedImage(i_id, i_path, tempText);
+        */
+        yield return null;
     }
 
     /// <summary>
@@ -593,6 +596,8 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
 		 * Calcular medias por columna
 		 * for que rellene plataformas
 		 * */
+
+        /*
         Texture2D auxText = new Texture2D(i_img.width, i_img.height);
         auxText.SetPixels(i_img.pixels);
         auxText.Apply();
@@ -697,6 +702,8 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         }
 
         //Ir rellenando array de plataformas
+        */
+        yield return null;
     }
 
     public IEnumerator GetCellsData(Vector2 i_pos, int i_width, int i_height, int i_mapSize, UnityEngine.Color[] i_tempPixels, float[,] i_cellsData)
