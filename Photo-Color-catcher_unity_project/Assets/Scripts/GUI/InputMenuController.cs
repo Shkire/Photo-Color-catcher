@@ -17,54 +17,14 @@ public class InputMenuController : MonoBehaviour {
 	private Dictionary<GameObject,GUIElementMap> uiMap;
 	private GameObject actualElem;
 	[SerializeField]
-	private float uiResponseTime;
+	private float uiResponseTime = 0.2f;
 
 	private float leftUiResponseTime;
 
 	// Use this for initialization
 	void Start () {
 
-		uiMap = new Dictionary<GameObject, GUIElementMap> ();
-
-		foreach (GameObject go in uiElements) 
-		{
-			GUIElementMap elem = new GUIElementMap ();
-			foreach (GameObject go2 in uiElements) {
-				if (go2 != go) {
-					float xVal = go2.transform.position.x - go.transform.position.x;
-					float yVal = go2.transform.position.y - go.transform.position.y;
-					if (Mathf.Abs (xVal) > Mathf.Abs (yVal)) {
-						if (xVal > 0) {
-							if (elem.right == null || (Vector3.Distance (go.transform.position, go2.transform.position) < (Vector3.Distance (go.transform.position, elem.right.transform.position))))
-								elem.right = go2;
-						} else {
-							if (elem.left == null || (Vector3.Distance (go.transform.position, go2.transform.position) < (Vector3.Distance (go.transform.position, elem.left.transform.position))))
-								elem.left = go2;
-						}
-					} else {
-						if (yVal > 0) {
-							if (elem.up == null || (Vector3.Distance (go.transform.position, go2.transform.position) < (Vector3.Distance (go.transform.position, elem.up.transform.position))))
-								elem.up = go2;
-						} else {
-							if (elem.down == null || (Vector3.Distance (go.transform.position, go2.transform.position) < (Vector3.Distance (go.transform.position, elem.down.transform.position))))
-								elem.down = go2;
-						}
-					}
-				}
-			}
-			uiMap.Add (go, elem);
-		}
-		actualElem = startingElem;
-		actualElem.SendMessage ("Focused",SendMessageOptions.DontRequireReceiver);
-		Debug.Log ("Actual elem "+actualElem);
-		foreach (GameObject go in uiMap.Keys) 
-		{
-			Debug.Log ("Key " + go);
-			Debug.Log ("Up " + uiMap [go].up);
-			Debug.Log ("Down " + uiMap [go].down);
-			Debug.Log ("Right " + uiMap [go].right);
-			Debug.Log ("Left " + uiMap [go].left);
-		}
+        MapElements();
 	}
 
 	void Update () {
@@ -113,4 +73,49 @@ public class InputMenuController : MonoBehaviour {
 			leftUiResponseTime -= Time.deltaTime;
 		}
 	}
+
+    public void MapElements()
+    {
+        uiMap = new Dictionary<GameObject, GUIElementMap> ();
+
+        foreach (GameObject go in uiElements) 
+        {
+            GUIElementMap elem = new GUIElementMap ();
+            foreach (GameObject go2 in uiElements) {
+                if (go2 != go) {
+                    float xVal = go2.transform.position.x - go.transform.position.x;
+                    float yVal = go2.transform.position.y - go.transform.position.y;
+                    if (Mathf.Abs (xVal) > Mathf.Abs (yVal)) {
+                        if (xVal > 0) {
+                            if (elem.right == null || (Vector3.Distance (go.transform.position, go2.transform.position) < (Vector3.Distance (go.transform.position, elem.right.transform.position))))
+                                elem.right = go2;
+                        } else {
+                            if (elem.left == null || (Vector3.Distance (go.transform.position, go2.transform.position) < (Vector3.Distance (go.transform.position, elem.left.transform.position))))
+                                elem.left = go2;
+                        }
+                    } else {
+                        if (yVal > 0) {
+                            if (elem.up == null || (Vector3.Distance (go.transform.position, go2.transform.position) < (Vector3.Distance (go.transform.position, elem.up.transform.position))))
+                                elem.up = go2;
+                        } else {
+                            if (elem.down == null || (Vector3.Distance (go.transform.position, go2.transform.position) < (Vector3.Distance (go.transform.position, elem.down.transform.position))))
+                                elem.down = go2;
+                        }
+                    }
+                }
+            }
+            uiMap.Add (go, elem);
+        }
+        actualElem = startingElem;
+        actualElem.SendMessage ("Focused",SendMessageOptions.DontRequireReceiver);
+        Debug.Log ("Actual elem "+actualElem);
+        foreach (GameObject go in uiMap.Keys) 
+        {
+            Debug.Log ("Key " + go);
+            Debug.Log ("Up " + uiMap [go].up);
+            Debug.Log ("Down " + uiMap [go].down);
+            Debug.Log ("Right " + uiMap [go].right);
+            Debug.Log ("Left " + uiMap [go].left);
+        }
+    }
 }
