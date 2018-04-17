@@ -2,8 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GUIChangeDirectory : GUITool {
-
+/// <summary>
+/// A GUITool used to change the actual directory
+/// </summary>
+public class GUIChangeDirectory : GUITool
+{
+    /// <summary>
+    /// The path of the new actual directory.
+    /// </summary>
     public string path;
 
     public override void Execute()

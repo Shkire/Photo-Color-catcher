@@ -7,37 +7,68 @@ using System.Linq;
 using UnityEngine.UI;
 
 /// <summary>
-/// Used to navigate through directories and get images from a directory.
+/// Used to create the file system explorer that allows the player to navigate through directories using the UI.
 /// </summary>
 public class FileSystemManager : Singleton<FileSystemManager>
 {
+    /// <summary>
+    /// The prefab used to create the file system explorer.
+    /// </summary>
     [SerializeField]
     private GameObject fileSystemModelPrefab;
 
+    /// <summary>
+    /// The parent canvas of the file system explorer.
+    /// </summary>
     [SerializeField]
     private GameObject canvas;
 
-    private List<GameObject> screenList;
+    /// <summary>
+    /// The UI text label used to show the actual directory path.
+    /// </summary>
+    [SerializeField]
+    private Text actualDirectoryText;
 
+    /// <summary>
+    /// The file system explorer page list.
+    /// </summary>
+    private List<GameObject> pageList;
+
+    /// <summary>
+    /// The input menu controller list.
+    /// </summary>
     private List<GameObject> inputMenuControllerList;
 
     protected FileSystemManager()
     {
     }
 
+    /// <summary>
+    /// Changes the actual directory and load the available directories and images.
+    /// </summary>
+    /// <param name="i_path">The new directory.</param>
     public void ChangeDirectory(string i_path)
     {
+        //Shows the new directory path as actual.
+        if (actualDirectoryText != null)
+            actualDirectoryText.text = i_path;
+
+        //Get the directories and images that are available in the new directory.
         string[] directories = GetDirectories(i_path);
         string[] images = GetImages(i_path);
 
-        if (screenList == null)
-            screenList = new List<GameObject>();
+        //Initializes the page list.
+        if (pageList == null)
+            pageList = new List<GameObject>();
+        //Destroys the previous page list.
         else
-            for (int i = 0; i < screenList.Count; i++)
-                Destroy(screenList[i]);
+            for (int i = 0; i < pageList.Count; i++)
+                Destroy(pageList[i]);
 
+        //Initializes the input menu controller list.
         if (inputMenuControllerList == null)
             inputMenuControllerList = new List<GameObject>();
+        //Destroys the previous input menu controller list.
         else
             for (int i = 0; i < inputMenuControllerList.Count; i++)
                 Destroy(inputMenuControllerList[i]);
@@ -48,121 +79,164 @@ public class FileSystemManager : Singleton<FileSystemManager>
         byte[] loadingBytes;
         Sprite spr;
         GUIObjectEnable objectEnable;
-        int parent = 1;
-        if (Directory.GetParent(i_path) == null)
-            parent = 0;
-        /*
-        inputMenuController = new GameObject("InputMenuController");
-        inputMenuController.AddComponent<InputMenuController>();
-        */
+
+        //If there is a parent directory available = 1; otherwise 0;
+        int parent = (Directory.GetParent(i_path) == null) ? 0 : 1;
+
+        //Creates the input menu controller for the first page of the file system explorer.
         inputMenuControllerList.Add(new GameObject("InputMenuController"));
-        inputMenuControllerList[inputMenuControllerList.Count-1].AddComponent<InputMenuController>().uiElements = new List<GameObject>();
-        screenList.Add((GameObject)Instantiate(fileSystemModelPrefab));
-        screenList[screenList.Count-1].transform.SetParent(canvas.transform, false);
-        Destroy(screenList[screenList.Count-1].GetChild("Prev page"));
+        inputMenuControllerList[inputMenuControllerList.Count - 1].AddComponent<InputMenuController>().uiElements = new List<GameObject>();
+
+        //Creates the first page of the file system explorer.
+        pageList.Add((GameObject)Instantiate(fileSystemModelPrefab));
+        pageList[pageList.Count - 1].transform.SetParent(canvas.transform, false);
+
+        //Destroys the "previous page" button
+        Destroy(pageList[pageList.Count - 1].GetChild("Prev page"));
+
+        //For each element to show in the file system explorer (directories and images).
         for (int i = 0; i < directories.Length + images.Length + parent; i++)
         {
-            /*
-            if (i % 9 == 0)
-            {
-                if (i != 0)
-                {
-                    screenList[screenList.Count-1].SetActive(false);
-                    inputMenuControllerList[screenList.Count-1].SetActive(false);
-                }
-                //SI NO ES LA PRIMERA, REDIRIGIR AL ANTERIOR MENU
-            }
-            */
-            //Directory
+            //If it is a directory.
             if (i < directories.Length + parent)
             {
-                Destroy(screenList[screenList.Count-1].GetChild("Image " + i%9));
-                aux = screenList[screenList.Count-1].GetChild("Directory " + i%9);
-                //Back directory
+                //Destroys the image button.
+                Destroy(pageList[pageList.Count - 1].GetChild("Image " + i % 9));
+
+                //Gets the directory button.
+                aux = pageList[pageList.Count - 1].GetChild("Directory " + i % 9);
+
+                //If it is the parent directory.
                 if (i == 0 && parent == 1)
                 {
+                    //Sets up the directory button.
                     aux.GetComponentInChildren<GUIChangeDirectory>().path = Directory.GetParent(i_path).FullName;
                     aux.GetComponentInChildren<Text>().text = "back";
                 }
                 else
                 {
-                    aux.GetComponentInChildren<GUIChangeDirectory>().path= directories[i- parent];
+                    //Sets up the directory button.
+                    aux.GetComponentInChildren<GUIChangeDirectory>().path = directories[i - parent];
                     pathSplit = directories[i - parent].Split(Path.DirectorySeparatorChar);
                     aux.GetComponentInChildren<Text>().text = pathSplit[pathSplit.Length - 1];
                 }
-                if (i%9 == 0)
-                    inputMenuControllerList[inputMenuControllerList.Count-1].GetComponent<InputMenuController>().startingElem = aux;
-                inputMenuControllerList[inputMenuControllerList.Count-1].GetComponent<InputMenuController>().uiElements.Add(aux);
+
+                //If it is the first element of the page.
+                if (i % 9 == 0)
+                    inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().startingElem = aux;
+
+                //Adds the button to the input menu controller.
+                inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(aux);
             }
-            //Image
+
+            //If it is an image.
             else
             {
-                Destroy(screenList[screenList.Count-1].GetChild("Directory " + i%9));
-                aux = screenList[screenList.Count-1].GetChild("Image " + i%9);
+                //Destroys the directory button.
+                Destroy(pageList[pageList.Count - 1].GetChild("Directory " + i % 9));
+
+                //Gets the image button.
+                aux = pageList[pageList.Count - 1].GetChild("Image " + i % 9);
+
+                //Sets up the image button.
                 //aux.GetComponentInChildren<GUIChangeDirectory>().path= images[i-directories.Length - 1];
-                pathSplit = images[i-directories.Length - 1].Split(Path.DirectorySeparatorChar);
+                pathSplit = images[i - directories.Length - 1].Split(Path.DirectorySeparatorChar);
                 aux.GetComponentInChildren<Text>().text = pathSplit[pathSplit.Length - 1];
                 auxText = new Texture2D(4, 4);
                 loadingBytes = File.ReadAllBytes(images[i - directories.Length - 1]);
                 auxText.LoadImage(loadingBytes);
-                spr = Sprite.Create (auxText, new Rect (0, 0, auxText.width, auxText.height), new Vector2 (0, 0));
+                spr = Sprite.Create(auxText, new Rect(0, 0, auxText.width, auxText.height), new Vector2(0, 0));
                 aux.GetChild("Image").GetComponent<Image>().sprite = spr;
-                if (i%9 == 0)
-                    inputMenuControllerList[inputMenuControllerList.Count-1].GetComponent<InputMenuController>().startingElem = aux;
-                if (inputMenuControllerList[inputMenuControllerList.Count-1].GetComponent<InputMenuController>().uiElements == null)
-                    inputMenuControllerList[inputMenuControllerList.Count-1].GetComponent<InputMenuController>().uiElements = new List<GameObject>();
-                inputMenuControllerList[inputMenuControllerList.Count-1].GetComponent<InputMenuController>().uiElements.Add(aux);
+
+                //If it is the first element of the page.
+                if (i % 9 == 0)
+                    inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().startingElem = aux;
+
+                //Adds the button to the input menu controller.
+                inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(aux);
             }
-            if (i == directories.Length + images.Length + parent -1 )
+
+            //If it is the last element of the file system explorer.
+            if (i == directories.Length + images.Length + parent - 1)
             {
+                //If it isn't the last element of the page.
                 if (i % 9 < 8)
                 {
+                    //Destroys the unused buttons.
                     for (int j = i % 9 + 1; j < 9; j++)
                     {
-                        Destroy(screenList[screenList.Count - 1].GetChild("Directory " + j));
-                        Destroy(screenList[screenList.Count - 1].GetChild("Image " + j));
+                        Destroy(pageList[pageList.Count - 1].GetChild("Directory " + j));
+                        Destroy(pageList[pageList.Count - 1].GetChild("Image " + j));
                     }  
                 }
-                Destroy(screenList[screenList.Count - 1].GetChild("Next page"));
-                inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().MapElements();
+
+                //Destroys the unused "next page" button.
+                Destroy(pageList[pageList.Count - 1].GetChild("Next page"));
+
+                //Maps the elements of the input menu controller.
+                //inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().MapElements();
             }
+
+            //If it is the last element of the page.
             else if (i % 9 == 8)
             {
+                //Creates the input menu controller for the next page of the file system explorer.
                 inputMenuControllerList.Add(new GameObject("InputMenuController"));
-                inputMenuControllerList[inputMenuControllerList.Count-1].AddComponent<InputMenuController>().uiElements = new List<GameObject>();
-                screenList.Add((GameObject)Instantiate(fileSystemModelPrefab));
-                screenList[screenList.Count-1].transform.SetParent(canvas.transform, false);
-                screenList[screenList.Count-1].SetActive(false);
-                inputMenuControllerList[screenList.Count-1].SetActive(false);
-                aux = screenList[screenList.Count-2].GetChild("Next page");
-                objectEnable = aux.AddComponent<GUIObjectEnable>();
-                objectEnable.enable = true;
-                objectEnable.target = inputMenuControllerList[inputMenuControllerList.Count - 1];
-                objectEnable = aux.AddComponent<GUIObjectEnable>();
-                objectEnable.enable = true;
-                objectEnable.target = screenList[screenList.Count - 1];
-                objectEnable = aux.AddComponent<GUIObjectEnable>();
-                objectEnable.enable = false;
-                objectEnable.target = inputMenuControllerList[inputMenuControllerList.Count - 2];
-                objectEnable = aux.AddComponent<GUIObjectEnable>();
-                objectEnable.enable = false;
-                objectEnable.target = screenList[screenList.Count - 2];
-                inputMenuControllerList[inputMenuControllerList.Count - 2].GetComponent<InputMenuController>().uiElements.Add(aux);
-                inputMenuControllerList[inputMenuControllerList.Count - 2].GetComponent<InputMenuController>().MapElements();
+                inputMenuControllerList[inputMenuControllerList.Count - 1].AddComponent<InputMenuController>().uiElements = new List<GameObject>();
 
-                aux = screenList[screenList.Count-1].GetChild("Prev page");
+                //Creates the next page of the file system explorer.
+                pageList.Add((GameObject)Instantiate(fileSystemModelPrefab));
+                pageList[pageList.Count - 1].transform.SetParent(canvas.transform, false);
+
+                //Deactivates the page and the input menu controller.
+                pageList[pageList.Count - 1].SetActive(false);
+                inputMenuControllerList[pageList.Count - 1].SetActive(false);
+
+                //Gets the "next page" button of this page.
+                aux = pageList[pageList.Count - 2].GetChild("Next page");
+
+                //Sets up the "next page" button (activate the next page and the next input menu controller).
+                objectEnable = aux.AddComponent<GUIObjectEnable>();
+                objectEnable.enable = true;
+                objectEnable.target = inputMenuControllerList[inputMenuControllerList.Count - 1];
+                objectEnable = aux.AddComponent<GUIObjectEnable>();
+                objectEnable.enable = true;
+                objectEnable.target = pageList[pageList.Count - 1];
+
+                //Sets up the "next page" button (deactivate this page and this input menu controller).
+                objectEnable = aux.AddComponent<GUIObjectEnable>();
+                objectEnable.enable = false;
+                objectEnable.target = inputMenuControllerList[inputMenuControllerList.Count - 2];
+                objectEnable = aux.AddComponent<GUIObjectEnable>();
+                objectEnable.enable = false;
+                objectEnable.target = pageList[pageList.Count - 2];
+
+                //Adds the "next page" button to the input menu controller.
+                inputMenuControllerList[inputMenuControllerList.Count - 2].GetComponent<InputMenuController>().uiElements.Add(aux);
+
+                //Maps the elements of the input menu controller.
+                //inputMenuControllerList[inputMenuControllerList.Count - 2].GetComponent<InputMenuController>().MapElements();
+
+                //Gets the "previous page" button of the next page.
+                aux = pageList[pageList.Count - 1].GetChild("Prev page");
+
+                //Sets up the "previous page" button (activate this page and this input menu controller).
                 objectEnable = aux.AddComponent<GUIObjectEnable>();
                 objectEnable.enable = true;
                 objectEnable.target = inputMenuControllerList[inputMenuControllerList.Count - 2];
                 objectEnable = aux.AddComponent<GUIObjectEnable>();
                 objectEnable.enable = true;
-                objectEnable.target = screenList[screenList.Count - 2];
+                objectEnable.target = pageList[pageList.Count - 2];
+
+                //Sets up the "previous page" button (deactivate the next page and the next input menu controller).
                 objectEnable = aux.AddComponent<GUIObjectEnable>();
                 objectEnable.enable = false;
                 objectEnable.target = inputMenuControllerList[inputMenuControllerList.Count - 1];
                 objectEnable = aux.AddComponent<GUIObjectEnable>();
                 objectEnable.enable = false;
-                objectEnable.target = screenList[screenList.Count - 1];
+                objectEnable.target = pageList[pageList.Count - 1];
+
+                //Adds the "previous page" button to the next input menu controller.
                 inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(aux);
             }
         }
@@ -207,8 +281,8 @@ public class FileSystemManager : Singleton<FileSystemManager>
         if (!Directory.Exists(i_path))
             return null;
         
-        string[] validExtensions = 
-        {
+        string[] validExtensions =
+            {
             ".jpg",
             ".jpeg",
             ".png"
