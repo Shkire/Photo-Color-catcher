@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
-using CIE_Color;
+using CIEColor;
 
 /// <summary>
 /// Singleton object for image processing.
@@ -103,19 +103,19 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
     {
         //Stores the sample colors: all posible combinations of RGB components.
         Dictionary<Vector3,RGB_Content> sampleColors = new Dictionary<Vector3, RGB_Content>();
-        CIE_LabColor aux = Color.red.ToCIE_Lab();
+        CIELabColor aux = Color.red.ToCIELab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, false, false));
-        aux = Color.green.ToCIE_Lab();
+        aux = Color.green.ToCIELab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(false, true, false));
-        aux = Color.blue.ToCIE_Lab();
+        aux = Color.blue.ToCIELab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(false, false, true));
-        aux = (new Color(1, 1, 0)).ToCIE_Lab();
+        aux = (new Color(1, 1, 0)).ToCIELab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, true, false));
-        aux = (new Color(1, 0, 1)).ToCIE_Lab();
+        aux = (new Color(1, 0, 1)).ToCIELab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, false, true));
-        aux = (new Color(0, 1, 1)).ToCIE_Lab();
+        aux = (new Color(0, 1, 1)).ToCIELab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(false, true, true));
-        aux = (new Color(1, 1, 1)).ToCIE_Lab();
+        aux = (new Color(1, 1, 1)).ToCIELab();
         sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, true, true));
 
         yield return null;
@@ -129,7 +129,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         //For every cell.
         foreach (Vector2 pos in i_cellImages.Keys)
         {
-            aux = i_cellImages[pos].average.ToCIE_Lab();
+            aux = i_cellImages[pos].average.ToCIELab();
             average = new Vector3(aux.l, aux.a, aux.b);
 
             //Compares the average color with all the samples.

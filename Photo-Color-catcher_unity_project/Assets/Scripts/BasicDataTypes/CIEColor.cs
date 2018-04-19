@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace CIE_Color
+namespace CIEColor
 {
 
     /// <summary>
     /// Data type used to store colors in CIE XYZ format.
     /// </summary>
-    public class CIE_XYZ_Color
+    public class CIE_XYZColor
     {
         /// <summary>
         /// The X component: linear combination of cone response curves chosen to be nonnegative.
@@ -28,7 +28,7 @@ namespace CIE_Color
     /// <summary>
     /// Data type used to store colors in CIE Lab format.
     /// </summary>
-    public class CIE_LabColor
+    public class CIELabColor
     {
         /// <summary>
         /// The L component: lightness.

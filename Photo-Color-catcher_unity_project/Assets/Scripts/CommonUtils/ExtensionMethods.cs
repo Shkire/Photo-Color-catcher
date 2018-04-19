@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using CIE_Color;
+using CIEColor;
 
 /// <summary>
 /// Extension methods.
@@ -90,14 +90,14 @@ public static class ExtensionMethods
     }
         
     /// <summary>
-    /// Transforms the UnityEngine.Color into CIE_Color.CIE_XYZ_Color.
+    /// Transforms the UnityEngine.Color into CIEColor.CIE_XYZColor.
     /// </summary>
     /// <returns>The CIE XYZ value of the Color.</returns>
-    public static CIE_XYZ_Color ToCIE_XYZ(this Color color)
+    public static CIE_XYZColor ToCIE_XYZ(this Color color)
     {
         //Ecuations: http://www.brucelindbloom.com/
 
-        CIE_XYZ_Color cieXyz = new CIE_XYZ_Color();
+        CIE_XYZColor cieXyz = new CIE_XYZColor();
 
         //Inverse companding
         float auxR = color.r <= 0.04045f ? color.r / 12.92f : Mathf.Pow((color.r + 0.055f) / 1.055f, 2.4f);
@@ -129,16 +129,16 @@ public static class ExtensionMethods
 	}
 
     /// <summary>
-    /// Transforms the UnityEngine.Color into CIE_Color.CIE_LabColor.
+    /// Transforms the UnityEngine.Color into CIEColor.CIELabColor.
     /// </summary>
     /// <returns>The CIE Lab value of the Color.</returns>
-	public static CIE_LabColor ToCIE_Lab (this Color color)
+	public static CIELabColor ToCIELab (this Color color)
 	{
         //Ecuations: http://www.brucelindbloom.com/
 
-		CIE_XYZ_Color cieXyz = color.ToCIE_XYZ ();
+		CIE_XYZColor cieXyz = color.ToCIE_XYZ ();
 
-		CIE_XYZ_Color referenceWhite = Color.white.ToCIE_XYZ ();
+		CIE_XYZColor referenceWhite = Color.white.ToCIE_XYZ ();
 
         //xr = X / Xr
 		float auxX = cieXyz.x / referenceWhite.x;
@@ -167,7 +167,7 @@ public static class ExtensionMethods
         //  fz = (903.3 * zr + 16) / 116
 		auxZ = (auxZ > 0.008856f) ? Mathf.Pow (auxZ, 1 / 3f) : ((903.3f * auxZ + 16) / 116f);
 
-		CIE_LabColor cieLab = new CIE_LabColor ();
+		CIELabColor cieLab = new CIELabColor ();
 
         //L = 116 * fy -16
 		cieLab.l = 116 * auxY - 16;

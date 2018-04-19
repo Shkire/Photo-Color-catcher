@@ -139,7 +139,7 @@ public class FileSystemManager : Singleton<FileSystemManager>
                 aux = pageList[pageList.Count - 1].GetChild("Image " + i % 9);
 
                 //Sets up the image button.
-                //aux.GetComponentInChildren<GUIChangeDirectory>().path= images[i-directories.Length - 1];
+                aux.GetComponentInChildren<GUIConfigImage>().path= images[i-directories.Length - 1];
                 pathSplit = images[i - directories.Length - 1].Split(Path.DirectorySeparatorChar);
                 aux.GetComponentInChildren<Text>().text = pathSplit[pathSplit.Length - 1];
                 auxText = new Texture2D(4, 4);
