@@ -15,6 +15,71 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
     [SerializeField]
     private GameObject pageCanvas;
 
+    [Header("Division Cell Tiles")]
+
+    [SerializeField]
+    private GameObject centerDivisionCell;
+
+    [SerializeField]
+    private GameObject lowerBorderDivisionCell;
+
+    [SerializeField]
+    private GameObject rightBorderDivisionCell;
+
+    [SerializeField]
+    private GameObject upperBorderDivisionCell;
+
+    [SerializeField]
+    private GameObject leftBorderDivisionCell;
+
+    [SerializeField]
+    private GameObject lowerRightVertexDivisionCell;
+
+    [SerializeField]
+    private GameObject upperRightVertexDivisionCell;
+
+    [SerializeField]
+    private GameObject upperLeftVertexDivisionCell;
+
+    [SerializeField]
+    private GameObject lowerLeftVertexDivisionCell;
+
+    [SerializeField]
+    private GameObject lowerDecorationDivisionCell;
+
+    [SerializeField]
+    private GameObject rightDecorationDivisionCell;
+
+    [SerializeField]
+    private GameObject upperDecorationDivisionCell;
+
+    [SerializeField]
+    private GameObject leftDecorationDivisionCell;
+
+    [SerializeField]
+    private GameObject rightLowerDecorationDivisionCell;
+
+    [SerializeField]
+    private GameObject lowerRightDecorationDivisionCell;
+
+    [SerializeField]
+    private GameObject upperRightDecorationDivisionCell;
+
+    [SerializeField]
+    private GameObject rightUpperDecorationDivisionCell;
+
+    [SerializeField]
+    private GameObject leftUpperDecorationDivisionCell;
+
+    [SerializeField]
+    private GameObject upperLeftDecorationDivisionCell;
+
+    [SerializeField]
+    private GameObject lowerLeftDecorationDivisionCell;
+
+    [SerializeField]
+    private GameObject leftLowerDecorationDivisionCell;
+
     protected ImageConfigurationManager()
     {
     }
@@ -63,7 +128,7 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
                 cellSize = auxText.height / i;
                 aux = Mathf.RoundToInt(auxText.width / (float)cellSize);
                 if (aux > 0 && aux <= 4 && Mathf.Abs(1 - auxText.width / (float)(cellSize * aux)) <= deformationMargin)
-                    imageConfigs.Add(new int[]{i,aux});
+                    imageConfigs.Add(new int[]{aux,i});
             }
         }
 
@@ -77,10 +142,10 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
             Destroy(pageList[pageList.Count-1].GetChild("Cells config"));
             pathSplit = i_path.Split(Path.DirectorySeparatorChar);
             aux = Path.GetExtension(pathSplit[pathSplit.Length - 1]).Length;
-            pathSplit[pathSplit.Length - 1].Remove(pathSplit[pathSplit.Length - 1].Length - aux, aux);
-            pageList[pageList.Count-1].GetChild("Image name").GetComponent<Text>().text = pathSplit[pathSplit.Length - 1];
+            pageList[pageList.Count-1].GetChild("Image name").GetComponent<Text>().text = pathSplit[pathSplit.Length - 1].Remove(pathSplit[pathSplit.Length - 1].Length - aux, aux);
             inputMenuControllerList.Add(new GameObject("InputMenuController"));
             auxGameObject = pageList[pageList.Count - 1].GetChild("Back button");
+            auxGameObject.GetComponent<GUIChangeDirectory>().path = Directory.GetParent(i_path).FullName;
             inputMenuControllerList[inputMenuControllerList.Count - 1].AddComponent<InputMenuController>().startingElem = auxGameObject;
             inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements = new List<GameObject>();
             inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(auxGameObject);
@@ -97,8 +162,7 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
                 Destroy(pageList[pageList.Count-1].GetChild("Error text"));
                 pathSplit = i_path.Split(Path.DirectorySeparatorChar);
                 aux = Path.GetExtension(pathSplit[pathSplit.Length - 1]).Length;
-                pathSplit[pathSplit.Length - 1].Remove(pathSplit[pathSplit.Length - 1].Length - aux, aux);
-                pageList[pageList.Count-1].GetChild("Image name").GetComponent<Text>().text = pathSplit[pathSplit.Length - 1];
+                pageList[pageList.Count-1].GetChild("Image name").GetComponent<Text>().text = pathSplit[pathSplit.Length - 1].Remove(pathSplit[pathSplit.Length - 1].Length - aux, aux);
                 pageList[pageList.Count-1].GetChild("Cells config").GetComponent<Text>().text = imageConfigs[i][0]+"x"+imageConfigs[i][1];
 
                 //SPRITE DE FONDO
@@ -117,9 +181,53 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
                     (auxGameObject.transform as RectTransform).anchorMin = new Vector2(0.5f - imageConfigs[i][0] / (float)(imageConfigs[i][1] + 2)/2f, 0.5f - imageConfigs[i][1] / (float)(imageConfigs[i][1] + 2)/2f);
                 }
 
-                //for (int j)
+                for (int x = 0; x < imageConfigs[i][0] + 2; x++)
+                {
+                    for (int y = 0; y < imageConfigs[i][1] + 2; y++)
+                    {
+                        if (!(x == 0 && y == 0) && !(x == 0 && y == imageConfigs[i][1] + 1) && !(x == imageConfigs[i][0] + 1 && y == 0) && !(x == imageConfigs[i][0]+1 && y == imageConfigs[i][1] + 1))
+                        {
+                            auxGameObject = new GameObject("DivisionCell("+x+","+y+")",typeof(RectTransform));
+                            auxGameObject.transform.SetParent(pageList[pageList.Count-1].GetChild("Margin").transform);
+                            (auxGameObject.transform as RectTransform).offsetMin = Vector2.zero;
+                            (auxGameObject.transform as RectTransform).offsetMax = Vector2.zero;
+                            if (imageConfigs[i][0] > imageConfigs[i][1])
+                            {
+                                (auxGameObject.transform as RectTransform).anchorMax = new Vector2((x + 1) / (float)(imageConfigs[i][0] + 2), ((imageConfigs[i][0]-imageConfigs[i][1])/2f + y +1) / (float)(imageConfigs[i][0] + 2));
+                                (auxGameObject.transform as RectTransform).anchorMin = new Vector2(x / (float)(imageConfigs[i][0] + 2), ((imageConfigs[i][0]-imageConfigs[i][1])/2f + y) / (float)(imageConfigs[i][0] + 2));
+
+                            }
+                            else
+                            {
+                                (auxGameObject.transform as RectTransform).anchorMax = new Vector2(((imageConfigs[i][1]-imageConfigs[i][0])/2f + x +1) / (float)(imageConfigs[i][1] + 2),(y + 1) / (float)(imageConfigs[i][1] + 2));
+                                (auxGameObject.transform as RectTransform).anchorMin = new Vector2(((imageConfigs[i][1]-imageConfigs[i][0])/2f + x) / (float)(imageConfigs[i][1] + 2),y / (float)(imageConfigs[i][1] + 2));
+                            }
+                            if (x == 0)
+                            {
+                                ((GameObject)Instantiate(leftDecorationDivisionCell)).transform.SetParent(auxGameObject.transform, false);
+                            }
+                            else if (x == imageConfigs[i][0] + 1)
+                            {
+                                ((GameObject)Instantiate(rightDecorationDivisionCell)).transform.SetParent(auxGameObject.transform, false);
+                            }
+                            else if (y == 0)
+                            {
+                                ((GameObject)Instantiate(lowerDecorationDivisionCell)).transform.SetParent(auxGameObject.transform, false);
+                            }
+                            else if (y == imageConfigs[i][1] + 1)
+                            {
+                                ((GameObject)Instantiate(upperDecorationDivisionCell)).transform.SetParent(auxGameObject.transform, false);
+                            }
+                            else
+                            {
+                                ((GameObject)Instantiate(centerDivisionCell)).transform.SetParent(auxGameObject.transform, false);
+                            }
+                        }
+                    }
+                }
 
                 auxGameObject = pageList[pageList.Count - 1].GetChild("Back button");
+                auxGameObject.GetComponent<GUIChangeDirectory>().path = Directory.GetParent(i_path).FullName;
                 inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().startingElem = auxGameObject;
                 inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(auxGameObject);
                 auxGameObject = pageList[pageList.Count - 1].GetChild("Accept button");
@@ -187,6 +295,31 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
                     //Adds the "previous page" button to the next input menu controller.
                     inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(auxGameObject);
                 }
+            }
+        }
+
+        foreach (GameObject page in pageList)
+        {
+            auxGameObject = page.GetChild("Back button");
+            foreach (GameObject page2 in pageList)
+            {
+                auxGameObject.AddComponent<GUIDestroy>().target = page2;
+            }
+
+            foreach (GameObject inputMenuController in inputMenuControllerList)
+            {
+                auxGameObject.AddComponent<GUIDestroy>().target = inputMenuController;
+            }
+
+            auxGameObject = page.GetChild("Accept button");
+            foreach (GameObject page2 in pageList)
+            {
+                auxGameObject.AddComponent<GUIDestroy>().target = page2;
+            }
+
+            foreach (GameObject inputMenuController in inputMenuControllerList)
+            {
+                auxGameObject.AddComponent<GUIDestroy>().target = inputMenuController;
             }
         }
 

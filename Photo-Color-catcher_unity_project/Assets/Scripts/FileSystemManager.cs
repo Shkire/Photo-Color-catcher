@@ -57,21 +57,20 @@ public class FileSystemManager : Singleton<FileSystemManager>
         string[] directories = GetDirectories(i_path);
         string[] images = GetImages(i_path);
 
-        //Initializes the page list.
-        if (pageList == null)
-            pageList = new List<GameObject>();
         //Destroys the previous page list.
-        else
+        if (pageList != null)
             for (int i = 0; i < pageList.Count; i++)
                 Destroy(pageList[i]);
+        //Initializes the page list.
+        pageList = new List<GameObject>();
 
-        //Initializes the input menu controller list.
-        if (inputMenuControllerList == null)
-            inputMenuControllerList = new List<GameObject>();
         //Destroys the previous input menu controller list.
-        else
+        if (inputMenuControllerList != null) 
             for (int i = 0; i < inputMenuControllerList.Count; i++)
                 Destroy(inputMenuControllerList[i]);
+        //Initializes the input menu controller list.
+        inputMenuControllerList = new List<GameObject>();
+        
 
         GameObject aux;
         string[] pathSplit;
@@ -238,6 +237,31 @@ public class FileSystemManager : Singleton<FileSystemManager>
 
                 //Adds the "previous page" button to the next input menu controller.
                 inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(aux);
+            }
+        }
+
+        foreach (GameObject page in pageList)
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                aux = page.GetChild("Image "+i);
+
+                if (aux != null)
+                {
+                    foreach (GameObject page2 in pageList)
+                    {
+                        objectEnable = aux.AddComponent<GUIObjectEnable>();
+                        objectEnable.target = page2;
+                        objectEnable.enable = false;
+                    }
+
+                    foreach (GameObject inputMenuController in inputMenuControllerList)
+                    {
+                        objectEnable = aux.AddComponent<GUIObjectEnable>();
+                        objectEnable.target = inputMenuController;
+                        objectEnable.enable = false;
+                    }
+                }
             }
         }
     }
