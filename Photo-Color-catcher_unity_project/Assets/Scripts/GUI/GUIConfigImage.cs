@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// A GUITool used to change the actual directory.
+/// A GUITool used to configurate an image for processing and level generation.
 /// </summary>
-public class GUIChangeDirectory : GUITool
+public class GUIConfigImage : GUITool
 {
     /// <summary>
-    /// The path of the new actual directory.
+    /// The path of the image.
     /// </summary>
     public string path;
 
     public override void Execute()
     {
-        FileSystemManager.Instance.ChangeDirectory(path);
+        ImageConfigurationManager.Instance.GetImageConfigurations(path);
     }
+
 }

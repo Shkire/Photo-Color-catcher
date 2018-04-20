@@ -1,0 +1,57 @@
+fileFormatVersion: 2
+guid: 922f2451f5fe387458cec7b643b099f5
+timeCreated: 1524156364
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - imageConfigurationPageModel: {fileID: 1932485190679478, guid: 4ebcdf6bfd631eb449730d81ee22d9e5,
+      type: 2}
+  - pageCanvas: {instanceID: 0}
+  - centerDivisionCell: {fileID: 1297822263764546, guid: f3deffa0c04065a429ffe217759bd1a2,
+      type: 2}
+  - lowerBorderDivisionCell: {fileID: 1077947206596404, guid: cbde575970fb02445a390d908d0c267b,
+      type: 2}
+  - rightBorderDivisionCell: {fileID: 1167829407030342, guid: bb250b20357c71149a12a835c7e6050c,
+      type: 2}
+  - upperBorderDivisionCell: {fileID: 1656320180842540, guid: a47346462d40e9e429b9d55a74671614,
+      type: 2}
+  - leftBorderDivisionCell: {fileID: 1684773895471694, guid: 6b18fe51f1b27d44cafec8e6d250602f,
+      type: 2}
+  - lowerRightVertexDivisionCell: {fileID: 1521038528230192, guid: 01b7dbd9ce9818341bc68406229f0fc5,
+      type: 2}
+  - upperRightVertexDivisionCell: {fileID: 1213481854598604, guid: 202c4ae20ff073049a947efa8b4e3d68,
+      type: 2}
+  - upperLeftVertexDivisionCell: {fileID: 1725216021834376, guid: fd09fe6aafed0744881bd4b630bcd4ea,
+      type: 2}
+  - lowerLeftVertexDivisionCell: {fileID: 1261065365380616, guid: 4ac2a48d2cbd4924f86208be3d211191,
+      type: 2}
+  - lowerDecorationDivisionCell: {fileID: 1337456409791960, guid: 123992643414fc3498a55ca5ac8892f4,
+      type: 2}
+  - rightDecorationDivisionCell: {fileID: 1462459998618552, guid: 539cd5189c9c6854e9969cc8c4d4f232,
+      type: 2}
+  - upperDecorationDivisionCell: {fileID: 1113281408980852, guid: c992985b982efbb4e85c898ebd32309e,
+      type: 2}
+  - leftDecorationDivisionCell: {fileID: 1983346387257906, guid: fe2202b64ab47c04fa642b13cf09249e,
+      type: 2}
+  - rightLowerDecorationDivisionCell: {fileID: 1640330721448558, guid: 640cfa4088474e34cada6d5940f836f4,
+      type: 2}
+  - lowerRightDecorationDivisionCell: {fileID: 1951956310218398, guid: 2c3270e52edc444439a6b1ae6be30672,
+      type: 2}
+  - upperRightDecorationDivisionCell: {fileID: 1387220164524002, guid: 0e3d04c5569de7240b43708d77b0f7c1,
+      type: 2}
+  - rightUpperDecorationDivisionCell: {fileID: 1691735648423662, guid: ee32fd9fb45c6d142bff415b71fdba95,
+      type: 2}
+  - leftUpperDecorationDivisionCell: {fileID: 1704383357678118, guid: 5e94fe6ee81810e4f8f4af6076152093,
+      type: 2}
+  - upperLeftDecorationDivisionCell: {fileID: 1821728073677568, guid: fc8810d7533575e41a5638ab627e1ac1,
+      type: 2}
+  - lowerLeftDecorationDivisionCell: {fileID: 1450713660408912, guid: 77b3ed9a04a15d74bb9d417286763bce,
+      type: 2}
+  - leftLowerDecorationDivisionCell: {fileID: 1395475605172034, guid: ca89c821d48b12d40bf40995a31f5d19,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
