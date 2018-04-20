@@ -2,8 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GUIConfigImage : GUITool {
-
+/// <summary>
+/// A GUITool used to configurate an image for processing and level generation.
+/// </summary>
+public class GUIConfigImage : GUITool
+{
+    /// <summary>
+    /// The path of the image.
+    /// </summary>
     public string path;
 
     public override void Execute()

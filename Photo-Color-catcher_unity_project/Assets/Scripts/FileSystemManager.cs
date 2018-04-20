@@ -61,13 +61,15 @@ public class FileSystemManager : Singleton<FileSystemManager>
         if (pageList != null)
             for (int i = 0; i < pageList.Count; i++)
                 Destroy(pageList[i]);
+        
         //Initializes the page list.
         pageList = new List<GameObject>();
 
         //Destroys the previous input menu controller list.
-        if (inputMenuControllerList != null) 
+        if (inputMenuControllerList != null)
             for (int i = 0; i < inputMenuControllerList.Count; i++)
                 Destroy(inputMenuControllerList[i]);
+        
         //Initializes the input menu controller list.
         inputMenuControllerList = new List<GameObject>();
         
@@ -138,7 +140,7 @@ public class FileSystemManager : Singleton<FileSystemManager>
                 aux = pageList[pageList.Count - 1].GetChild("Image " + i % 9);
 
                 //Sets up the image button.
-                aux.GetComponentInChildren<GUIConfigImage>().path= images[i-directories.Length - 1];
+                aux.GetComponentInChildren<GUIConfigImage>().path = images[i - directories.Length - 1];
                 pathSplit = images[i - directories.Length - 1].Split(Path.DirectorySeparatorChar);
                 aux.GetComponentInChildren<Text>().text = pathSplit[pathSplit.Length - 1];
                 auxText = new Texture2D(4, 4);
@@ -171,9 +173,6 @@ public class FileSystemManager : Singleton<FileSystemManager>
 
                 //Destroys the unused "next page" button.
                 Destroy(pageList[pageList.Count - 1].GetChild("Next page"));
-
-                //Maps the elements of the input menu controller.
-                //inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().MapElements();
             }
 
             //If it is the last element of the page.
@@ -213,9 +212,6 @@ public class FileSystemManager : Singleton<FileSystemManager>
                 //Adds the "next page" button to the input menu controller.
                 inputMenuControllerList[inputMenuControllerList.Count - 2].GetComponent<InputMenuController>().uiElements.Add(aux);
 
-                //Maps the elements of the input menu controller.
-                //inputMenuControllerList[inputMenuControllerList.Count - 2].GetComponent<InputMenuController>().MapElements();
-
                 //Gets the "previous page" button of the next page.
                 aux = pageList[pageList.Count - 1].GetChild("Prev page");
 
@@ -240,23 +236,29 @@ public class FileSystemManager : Singleton<FileSystemManager>
             }
         }
 
+        //For each page.
         foreach (GameObject page in pageList)
         {
+            //For each image.
             for (int i = 0; i < 9; i++)
             {
-                aux = page.GetChild("Image "+i);
+                aux = page.GetChild("Image " + i);
 
                 if (aux != null)
                 {
+                    //For each page.
                     foreach (GameObject page2 in pageList)
                     {
+                        //Adds an GUIObjectEnable component to the image button.
                         objectEnable = aux.AddComponent<GUIObjectEnable>();
                         objectEnable.target = page2;
                         objectEnable.enable = false;
                     }
 
+                    //For each InputMenuController.
                     foreach (GameObject inputMenuController in inputMenuControllerList)
                     {
+                        //Adds an GUIObjectEnable component to the image button.
                         objectEnable = aux.AddComponent<GUIObjectEnable>();
                         objectEnable.target = inputMenuController;
                         objectEnable.enable = false;
@@ -307,10 +309,10 @@ public class FileSystemManager : Singleton<FileSystemManager>
         
         string[] validExtensions =
             {
-            ".jpg",
-            ".jpeg",
-            ".png"
-        };
+                ".jpg",
+                ".jpeg",
+                ".png"
+            };
         string[] images = Directory.GetFiles(i_path).Where(x => validExtensions.Contains(Path.GetExtension(x).ToLower())).ToArray();
         Array.Sort(images, StringComparer.InvariantCulture);
         return images;

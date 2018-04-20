@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// A GUITool used to change the actual directory
+/// A GUITool used to change the actual directory.
 /// </summary>
 public class GUIChangeDirectory : GUITool
 {
