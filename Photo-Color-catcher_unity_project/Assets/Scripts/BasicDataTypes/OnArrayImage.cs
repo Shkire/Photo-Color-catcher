@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// Data type used to store RGB components combinations.
 /// </summary>
 [System.Serializable]
-public class RGB_Content
+public class RGBContent
 {
     /// <summary>
     /// Contains R component.
@@ -23,7 +23,7 @@ public class RGB_Content
     /// </summary>
     public bool b;
 
-    public RGB_Content(bool i_r, bool i_g, bool i_b)
+    public RGBContent(bool i_r, bool i_g, bool i_b)
     {
         r = i_r;
         g = i_g;
@@ -65,7 +65,7 @@ public class OnArrayImage
     /// <summary>
     /// RGB components combination assigned to the image.
     /// </summary>
-    public RGB_Content rgbComponents;
+    public RGBContent rgbComponents;
 
     public OnArrayImage(int i_width, int i_height)
     {
