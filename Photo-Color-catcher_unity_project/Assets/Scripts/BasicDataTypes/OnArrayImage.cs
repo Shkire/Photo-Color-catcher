@@ -79,6 +79,7 @@ public class OnArrayImage
     {
         width = i_img.width;
         height = i_img.height;
+        pixels = new Color[i_img.GetPixels().Length];
         Array.Copy(i_img.GetPixels(), pixels, i_img.GetPixels().Length);
     }
 

@@ -19,281 +19,8 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
     /// </summary>
     public int mapSize;
 
-    public LevelConfigList levelConfigList;
-
-    //Protected constructor of singleton
     protected ImgProcessManager()
     {
-    }
-
-    private IEnumerator DivideImage(OnArrayImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnArrayImage> o_childrenImages)
-    {
-        //Calculates child width (width/columns)
-        int childrenWidth = Mathf.CeilToInt((float)i_img.width / i_columns);
-        //Calculates child height (height/rows)
-        int childrenHeight = Mathf.CeilToInt((float)i_img.height / i_rows);
-
-        //Resizes texture if needed
-        i_img.ResizeBilinear(childrenWidth * i_columns, childrenHeight * i_rows);
-
-        yield return null;
-
-        //Creates children image dictionary and initializes it
-        o_childrenImages = new Dictionary<Vector2, OnArrayImage>();
-        for (int x = 0; x < i_columns; x++)
-        {
-            for (int y = 0; y < i_rows; y++)
-            {
-                o_childrenImages.Add(new Vector2((float)x, (float)y), new OnArrayImage(childrenWidth, childrenHeight));
-            }
-        }
-
-        //For every pixel
-        int counter = 0;
-        OnArrayImage childImage;
-        int column;
-        int row;
-        int childFirstPos;
-        int childPixelPos;
-        while (counter < i_img.pixels.Length)
-        {
-            column = ((counter / childrenWidth) % i_columns);
-            row = counter / (childrenHeight * i_img.width);
-            childImage = o_childrenImages[new Vector2((float)column, (float)row)];
-            for (int i = 0; i < childrenWidth; i++)
-            {
-                childFirstPos = row * childrenHeight * i_img.width + column * childrenWidth;
-                childPixelPos = ((counter + i - childFirstPos) / i_img.width) * childrenWidth + ((counter + i - childFirstPos) % i_img.width);
-                childImage.pixels[childPixelPos] = i_img.pixels[counter + i];
-            }
-            counter += childrenWidth;
-
-            //Copies a child image row per frame
-            yield return null;
-        }
-    }
-
-    private IEnumerator DivideImageAndProcessCellData(OnArrayImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnArrayImage> o_childrenImages)
-    {
-        yield return (StartCoroutine(DivideImage(i_img, i_rows, i_columns, o_childrenImages)));
-
-        //Get color average and grayscale from cell
-        foreach (Vector2 pos in o_childrenImages.Keys)
-        {
-            OnArrayImage img = o_childrenImages[pos];
-            img.average = Color.black;
-            for (int i = 0; i < img.pixels.Length; i++)
-            {
-                img.average.r += img.pixels[i].r / img.pixels.Length;
-                img.average.g += img.pixels[i].g / img.pixels.Length;
-                img.average.b += img.pixels[i].b / img.pixels.Length;
-                img.grayscale += img.pixels[i].grayscale / img.pixels.Length;
-            }
-
-            yield return null;
-        }
-    }
-
-    /// <summary>
-    /// Generates a level using the processed cells of the image.
-    /// </summary>
-    /// <param name="i_cellImages">Image divided into cells.</param>
-    /// <param name="o_levelGraph">OUT: Level graph.</param>
-    private IEnumerator GenerateLevel(Dictionary<Vector2,OnArrayImage> i_cellImages, GraphType<Vector2> o_levelGraph)
-    {
-        //Stores the sample colors: all posible combinations of RGB components.
-        Dictionary<Vector3,RGB_Content> sampleColors = new Dictionary<Vector3, RGB_Content>();
-        CIELabColor aux = Color.red.ToCIELab();
-        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, false, false));
-        aux = Color.green.ToCIELab();
-        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(false, true, false));
-        aux = Color.blue.ToCIELab();
-        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(false, false, true));
-        aux = (new Color(1, 1, 0)).ToCIELab();
-        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, true, false));
-        aux = (new Color(1, 0, 1)).ToCIELab();
-        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, false, true));
-        aux = (new Color(0, 1, 1)).ToCIELab();
-        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(false, true, true));
-        aux = (new Color(1, 1, 1)).ToCIELab();
-        sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGB_Content(true, true, true));
-
-        yield return null;
-
-        Vector3 goal = Vector3.zero;
-        Vector3 average;
-        float distance = -1;
-        RGB_Content rgbSample;
-        o_levelGraph = new GraphType<Vector2>();
-
-        //For every cell.
-        foreach (Vector2 pos in i_cellImages.Keys)
-        {
-            aux = i_cellImages[pos].average.ToCIELab();
-            average = new Vector3(aux.l, aux.a, aux.b);
-
-            //Compares the average color with all the samples.
-            foreach (Vector3 sample in sampleColors.Keys)
-            {
-                if (distance == -1 || (Vector3.Distance(average, sample) < distance))
-                {
-                    goal = sample;
-                    distance = Vector3.Distance(average, goal);
-                }
-            }
-            rgbSample = sampleColors[goal];
-
-            //Assigns the RGB combination of the most similar sample.
-            i_cellImages[pos].rgbComponents = new RGB_Content(rgbSample.r, rgbSample.g, rgbSample.b);
-
-            //Adds the vertex to the graph.
-            o_levelGraph.AddVertex(pos);
-
-            yield return null;
-        }
-            
-        int max = (int)Mathf.Pow(o_levelGraph.vertices.Count, 0.5f);
-
-        //For each cell
-        for (int y = 0; y < max; y++)
-        {
-            for (int x = 0; x < max; x++)
-            {
-
-                //Checks if grayscale difference between the cell and adjacent < 0.5.
-                if (x < max - 1 && Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x + 1, (float)y)].grayscale) < 0.5f)
-
-                    //Makes the vertices adjacent: no barrier between cells.
-                    o_levelGraph.AddAdjacent(new Vector2((float)x, (float)y), new Vector2((float)x + 1, (float)y));
-
-                //Checks if grayscale difference between the cell and adjacent < 0.5.
-                if (x < max - 1 && Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x, (float)y + 1)].grayscale) < 0.5f)
-
-                    //Makes the vertices adjacent: no barrier between cells.
-                    o_levelGraph.AddAdjacent(new Vector2((float)x, (float)y), new Vector2((float)x, (float)y + 1));
-            }
-        }
-
-        yield return null;
-
-        List<List<Vector2>> connectedVertices = o_levelGraph.GetConnectedVertices();
-        float minGrayDif;
-        Vector2 vertex = Vector2.zero;
-        Vector2 adjacent = Vector2.zero;
-        bool notConnected;
-        int foundVertices;
-
-        //While the graph is not fully connected.
-        while (connectedVertices.Count > 1)
-        {
-            minGrayDif = 2f;
-
-            //For each vertex.
-            for (int y = 0; y < max; y++)
-            {
-                for (int x = 0; x < max; x++)
-                {
-                    if (x < max - 1)
-                    {
-                        notConnected = true;
-                        foundVertices = 0;
-
-                        //For each list of connected vertices.
-                        for (int i = 0; i < connectedVertices.Count; i++)
-                        {
-                            
-                            //If the vertices are connected (on the same list).
-                            if (foundVertices == 0 && connectedVertices[i].Contains(new Vector2((float)x, (float)y)) && connectedVertices[i].Contains(new Vector2((float)x + 1, (float)y)))
-                            {
-                                notConnected = false;
-                                break;
-                            }
-
-                            //If one of the vertex is on the list.
-                            if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) || connectedVertices[i].Contains(new Vector2((float)x + 1, (float)y)))
-                            {
-                                foundVertices++;
-
-                                //If both vertices have been found on lists.
-                                if (foundVertices == 2)
-                                    break;
-                            }
-                        }
-
-                        //If the cells are not connected and the grayscale difference between both is lower.
-                        if (notConnected && Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x + 1, (float)y)].grayscale) < minGrayDif)
-                        {
-                            minGrayDif = Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x + 1, (float)y)].grayscale);
-                            vertex = new Vector2((float)x, (float)y);
-                            adjacent = new Vector2((float)x + 1, (float)y);
-                        }
-                    }
-                    if (y < max - 1)
-                    {
-                        notConnected = true;
-                        foundVertices = 0;
-
-                        //For each list of connected vertices.
-                        for (int i = 0; i < connectedVertices.Count; i++)
-                        {
-
-                            //If the vertices are connected (on the same list).
-                            if (foundVertices == 0 && connectedVertices[i].Contains(new Vector2((float)x, (float)y)) && connectedVertices[i].Contains(new Vector2((float)x, (float)y + 1)))
-                            {
-                                notConnected = false;
-                                break;
-                            }
-
-                            //If one of the vertex is on the list.
-                            if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) || connectedVertices[i].Contains(new Vector2((float)x, (float)y + 1)))
-                            {
-                                foundVertices++;
-
-                                //If both vertices have been found on lists.
-                                if (foundVertices == 2)
-                                    break;
-                            }
-                        }
-
-                        //If the cells are not connected and the grayscale difference between both is lower.
-                        if (notConnected && Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x, (float)y + 1)].grayscale) < minGrayDif)
-                        {
-                            minGrayDif = Mathf.Abs(i_cellImages[new Vector2((float)x, (float)y)].grayscale - i_cellImages[new Vector2((float)x, (float)y + 1)].grayscale);
-                            vertex = new Vector2((float)x, (float)y);
-                            adjacent = new Vector2((float)x, (float)y + 1);
-                        }
-                    }
-
-                }
-            }
-
-            //Makes the vertices adjacent
-            o_levelGraph.AddAdjacent(vertex, adjacent);
-
-            yield return null;
-
-            connectedVertices = o_levelGraph.GetConnectedVertices();
-        }
-    }
-
-    public void StartDivideImage(OnArrayImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnArrayImage> o_childrenImages)
-    {
-        StartCoroutine(DivideImage(i_img, i_rows, i_columns, o_childrenImages));
-    }
-
-    public void StartDivideImageAndProcessCellData(OnArrayImage i_img, int i_rows, int i_columns, Dictionary<Vector2,OnArrayImage> o_childrenImages)
-    {
-        StartCoroutine(DivideImageAndProcessCellData(i_img, i_rows, i_columns, o_childrenImages));
-    }
-
-    /// <summary>
-    /// Starts the GenerateLevel coroutine.
-    /// </summary>
-    /// <param name="i_cellImages">Image divided into cells.</param>
-    /// <param name="o_levelGraph">OUT: Level graph.</param>
-    public void StartGenerateLevel(Dictionary<Vector2,OnArrayImage> i_cellImages, GraphType<Vector2> o_levelGraph)
-    {
-        StartCoroutine(GenerateLevel(i_cellImages, o_levelGraph));
     }
 
     /// <summary>
@@ -330,6 +57,316 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
 		sprtRend.sprite = spr;
 	}
 	*/
+
+    public void StartProcessImageAndGenerateLevel(Texture2D i_img, int[] i_imageConfig)
+    {
+        StartCoroutine(ProcessImageAndGenerateLevel(i_img,i_imageConfig));
+    }
+
+    public IEnumerator ProcessImageAndGenerateLevel(Texture2D i_img, int[] i_imageConfig)
+    {
+        World world = new World();
+        int cellSize;
+
+        //If image is horizontal.
+        if (i_img.width > i_img.height)
+        {
+            //Calculates cell size (width/columns)
+            cellSize = Mathf.CeilToInt(i_img.width / (float)i_imageConfig[0]);
+        }
+
+        //If image is vertical.
+        else
+        {
+            //Calculates cell size (height/rows)
+            cellSize = Mathf.CeilToInt(i_img.height / (float)i_imageConfig[1]);
+        }
+
+        //Resizes texture.
+        i_img = i_img.ResizeBilinear(cellSize * i_imageConfig[0], cellSize * i_imageConfig[1]);
+
+        world._img = new OnArrayImage(i_img);
+
+        yield return null;
+
+        //Creates children image dictionary and initializes it
+        world._levels = new Dictionary<Vector2,Level>();
+        for (int x = 0; x < i_imageConfig[0]; x++)
+        {
+            for (int y = 0; y < i_imageConfig[1]; y++)
+            {
+                world._levels.Add(new Vector2((float)x, (float)y), new Level());
+                world._levels[new Vector2((float)x, (float)y)]._img = new OnArrayImage(cellSize, cellSize);
+            }
+        }
+
+        //For every pixel
+        int counter = 0;
+        OnArrayImage onArrayImage = null;
+        int column;
+        int row;
+        int childFirstPos;
+        int childPixelPos;
+        while (counter < i_img.GetPixels().Length)
+        {
+            column = ((counter / cellSize) % i_imageConfig[0]);
+            row = counter / (cellSize * i_img.width);
+            onArrayImage = world._levels[new Vector2((float)column, (float)row)]._img;
+            for (int i = 0; i < cellSize; i++)
+            {
+                childFirstPos = row * cellSize * i_img.width + column * cellSize;
+                childPixelPos = ((counter + i - childFirstPos) / i_img.width) * cellSize + ((counter + i - childFirstPos) % i_img.width);
+                onArrayImage.pixels[childPixelPos] = i_img.GetPixels()[counter + i];
+            }
+            counter += cellSize;
+
+            //Copies a child image row per frame
+            yield return null;
+        }
+
+        OnArrayImage image;
+        Dictionary<Vector3,RGBContent> sampleColors;
+        CIELabColor aux;
+        Vector3 goal = Vector3.zero;
+        Vector3 average;
+        float distance;
+        RGBContent rgbSample;
+        int max;
+        List<List<Vector2>> connectedVertices;
+        float minGrayDif;
+        Vector2 vertex = Vector2.zero;
+        Vector2 adjacent = Vector2.zero;
+        bool notConnected;
+        int foundVertices;
+
+        foreach (Vector2 pos in world._levels.Keys)
+        {
+            image = world._levels[pos]._img;
+
+            cellSize = Mathf.CeilToInt(onArrayImage.width / (float)mapSize);
+
+            image = image.ResizeBilinear(cellSize * mapSize, cellSize * mapSize);
+
+            yield return null;
+
+            world._levels[pos]._cells = new Dictionary<Vector2,LevelCell>();
+            for (int x = 0; x < mapSize; x++)
+            {
+                for (int y = 0; y < mapSize; y++)
+                {
+                    world._levels[pos]._cells.Add(new Vector2((float)x, (float)y), new LevelCell());
+                    world._levels[pos]._cells[new Vector2((float)x, (float)y)]._img = new OnArrayImage(cellSize, cellSize);
+                }
+            }
+
+            //For every pixel
+            counter = 0;
+            while (counter < image.pixels.Length)
+            {
+                column = ((counter / cellSize) % mapSize);
+                row = counter / (cellSize * image.width);
+                onArrayImage = world._levels[pos]._cells[new Vector2((float)column, (float)row)]._img;
+                for (int i = 0; i < cellSize; i++)
+                {
+                    childFirstPos = row * cellSize * image.width + column * cellSize;
+                    childPixelPos = ((counter + i - childFirstPos) / image.width) * cellSize + ((counter + i - childFirstPos) % image.width);
+                    onArrayImage.pixels[childPixelPos] = image.pixels[counter + i];
+                }
+                counter += cellSize;
+
+                //Copies a child image row per frame
+                yield return null;
+            }
+
+            LevelCell cell;
+
+            //Get color average and grayscale from cell
+            foreach (Vector2 pos2 in world._levels[pos]._cells.Keys)
+            {
+                cell = world._levels[pos]._cells[pos2];
+                cell._average = Color.black;
+                for (int i = 0; i < cell._img.pixels.Length; i++)
+                {
+                    cell._average.r += cell._img.pixels[i].r / cell._img.pixels.Length;
+                    cell._average.g += cell._img.pixels[i].g / cell._img.pixels.Length;
+                    cell._average.b += cell._img.pixels[i].b / cell._img.pixels.Length;
+                    cell._grayscale += cell._img.pixels[i].grayscale / cell._img.pixels.Length;
+                }
+
+                yield return null;
+            }
+
+            //Stores the sample colors: all posible combinations of RGB components.
+            sampleColors = new Dictionary<Vector3, RGBContent>();
+            aux = Color.red.ToCIELab();
+            sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGBContent(true, false, false));
+            aux = Color.green.ToCIELab();
+            sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGBContent(false, true, false));
+            aux = Color.blue.ToCIELab();
+            sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGBContent(false, false, true));
+            aux = (new Color(1, 1, 0)).ToCIELab();
+            sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGBContent(true, true, false));
+            aux = (new Color(1, 0, 1)).ToCIELab();
+            sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGBContent(true, false, true));
+            aux = (new Color(0, 1, 1)).ToCIELab();
+            sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGBContent(false, true, true));
+            aux = (new Color(1, 1, 1)).ToCIELab();
+            sampleColors.Add(new Vector3(aux.l, aux.a, aux.b), new RGBContent(true, true, true));
+
+            yield return null;
+
+            distance = -1;
+
+            world._levels[pos]._graph = new GraphType<Vector2>();
+
+            //For every cell.
+            foreach (Vector2 pos2 in world._levels[pos]._cells.Keys)
+            {
+                aux = world._levels[pos]._cells[pos2]._average.ToCIELab();
+                average = new Vector3(aux.l, aux.a, aux.b);
+
+                //Compares the average color with all the samples.
+                foreach (Vector3 sample in sampleColors.Keys)
+                {
+                    if (distance == -1 || (Vector3.Distance(average, sample) < distance))
+                    {
+                        goal = sample;
+                        distance = Vector3.Distance(average, goal);
+                    }
+                }
+                rgbSample = sampleColors[goal];
+
+                //Assigns the RGB combination of the most similar sample.
+                world._levels[pos]._cells[pos2]._rgbComponents = new RGBContent(rgbSample.r, rgbSample.g, rgbSample.b);
+
+                //Adds the vertex to the graph.
+                world._levels[pos]._graph.AddVertex(pos2);
+
+                yield return null;
+            }
+
+            max = (int)Mathf.Pow(world._levels[pos]._graph.vertices.Count, 0.5f);
+
+            //For each cell
+            for (int y = 0; y < max; y++)
+            {
+                for (int x = 0; x < max; x++)
+                {
+
+                    //Checks if grayscale difference between the cell and adjacent < 0.5.
+                    if (x < max - 1 && Mathf.Abs(world._levels[pos]._cells[new Vector2((float)x, (float)y)]._grayscale - world._levels[pos]._cells[new Vector2((float)x + 1, (float)y)]._grayscale) < 0.5f)
+
+                        //Makes the vertices adjacent: no barrier between cells.
+                        world._levels[pos]._graph.AddAdjacent(new Vector2((float)x, (float)y), new Vector2((float)x + 1, (float)y));
+
+                    //Checks if grayscale difference between the cell and adjacent < 0.5.
+                    if (y < max - 1 && Mathf.Abs(world._levels[pos]._cells[new Vector2((float)x, (float)y)]._grayscale - world._levels[pos]._cells[new Vector2((float)x, (float)y + 1)]._grayscale) < 0.5f)
+
+                        //Makes the vertices adjacent: no barrier between cells.
+                        world._levels[pos]._graph.AddAdjacent(new Vector2((float)x, (float)y), new Vector2((float)x, (float)y + 1));
+                }
+            }
+
+            yield return null;
+
+            connectedVertices = world._levels[pos]._graph.GetConnectedVertices();
+
+            //While the graph is not fully connected.
+            while (connectedVertices.Count > 1)
+            {
+                minGrayDif = 2f;
+
+                //For each vertex.
+                for (int y = 0; y < max; y++)
+                {
+                    for (int x = 0; x < max; x++)
+                    {
+                        if (x < max - 1)
+                        {
+                            notConnected = true;
+                            foundVertices = 0;
+
+                            //For each list of connected vertices.
+                            for (int i = 0; i < connectedVertices.Count; i++)
+                            {
+
+                                //If the vertices are connected (on the same list).
+                                if (foundVertices == 0 && connectedVertices[i].Contains(new Vector2((float)x, (float)y)) && connectedVertices[i].Contains(new Vector2((float)x + 1, (float)y)))
+                                {
+                                    notConnected = false;
+                                    break;
+                                }
+
+                                //If one of the vertex is on the list.
+                                if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) || connectedVertices[i].Contains(new Vector2((float)x + 1, (float)y)))
+                                {
+                                    foundVertices++;
+
+                                    //If both vertices have been found on lists.
+                                    if (foundVertices == 2)
+                                        break;
+                                }
+                            }
+
+                            //If the cells are not connected and the grayscale difference between both is lower.
+                            if (notConnected && Mathf.Abs(world._levels[pos]._cells[new Vector2((float)x, (float)y)]._grayscale - world._levels[pos]._cells[new Vector2((float)x + 1, (float)y)]._grayscale) < minGrayDif)
+                            {
+                                minGrayDif = Mathf.Abs(world._levels[pos]._cells[new Vector2((float)x, (float)y)]._grayscale - world._levels[pos]._cells[new Vector2((float)x + 1, (float)y)]._grayscale);
+                                vertex = new Vector2((float)x, (float)y);
+                                adjacent = new Vector2((float)x + 1, (float)y);
+                            }
+                        }
+                        if (y < max - 1)
+                        {
+                            notConnected = true;
+                            foundVertices = 0;
+
+                            //For each list of connected vertices.
+                            for (int i = 0; i < connectedVertices.Count; i++)
+                            {
+
+                                //If the vertices are connected (on the same list).
+                                if (foundVertices == 0 && connectedVertices[i].Contains(new Vector2((float)x, (float)y)) && connectedVertices[i].Contains(new Vector2((float)x, (float)y + 1)))
+                                {
+                                    notConnected = false;
+                                    break;
+                                }
+
+                                //If one of the vertex is on the list.
+                                if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) || connectedVertices[i].Contains(new Vector2((float)x, (float)y + 1)))
+                                {
+                                    foundVertices++;
+
+                                    //If both vertices have been found on lists.
+                                    if (foundVertices == 2)
+                                        break;
+                                }
+                            }
+
+                            //If the cells are not connected and the grayscale difference between both is lower.
+                            if (notConnected && Mathf.Abs(world._levels[pos]._cells[new Vector2((float)x, (float)y)]._grayscale - world._levels[pos]._cells[new Vector2((float)x, (float)y + 1)]._grayscale) < minGrayDif)
+                            {
+                                minGrayDif = Mathf.Abs(world._levels[pos]._cells[new Vector2((float)x, (float)y)]._grayscale - world._levels[pos]._cells[new Vector2((float)x, (float)y + 1)]._grayscale);
+                                vertex = new Vector2((float)x, (float)y);
+                                adjacent = new Vector2((float)x, (float)y + 1);
+                            }
+                        }
+
+                    }
+                }
+
+                //Makes the vertices adjacent
+                world._levels[pos]._graph.AddAdjacent(vertex, adjacent);
+
+                yield return null;
+
+                connectedVertices = world._levels[pos]._graph.GetConnectedVertices();
+            }
+        }
+
+        Debug.Log("Fin");
+        //PERSISTENCIA
+    }
 
     #region ImageProcessingAndDivision
 

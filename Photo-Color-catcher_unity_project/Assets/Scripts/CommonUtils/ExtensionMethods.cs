@@ -122,8 +122,8 @@ public static class ExtensionMethods
 		float[][] cieXyzMatrix = MathMatrix.MatrixMultiplication(transformationMatrix,rgbMatrix);
 
 		cieXyz.x = cieXyzMatrix[0][0];
-		cieXyz.x = cieXyzMatrix[0][1];
-		cieXyz.x = cieXyzMatrix[0][2];
+		cieXyz.y = cieXyzMatrix[1][0];
+		cieXyz.z = cieXyzMatrix[2][0];
 
 		return cieXyz;
 	}

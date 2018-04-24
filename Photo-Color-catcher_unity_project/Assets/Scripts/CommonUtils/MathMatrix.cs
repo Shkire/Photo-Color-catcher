@@ -38,7 +38,7 @@ public static class MathMatrix
             float aux = 0;
             for (int i = 0; i < m1Columns; i++)
             {
-                aux += i_m1[1][i] * i_m2[i][1];
+                aux += i_m1[0][i] * i_m2[i][0];
             }
             return new float[][]{ new float[] { aux } };
         }
