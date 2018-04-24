@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 /// <summary>
 /// Data type used to store RGB components combinations.
@@ -74,26 +75,28 @@ public class OnArrayImage
         pixels = new Color[width * height];
     }
 
-    /// <summary>
-    /// Applies a bilinear resize to the image.
-    /// </summary>
-    /// <param name="i_newWidth">New width.</param>
-    /// <param name="i_newHeight">New height.</param>
-    public void ResizeBilinear(int i_newWidth, int i_newHeight)
+    public OnArrayImage(Texture2D i_img)
     {
-        if (i_newWidth != width || i_newHeight != height)
-        {
-            //Creates auxiliar texture with the image.
-            Texture2D tempText = new Texture2D(width, height);
-            tempText.SetPixels(pixels);
-            tempText.Apply();
+        width = i_img.width;
+        height = i_img.height;
+        Array.Copy(i_img.GetPixels(), pixels, i_img.GetPixels().Length);
+    }
 
-            //Resizes texture
-            tempText = tempText.ResizeBilinear(i_newWidth, i_newHeight);
-            pixels = tempText.GetPixels();
-            width = tempText.width;
-            height = tempText.height;
-        }
+
+    public OnArrayImage ResizeBilinear(int i_newWidth, int i_newHeight)
+    {
+        //Creates auxiliar texture with the image.
+        Texture2D tempText = new Texture2D(width, height);
+        tempText.SetPixels(pixels);
+        tempText.Apply();
+
+        //Resizes texture
+        tempText = tempText.ResizeBilinear(i_newWidth, i_newHeight);
+        pixels = tempText.GetPixels();
+        width = tempText.width;
+        height = tempText.height;
+
+        return new OnArrayImage(tempText);
     }
 
     /*

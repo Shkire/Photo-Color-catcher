@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Level
 {
-    public Color[] _pixels;
+    public OnArrayImage _img;
 
     public Dictionary<Vector2,LevelCell> _cells;
 }

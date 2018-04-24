@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class World
 {
-    public Color[] _pixels;
+    public OnArrayImage _img;
 
     public Dictionary<Vector2,Level> _levels;
 }

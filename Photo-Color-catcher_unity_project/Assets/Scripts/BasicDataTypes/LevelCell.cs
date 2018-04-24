@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LevelCell
 {
-    public Color[] _pixels;
+    public OnArrayImage _img;
 
     public Color _average;
 
