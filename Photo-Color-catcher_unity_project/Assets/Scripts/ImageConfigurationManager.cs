@@ -12,19 +12,19 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
     /// <summary>
     /// The deformation margin (max deformation: |1 - originalSize/newSize|).
     /// </summary>
-    public float deformationMargin;
+    public float _deformationMargin;
 
     /// <summary>
     /// The prefab used to create the configuration selector.
     /// </summary>
     [SerializeField]
-    private GameObject imageConfigurationPageModel;
+    private GameObject p_imageConfigurationPageModel;
 
     /// <summary>
     /// The parent canvas of the file system explorer.
     /// </summary>
     [SerializeField]
-    private GameObject pageCanvas;
+    private GameObject p_pageCanvas;
 
     [Header("Division Cell Tiles")]
 
@@ -32,31 +32,31 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
     /// The prefab used as a tile inside the divided image grid.
     /// </summary>
     [SerializeField]
-    private GameObject centerDivisionCell;
+    private GameObject p_centerDivisionCell;
 
     /// <summary>
     /// The prefab used as a tile on the outside of the lower side of the divided image grid.
     /// </summary>
     [SerializeField]
-    private GameObject lowerDecorationDivisionCell;
+    private GameObject p_lowerDecorationDivisionCell;
 
     /// <summary>
     /// The prefab used as a tile on the outside of the right side of the divided image grid.
     /// </summary>
     [SerializeField]
-    private GameObject rightDecorationDivisionCell;
+    private GameObject p_rightDecorationDivisionCell;
 
     /// <summary>
     /// The prefab used as a tile on the outside of the upper side of the divided image grid.
     /// </summary>
     [SerializeField]
-    private GameObject upperDecorationDivisionCell;
+    private GameObject p_upperDecorationDivisionCell;
 
     /// <summary>
     /// The prefab used as a tile on the outside of the left side of the divided image grid.
     /// </summary>
     [SerializeField]
-    private GameObject leftDecorationDivisionCell;
+    private GameObject p_leftDecorationDivisionCell;
 
     protected ImageConfigurationManager()
     {
@@ -80,8 +80,6 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
         string[] pathSplit;
         GUIObjectEnable objectEnable;
         Sprite spr = null;
-        Vector2 anchorMax;
-        Vector2 anchorMin;
 
         //From max cells per size to min cells per size.
         for (int i = 4; i > 0; i--)
@@ -96,7 +94,7 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
                 aux = Mathf.RoundToInt(auxText.height / (float)cellSize);
 
                 //If the number of cells by column is between min and max and the image height deformation is under the margin.
-                if (aux > 0 && aux <= 4 && Mathf.Abs(1 - auxText.height / (float)(cellSize * aux)) <= deformationMargin)
+                if (aux > 0 && aux <= 4 && Mathf.Abs(1 - auxText.height / (float)(cellSize * aux)) <= _deformationMargin)
 
                     //Adds the configuration.
                     imageConfigs.Add(new int[]{ i, aux });
@@ -112,7 +110,7 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
                 aux = Mathf.RoundToInt(auxText.width / (float)cellSize);
 
                 //If the number of cells by row is between min and max and the image height deformation is under the margin.
-                if (aux > 0 && aux <= 4 && Mathf.Abs(1 - auxText.width / (float)(cellSize * aux)) <= deformationMargin)
+                if (aux > 0 && aux <= 4 && Mathf.Abs(1 - auxText.width / (float)(cellSize * aux)) <= _deformationMargin)
 
                     //Adds the configuration.
                     imageConfigs.Add(new int[]{ aux, i });
@@ -123,8 +121,8 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
         if (imageConfigs.Count == 0)
         {
             //Creates the first page of the configuration selector.
-            pageList.Add((GameObject)Instantiate(imageConfigurationPageModel));
-            pageList[pageList.Count - 1].transform.SetParent(pageCanvas.transform, false);
+            pageList.Add((GameObject)Instantiate(p_imageConfigurationPageModel));
+            pageList[pageList.Count - 1].transform.SetParent(p_pageCanvas.transform, false);
 
             //Destroys all the useless elements of the page.
             Destroy(pageList[pageList.Count - 1].GetChild("Prev page"));
@@ -157,8 +155,8 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
         else
         {
             //Creates the first page of the configuration selector.
-            pageList.Add((GameObject)Instantiate(imageConfigurationPageModel));
-            pageList[pageList.Count - 1].transform.SetParent(pageCanvas.transform, false);
+            pageList.Add((GameObject)Instantiate(p_imageConfigurationPageModel));
+            pageList[pageList.Count - 1].transform.SetParent(p_pageCanvas.transform, false);
 
             //Destroys the "Previous page" button.
             Destroy(pageList[pageList.Count - 1].GetChild("Prev page"));
@@ -241,35 +239,35 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
                             if (x == 0)
                             {
                                 //Instantiates the tile.
-                                ((GameObject)Instantiate(leftDecorationDivisionCell)).transform.SetParent(auxGameObject.transform, false);
+                                ((GameObject)Instantiate(p_leftDecorationDivisionCell)).transform.SetParent(auxGameObject.transform, false);
                             }
 
                             //If the cell is (cells by row + 1,?): outside the right side of the grid.
                             else if (x == imageConfigs[i][0] + 1)
                             {
                                 //Instantiates the tile.
-                                ((GameObject)Instantiate(rightDecorationDivisionCell)).transform.SetParent(auxGameObject.transform, false);
+                                ((GameObject)Instantiate(p_rightDecorationDivisionCell)).transform.SetParent(auxGameObject.transform, false);
                             }
 
                             //If the cell is (?,0): outside the lower side of the grid.
                             else if (y == 0)
                             {
                                 //Instantiates the tile.
-                                ((GameObject)Instantiate(lowerDecorationDivisionCell)).transform.SetParent(auxGameObject.transform, false);
+                                ((GameObject)Instantiate(p_lowerDecorationDivisionCell)).transform.SetParent(auxGameObject.transform, false);
                             }
 
                             //If the cell is (?,cells by column + 1): outside the upper side of the grid.
                             else if (y == imageConfigs[i][1] + 1)
                             {
                                 //Instantiates the tile.
-                                ((GameObject)Instantiate(upperDecorationDivisionCell)).transform.SetParent(auxGameObject.transform, false);
+                                ((GameObject)Instantiate(p_upperDecorationDivisionCell)).transform.SetParent(auxGameObject.transform, false);
                             }
 
                             //If the cell is on the grid.
                             else
                             {
                                 //Instantiates the tile.
-                                ((GameObject)Instantiate(centerDivisionCell)).transform.SetParent(auxGameObject.transform, false);
+                                ((GameObject)Instantiate(p_centerDivisionCell)).transform.SetParent(auxGameObject.transform, false);
                             }
                         }
                     }
@@ -287,9 +285,11 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
 
                 //Gets the "Accept" button of the page.
                 auxGameObject = pageList[pageList.Count - 1].GetChild("Accept button");
-                auxGameObject.GetComponent<GUIProcessImageAndGenerateLevel>()._img = auxText;
-                auxGameObject.GetComponent<GUIProcessImageAndGenerateLevel>()._imageConfig = imageConfigs[i];
-                auxGameObject.GetComponent<GUIProcessImageAndGenerateLevel>()._name = pageList[pageList.Count - 1].GetChild("Image name").GetComponent<Text>().text;
+
+                //Sets up the "Accept" button.
+                auxGameObject.GetComponent<GUIGenerateWorld>()._img = auxText;
+                auxGameObject.GetComponent<GUIGenerateWorld>()._imageConfig = imageConfigs[i];
+                auxGameObject.GetComponent<GUIGenerateWorld>()._name = pageList[pageList.Count - 1].GetChild("Image name").GetComponent<Text>().text;
 
                 //Adds the button to the InputMenuController.
                 inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(auxGameObject);
@@ -305,8 +305,8 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
                 else
                 {
                     //Creates the next page of the configuration selector.
-                    pageList.Add((GameObject)Instantiate(imageConfigurationPageModel));
-                    pageList[pageList.Count - 1].transform.SetParent(pageCanvas.transform, false);
+                    pageList.Add((GameObject)Instantiate(p_imageConfigurationPageModel));
+                    pageList[pageList.Count - 1].transform.SetParent(p_pageCanvas.transform, false);
 
                     //Creates the next InputMenuController.
                     inputMenuControllerList.Add(new GameObject("InputMenuController"));

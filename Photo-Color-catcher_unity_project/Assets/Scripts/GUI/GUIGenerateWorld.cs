@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GUIProcessImageAndGenerateLevel : GUITool
+public class GUIGenerateWorld : GUITool
 {
     public Texture2D _img;
 
@@ -11,7 +11,7 @@ public class GUIProcessImageAndGenerateLevel : GUITool
 
     public override void Execute()
     {
-        ImgProcessManager.Instance.StartProcessImageAndGenerateLevel(_img, _imageConfig, _name);
+        ImgProcessManager.Instance.StartProcessImageAndGenerateWorld(_img, _imageConfig, _name);
     }
 
 }
