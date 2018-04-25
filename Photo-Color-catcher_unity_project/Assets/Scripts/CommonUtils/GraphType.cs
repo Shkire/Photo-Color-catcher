@@ -4,6 +4,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Simple graph data type.
 /// </summary>
+[System.Serializable]
 public class GraphType<E>
 {
     /// <summary>

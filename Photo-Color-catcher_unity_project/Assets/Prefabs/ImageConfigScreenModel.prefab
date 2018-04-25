@@ -256,6 +256,7 @@ GameObject:
   m_Component:
   - component: {fileID: 224447179799742456}
   - component: {fileID: 114980526824901276}
+  - component: {fileID: 114395428396082044}
   m_Layer: 5
   m_Name: Accept button
   m_TagString: Untagged
@@ -594,6 +595,19 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114395428396082044
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1864091385117050}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7a55af840832d34e8357f1e76c85a3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _img: {fileID: 0}
+  _imageConfig: 
 --- !u!114 &114492641764377966
 MonoBehaviour:
   m_ObjectHideFlags: 1

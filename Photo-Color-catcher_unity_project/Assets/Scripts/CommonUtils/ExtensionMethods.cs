@@ -88,7 +88,7 @@ public static class ExtensionMethods
         resTexture.Apply();
         return resTexture;
     }
-        
+
     /// <summary>
     /// Transforms the UnityEngine.Color into CIEColor.CIE_XYZColor.
     /// </summary>
@@ -114,70 +114,70 @@ public static class ExtensionMethods
 
         float[][] rgbMatrix =
             {
-			new float[] {auxR},
-			new float[] {auxG},
-			new float[] {auxB}
-		};
+                new float[] { auxR },
+                new float[] { auxG },
+                new float[] { auxB }
+            };
 
-		float[][] cieXyzMatrix = MathMatrix.MatrixMultiplication(transformationMatrix,rgbMatrix);
+        float[][] cieXyzMatrix = MathMatrix.MatrixMultiplication(transformationMatrix, rgbMatrix);
 
-		cieXyz.x = cieXyzMatrix[0][0];
-		cieXyz.x = cieXyzMatrix[0][1];
-		cieXyz.x = cieXyzMatrix[0][2];
+        cieXyz.x = cieXyzMatrix[0][0];
+        cieXyz.y = cieXyzMatrix[1][0];
+        cieXyz.z = cieXyzMatrix[2][0];
 
-		return cieXyz;
-	}
+        return cieXyz;
+    }
 
     /// <summary>
     /// Transforms the UnityEngine.Color into CIEColor.CIELabColor.
     /// </summary>
     /// <returns>The CIE Lab value of the Color.</returns>
-	public static CIELabColor ToCIELab (this Color color)
-	{
+    public static CIELabColor ToCIELab(this Color color)
+    {
         //Ecuations: http://www.brucelindbloom.com/
 
-		CIE_XYZColor cieXyz = color.ToCIE_XYZ ();
+        CIE_XYZColor cieXyz = color.ToCIE_XYZ();
 
-		CIE_XYZColor referenceWhite = Color.white.ToCIE_XYZ ();
+        CIE_XYZColor referenceWhite = Color.white.ToCIE_XYZ();
 
         //xr = X / Xr
-		float auxX = cieXyz.x / referenceWhite.x;
+        float auxX = cieXyz.x / referenceWhite.x;
 
         //yr = Y / Yr
-		float auxY = cieXyz.y / referenceWhite.y;
+        float auxY = cieXyz.y / referenceWhite.y;
 
         //zr = Z / Zr
-		float auxZ = cieXyz.z / referenceWhite.z;
+        float auxZ = cieXyz.z / referenceWhite.z;
 
         //if xr > 0.008856
         //  fx = xr ^ 1/3
         //else
         //  fx = (903.3 * xr + 16) / 116
-		auxX = (auxX > 0.008856f) ? Mathf.Pow (auxX, 1 / 3f) : ((903.3f * auxX + 16) / 116f);
+        auxX = (auxX > 0.008856f) ? Mathf.Pow(auxX, 1 / 3f) : ((903.3f * auxX + 16) / 116f);
 
         //if yr > 0.008856
         //  fy = yr ^ 1/3
         //else
         //  fy = (903.3 * yr + 16) / 116
-		auxY = (auxY > 0.008856f) ? Mathf.Pow (auxY, 1 / 3f) : ((903.3f * auxY + 16) / 116f);
+        auxY = (auxY > 0.008856f) ? Mathf.Pow(auxY, 1 / 3f) : ((903.3f * auxY + 16) / 116f);
 
         //if zr > 0.008856
         //  fz = zr ^ 1/3
         //else
         //  fz = (903.3 * zr + 16) / 116
-		auxZ = (auxZ > 0.008856f) ? Mathf.Pow (auxZ, 1 / 3f) : ((903.3f * auxZ + 16) / 116f);
+        auxZ = (auxZ > 0.008856f) ? Mathf.Pow(auxZ, 1 / 3f) : ((903.3f * auxZ + 16) / 116f);
 
-		CIELabColor cieLab = new CIELabColor ();
+        CIELabColor cieLab = new CIELabColor();
 
         //L = 116 * fy -16
-		cieLab.l = 116 * auxY - 16;
+        cieLab.l = 116 * auxY - 16;
 
         //a = 500 * (fx - fy)
-		cieLab.a = 500 * (auxX - auxY);
+        cieLab.a = 500 * (auxX - auxY);
 
         //b = 200 * (fy - fz)
-		cieLab.b = 200 * (auxY - auxZ);
+        cieLab.b = 200 * (auxY - auxZ);
 
-		return cieLab;
-	}
+        return cieLab;
+    }
 }

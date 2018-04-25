@@ -42,7 +42,7 @@ public class ImageLoader : MonoBehaviour
 			(imageButton.transform as RectTransform).anchorMin = new Vector2((0.5f+(counter%4)*1.5f)/6.5f,1-((1.5f+(counter/4)*1.5f)/7f));
 			(imageButton.transform as RectTransform).anchorMax = new Vector2((1.5f+(counter%4)*1.5f)/6.5f,1-((0.5f+(counter/4)*1.5f)/7f));
 			string[] splitPath = loadingFile.Split ('/');
-			imageButton.GetComponent<GUIProcessImage> ().path = splitPath [splitPath.Length - 1];
+			//imageButton.GetComponent<GUIProcessImage> ().path = splitPath [splitPath.Length - 1];
 			if (counter == 0) 
 			{
 				if (menuController.uiElements == null)
