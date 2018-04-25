@@ -4,7 +4,6 @@ using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Color = UnityEngine.Color;
 
 public static class PersistenceManager
 {
@@ -12,8 +11,34 @@ public static class PersistenceManager
 	private static PersistentImageData currentImg;
 
 	const string ROOT_PATH = "/";
-	const string MAIN_DATA_EXT = ".phgm";
-	const string IMG_DATA_EXT = ".phdt";
+	const string IMG_DATA_EXT = ".pcci";
+    const string MAIN_DATA_EXT = "";
+
+    public static void SaveWorld(World i_world, string i_name)
+    {
+        FileStream file = null; 
+        BinaryFormatter bf = new BinaryFormatter();
+        SurrogateSelector ss = new SurrogateSelector();
+        ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate ();
+        Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate ();
+        //DictionarySerializationSurrogate<object,object> dictSs = new DictionarySerializationSurrogate<object, object> ();
+        DictionarySerializationSurrogate<Vector2,Level> levelDictSs = new DictionarySerializationSurrogate<Vector2, Level>();
+        DictionarySerializationSurrogate<Vector2,LevelCell> levelCellDictSs = new DictionarySerializationSurrogate<Vector2, LevelCell>();
+        StreamingContext sc = new StreamingContext (StreamingContextStates.All); 
+        ss.AddSurrogate (typeof(Color), sc, colorSs);
+        ss.AddSurrogate (typeof(Vector2), sc, v2ss);
+        //ss.AddSurrogate (typeof(Dictionary<object,object>), sc, dictSs);
+        ss.AddSurrogate (typeof(Dictionary<Vector2,Level>), sc, levelDictSs);
+        ss.AddSurrogate (typeof(Dictionary<Vector2,LevelCell>), sc, levelCellDictSs);
+        bf.SurrogateSelector = ss;
+        if (File.Exists (Application.persistentDataPath + ROOT_PATH + i_name + IMG_DATA_EXT)) {
+            //EXISTS
+        } else {
+            file = File.Create (Application.persistentDataPath + ROOT_PATH + i_name + IMG_DATA_EXT);
+        }
+        bf.Serialize (file, i_world);
+        file.Close();
+    }
 
 	//Carga inicial se cargan las imagenes padre que hay indexadas y las configuraciones
 	//Carga de nivel se cargan los datos de la imagen principal y de las hijas

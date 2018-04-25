@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
 using CIEColor;
+using System;
 
 /// <summary>
 /// Singleton object for image processing.
@@ -58,34 +59,35 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
 	}
 	*/
 
-    public void StartProcessImageAndGenerateLevel(Texture2D i_img, int[] i_imageConfig)
+    public void StartProcessImageAndGenerateLevel(Texture2D i_img, int[] i_imageConfig, string i_name)
     {
-        StartCoroutine(ProcessImageAndGenerateLevel(i_img,i_imageConfig));
+        StartCoroutine(ProcessImageAndGenerateLevel(i_img, i_imageConfig, i_name));
     }
 
-    public IEnumerator ProcessImageAndGenerateLevel(Texture2D i_img, int[] i_imageConfig)
+    public IEnumerator ProcessImageAndGenerateLevel(Texture2D i_img, int[] i_imageConfig, string i_name)
     {
         World world = new World();
+        Texture2D auxText = i_img;
         int cellSize;
 
         //If image is horizontal.
-        if (i_img.width > i_img.height)
+        if (auxText.width > auxText.height)
         {
             //Calculates cell size (width/columns)
-            cellSize = Mathf.CeilToInt(i_img.width / (float)i_imageConfig[0]);
+            cellSize = Mathf.CeilToInt(auxText.width / (float)i_imageConfig[0]);
         }
 
         //If image is vertical.
         else
         {
             //Calculates cell size (height/rows)
-            cellSize = Mathf.CeilToInt(i_img.height / (float)i_imageConfig[1]);
+            cellSize = Mathf.CeilToInt(auxText.height / (float)i_imageConfig[1]);
         }
 
         //Resizes texture.
-        i_img = i_img.ResizeBilinear(cellSize * i_imageConfig[0], cellSize * i_imageConfig[1]);
+        auxText = auxText.ResizeBilinear(cellSize * i_imageConfig[0], cellSize * i_imageConfig[1]);
 
-        world._img = new OnArrayImage(i_img);
+        world._img = new OnArrayImage(auxText);
 
         yield return null;
 
@@ -97,6 +99,8 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
             {
                 world._levels.Add(new Vector2((float)x, (float)y), new Level());
                 world._levels[new Vector2((float)x, (float)y)]._img = new OnArrayImage(cellSize, cellSize);
+                world._levels[new Vector2((float)x, (float)y)]._img.pixels = auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize);
+                yield return null;
             }
         }
 
@@ -107,6 +111,8 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         int row;
         int childFirstPos;
         int childPixelPos;
+
+        /*
         while (counter < i_img.GetPixels().Length)
         {
             column = ((counter / cellSize) % i_imageConfig[0]);
@@ -119,10 +125,19 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                 onArrayImage.pixels[childPixelPos] = i_img.GetPixels()[counter + i];
             }
             counter += cellSize;
-
+            /*
+            column = ((counter / cellSize) % i_imageConfig[0]);
+            row = counter / (cellSize * i_img.width);
+            onArrayImage = world._levels[new Vector2((float)column, (float)row)]._img;
+            childFirstPos = row * cellSize * i_img.width + column * cellSize;
+            childPixelPos = ((counter - childFirstPos) / i_img.width) * cellSize + ((counter - childFirstPos) % i_img.width);
+            Array.Copy(i_img.GetPixels(),counter,onArrayImage.pixels,childPixelPos,cellSize);
+            counter += cellSize;
+            *-/
             //Copies a child image row per frame
             yield return null;
         }
+         */
 
         OnArrayImage image;
         Dictionary<Vector3,RGBContent> sampleColors;
@@ -143,24 +158,32 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         {
             image = world._levels[pos]._img;
 
-            cellSize = Mathf.CeilToInt(onArrayImage.width / (float)mapSize);
+            cellSize = Mathf.CeilToInt(image.width / (float)mapSize);
 
             image = image.ResizeBilinear(cellSize * mapSize, cellSize * mapSize);
 
-            yield return null;
+            auxText = new Texture2D(image.width, image.height);
+
+            auxText.SetPixels(image.pixels);
+
+            auxText.Apply();
 
             world._levels[pos]._cells = new Dictionary<Vector2,LevelCell>();
+
             for (int x = 0; x < mapSize; x++)
             {
                 for (int y = 0; y < mapSize; y++)
                 {
                     world._levels[pos]._cells.Add(new Vector2((float)x, (float)y), new LevelCell());
                     world._levels[pos]._cells[new Vector2((float)x, (float)y)]._img = new OnArrayImage(cellSize, cellSize);
+                    world._levels[pos]._cells[new Vector2((float)x, (float)y)]._img.pixels = auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize);
+                    yield return null;
                 }
             }
 
             //For every pixel
             counter = 0;
+            /*
             while (counter < image.pixels.Length)
             {
                 column = ((counter / cellSize) % mapSize);
@@ -174,10 +197,19 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                 }
                 counter += cellSize;
 
+                /*
+                column = ((counter / cellSize) % mapSize);
+                row = counter / (cellSize * image.width);
+                onArrayImage = world._levels[pos]._cells[new Vector2((float)column, (float)row)]._img;
+                childFirstPos = row * cellSize * image.width + column * cellSize;
+                childPixelPos = ((counter - childFirstPos) / image.width) * cellSize + ((counter - childFirstPos) % image.width);
+                Array.Copy(image.pixels,counter,onArrayImage.pixels,childPixelPos,cellSize);
+                counter += cellSize;
+                *-/
                 //Copies a child image row per frame
                 yield return null;
             }
-
+            */
             LevelCell cell;
 
             //Get color average and grayscale from cell
@@ -215,16 +247,19 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
 
             yield return null;
 
-            distance = -1;
+           
 
             world._levels[pos]._graph = new GraphType<Vector2>();
 
+            Debug.Log("Nivel " + pos);
             //For every cell.
             foreach (Vector2 pos2 in world._levels[pos]._cells.Keys)
             {
+                distance = -1;
+                Debug.Log("Celda " + pos2);
                 aux = world._levels[pos]._cells[pos2]._average.ToCIELab();
                 average = new Vector3(aux.l, aux.a, aux.b);
-
+                Debug.Log("Media color " + average);
                 //Compares the average color with all the samples.
                 foreach (Vector3 sample in sampleColors.Keys)
                 {
@@ -235,10 +270,10 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                     }
                 }
                 rgbSample = sampleColors[goal];
-
+                Debug.Log("Sample " + goal);
                 //Assigns the RGB combination of the most similar sample.
                 world._levels[pos]._cells[pos2]._rgbComponents = new RGBContent(rgbSample.r, rgbSample.g, rgbSample.b);
-
+                Debug.Log("RGBCOMP (" + world._levels[pos]._cells[pos2]._rgbComponents.r + "," + world._levels[pos]._cells[pos2]._rgbComponents.g + "," + world._levels[pos]._cells[pos2]._rgbComponents.b + ")");
                 //Adds the vertex to the graph.
                 world._levels[pos]._graph.AddVertex(pos2);
 
@@ -365,6 +400,8 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         }
 
         Debug.Log("Fin");
+
+        PersistenceManager.SaveWorld(world, i_name);
         //PERSISTENCIA
     }
 

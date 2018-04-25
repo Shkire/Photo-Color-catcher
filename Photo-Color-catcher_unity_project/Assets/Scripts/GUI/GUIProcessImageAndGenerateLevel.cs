@@ -7,9 +7,11 @@ public class GUIProcessImageAndGenerateLevel : GUITool
 
     public int[] _imageConfig;
 
+    public string _name;
+
     public override void Execute()
     {
-        ImgProcessManager.Instance.StartProcessImageAndGenerateLevel(_img, _imageConfig);
+        ImgProcessManager.Instance.StartProcessImageAndGenerateLevel(_img, _imageConfig, _name);
     }
 
 }

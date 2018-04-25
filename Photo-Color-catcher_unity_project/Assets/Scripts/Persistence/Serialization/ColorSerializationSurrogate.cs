@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Runtime.Serialization;
-using Color = UnityEngine.Color;
 
 sealed class ColorSerializationSurrogate : ISerializationSurrogate
 {

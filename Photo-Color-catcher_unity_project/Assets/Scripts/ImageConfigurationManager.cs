@@ -289,6 +289,7 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
                 auxGameObject = pageList[pageList.Count - 1].GetChild("Accept button");
                 auxGameObject.GetComponent<GUIProcessImageAndGenerateLevel>()._img = auxText;
                 auxGameObject.GetComponent<GUIProcessImageAndGenerateLevel>()._imageConfig = imageConfigs[i];
+                auxGameObject.GetComponent<GUIProcessImageAndGenerateLevel>()._name = pageList[pageList.Count - 1].GetChild("Image name").GetComponent<Text>().text;
 
                 //Adds the button to the InputMenuController.
                 inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(auxGameObject);

@@ -53,21 +53,6 @@ public class OnArrayImage
     /// </summary>
     public int height;
 
-    /// <summary>
-    /// Average color of image.
-    /// </summary>
-    public Color average;
-
-    /// <summary>
-    /// Average grayscale of image.
-    /// </summary>
-    public float grayscale;
-
-    /// <summary>
-    /// RGB components combination assigned to the image.
-    /// </summary>
-    public RGBContent rgbComponents;
-
     public OnArrayImage(int i_width, int i_height)
     {
         width = i_width;
@@ -79,8 +64,7 @@ public class OnArrayImage
     {
         width = i_img.width;
         height = i_img.height;
-        pixels = new Color[i_img.GetPixels().Length];
-        Array.Copy(i_img.GetPixels(), pixels, i_img.GetPixels().Length);
+        pixels = i_img.GetPixels();
     }
 
 
