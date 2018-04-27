@@ -39,6 +39,9 @@ namespace BasicDataTypes
     [System.Serializable]
     public class OnArrayImage
     {
+
+        //CHANGE TO TEXTURE2D AND SURROGATE??
+
         /// <summary>
         /// Pixel array.
         /// </summary>
@@ -66,6 +69,14 @@ namespace BasicDataTypes
             _width = i_img.width;
             _height = i_img.height;
             _pixels = i_img.GetPixels();
+        }
+
+        public Texture2D ToTexture2D()
+        {
+            Texture2D aux = new Texture2D(_width, _height);
+            aux.SetPixels(_pixels);
+            aux.Apply();
+            return aux;
         }
     }
 
@@ -124,6 +135,10 @@ namespace BasicDataTypes
     [System.Serializable]
     public class World
     {
+        public string _name;
+
+        public int[] _imageConfig;
+
         /// <summary>
         /// The level image stored as an array.
         /// </summary>
