@@ -18,7 +18,7 @@ public static class ExtensionMethods
         float incY = (1.0f / (float)newYSize);
         for (int px = 0; px < rpixels.Length; px++)
         {
-            rpixels[px] = text.GetPixelBilinear(incX * ((float)px % newXSize), incY * ((float)Mathf.Floor(px / newYSize)));
+            rpixels[px] = text.GetPixelBilinear(incX * ((float)px % newXSize), incY * ((float)Mathf.Floor(px / newXSize)));
         }
         result.SetPixels(rpixels); 
         result.Apply(); 
