@@ -129,7 +129,7 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
             Destroy(pageList[pageList.Count - 1].GetChild("Next page"));
             Destroy(pageList[pageList.Count - 1].GetChild("Accept button"));
             Destroy(pageList[pageList.Count - 1].GetChild("Cells config"));
-            Destroy(pageList[pageList.Count - 1].GetChild("Backgrounf image"));
+            Destroy(pageList[pageList.Count - 1].GetChild("Background image"));
 
             //Shows the image name.
             pathSplit = i_path.Split(Path.DirectorySeparatorChar);

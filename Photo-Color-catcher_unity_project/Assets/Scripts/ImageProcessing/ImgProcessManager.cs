@@ -74,6 +74,12 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         //Assings the world image.
         world._img = new OnArrayImage(auxText);
 
+        //Assigns the world name.
+        world._name = i_name;
+
+        //Assings the image configuration.
+        world._imageConfig = i_imageConfig;
+
         yield return null;
 
         //Creates levels map and initializes it.
