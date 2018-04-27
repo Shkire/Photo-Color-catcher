@@ -12,7 +12,7 @@ public static class PersistenceManager
     private static PersistentImageData currentImg;
 
     const string ROOT_PATH = "/";
-    const string IMG_DATA_EXT = ".pcci";
+    const string IMG_DATA_EXT = ".pccw";
     const string MAIN_DATA_EXT = "";
 
     public static void SaveWorld(World i_world, string i_name)
@@ -22,15 +22,15 @@ public static class PersistenceManager
         SurrogateSelector ss = new SurrogateSelector();
         ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate();
         Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate();
-        //DictionarySerializationSurrogate<object,object> dictSs = new DictionarySerializationSurrogate<object, object> ();
-        DictionarySerializationSurrogate<Vector2,Level> levelDictSs = new DictionarySerializationSurrogate<Vector2, Level>();
-        DictionarySerializationSurrogate<Vector2,LevelCell> levelCellDictSs = new DictionarySerializationSurrogate<Vector2, LevelCell>();
+        DictionarySerializationSurrogate<object,object> dictSs = new DictionarySerializationSurrogate<object, object> ();
+        //DictionarySerializationSurrogate<Vector2,Level> levelDictSs = new DictionarySerializationSurrogate<Vector2, Level>();
+        //DictionarySerializationSurrogate<Vector2,LevelCell> levelCellDictSs = new DictionarySerializationSurrogate<Vector2, LevelCell>();
         StreamingContext sc = new StreamingContext(StreamingContextStates.All); 
         ss.AddSurrogate(typeof(Color), sc, colorSs);
         ss.AddSurrogate(typeof(Vector2), sc, v2ss);
-        //ss.AddSurrogate (typeof(Dictionary<object,object>), sc, dictSs);
-        ss.AddSurrogate(typeof(Dictionary<Vector2,Level>), sc, levelDictSs);
-        ss.AddSurrogate(typeof(Dictionary<Vector2,LevelCell>), sc, levelCellDictSs);
+        ss.AddSurrogate (typeof(Dictionary<object,object>), sc, dictSs);
+        //ss.AddSurrogate(typeof(Dictionary<Vector2,Level>), sc, levelDictSs);
+        //ss.AddSurrogate(typeof(Dictionary<Vector2,LevelCell>), sc, levelCellDictSs);
         bf.SurrogateSelector = ss;
         if (File.Exists(Application.persistentDataPath + ROOT_PATH + i_name + IMG_DATA_EXT))
         {
@@ -42,6 +42,30 @@ public static class PersistenceManager
         }
         bf.Serialize(file, i_world);
         file.Close();
+    }
+
+    public static World LoadWorld(string i_path)
+    {
+        if (!File.Exists(i_path))
+            return null;
+        FileStream file = File.Open(i_path, FileMode.Open);
+        BinaryFormatter bf = new BinaryFormatter();
+        SurrogateSelector ss = new SurrogateSelector();
+        ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate();
+        Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate();
+        DictionarySerializationSurrogate<object,object> dictSs = new DictionarySerializationSurrogate<object, object> ();
+        //DictionarySerializationSurrogate<Vector2,Level> levelDictSs = new DictionarySerializationSurrogate<Vector2, Level>();
+        //DictionarySerializationSurrogate<Vector2,LevelCell> levelCellDictSs = new DictionarySerializationSurrogate<Vector2, LevelCell>();
+        StreamingContext sc = new StreamingContext(StreamingContextStates.All); 
+        ss.AddSurrogate(typeof(Color), sc, colorSs);
+        ss.AddSurrogate(typeof(Vector2), sc, v2ss);
+        ss.AddSurrogate (typeof(Dictionary<object,object>), sc, dictSs);
+        //ss.AddSurrogate(typeof(Dictionary<Vector2,Level>), sc, levelDictSs);
+        //ss.AddSurrogate(typeof(Dictionary<Vector2,LevelCell>), sc, levelCellDictSs);
+        bf.SurrogateSelector = ss;
+        return ((World)(bf.Deserialize(file)));
+        file.Close();
+
     }
 
     //Carga inicial se cargan las imagenes padre que hay indexadas y las configuraciones
