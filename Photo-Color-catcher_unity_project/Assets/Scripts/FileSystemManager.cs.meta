@@ -1,10 +1,14 @@
 fileFormatVersion: 2
 guid: a3312e1c86d37094780b607db8c6a889
-timeCreated: 1523628640
+timeCreated: 1524921420
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - fileSystemModelPrefab: {fileID: 1047430314457882, guid: 9ff166c76ff2b884a8614fcef782276b,
+      type: 2}
+  - canvas: {instanceID: 0}
+  - actualDirectoryText: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
