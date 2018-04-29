@@ -22,13 +22,13 @@ public static class PersistenceManager
         SurrogateSelector ss = new SurrogateSelector();
         ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate();
         Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate();
-        DictionarySerializationSurrogate<object,object> dictSs = new DictionarySerializationSurrogate<object, object> ();
+        DictionarySerializationSurrogate<object,object> dictSs = new DictionarySerializationSurrogate<object, object>();
         //DictionarySerializationSurrogate<Vector2,Level> levelDictSs = new DictionarySerializationSurrogate<Vector2, Level>();
         //DictionarySerializationSurrogate<Vector2,LevelCell> levelCellDictSs = new DictionarySerializationSurrogate<Vector2, LevelCell>();
         StreamingContext sc = new StreamingContext(StreamingContextStates.All); 
         ss.AddSurrogate(typeof(Color), sc, colorSs);
         ss.AddSurrogate(typeof(Vector2), sc, v2ss);
-        ss.AddSurrogate (typeof(Dictionary<object,object>), sc, dictSs);
+        ss.AddSurrogate(typeof(Dictionary<object,object>), sc, dictSs);
         //ss.AddSurrogate(typeof(Dictionary<Vector2,Level>), sc, levelDictSs);
         //ss.AddSurrogate(typeof(Dictionary<Vector2,LevelCell>), sc, levelCellDictSs);
         bf.SurrogateSelector = ss;
@@ -46,25 +46,28 @@ public static class PersistenceManager
 
     public static World LoadWorld(string i_path)
     {
+        World aux;
         if (!File.Exists(i_path))
             return null;
-        FileStream file = File.Open(i_path, FileMode.Open);
-        BinaryFormatter bf = new BinaryFormatter();
-        SurrogateSelector ss = new SurrogateSelector();
-        ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate();
-        Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate();
-        DictionarySerializationSurrogate<object,object> dictSs = new DictionarySerializationSurrogate<object, object> ();
-        //DictionarySerializationSurrogate<Vector2,Level> levelDictSs = new DictionarySerializationSurrogate<Vector2, Level>();
-        //DictionarySerializationSurrogate<Vector2,LevelCell> levelCellDictSs = new DictionarySerializationSurrogate<Vector2, LevelCell>();
-        StreamingContext sc = new StreamingContext(StreamingContextStates.All); 
-        ss.AddSurrogate(typeof(Color), sc, colorSs);
-        ss.AddSurrogate(typeof(Vector2), sc, v2ss);
-        ss.AddSurrogate (typeof(Dictionary<object,object>), sc, dictSs);
-        //ss.AddSurrogate(typeof(Dictionary<Vector2,Level>), sc, levelDictSs);
-        //ss.AddSurrogate(typeof(Dictionary<Vector2,LevelCell>), sc, levelCellDictSs);
-        bf.SurrogateSelector = ss;
-        return ((World)(bf.Deserialize(file)));
-        file.Close();
+        using (FileStream file = File.Open(i_path, FileMode.Open))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            SurrogateSelector ss = new SurrogateSelector();
+            ColorSerializationSurrogate colorSs = new ColorSerializationSurrogate();
+            Vector2SerializationSurrogate v2ss = new Vector2SerializationSurrogate();
+            DictionarySerializationSurrogate<object,object> dictSs = new DictionarySerializationSurrogate<object, object>();
+            //DictionarySerializationSurrogate<Vector2,Level> levelDictSs = new DictionarySerializationSurrogate<Vector2, Level>();
+            //DictionarySerializationSurrogate<Vector2,LevelCell> levelCellDictSs = new DictionarySerializationSurrogate<Vector2, LevelCell>();
+            StreamingContext sc = new StreamingContext(StreamingContextStates.All); 
+            ss.AddSurrogate(typeof(Color), sc, colorSs);
+            ss.AddSurrogate(typeof(Vector2), sc, v2ss);
+            ss.AddSurrogate(typeof(Dictionary<object,object>), sc, dictSs);
+            //ss.AddSurrogate(typeof(Dictionary<Vector2,Level>), sc, levelDictSs);
+            //ss.AddSurrogate(typeof(Dictionary<Vector2,LevelCell>), sc, levelCellDictSs);
+            bf.SurrogateSelector = ss;
+            aux = ((World)(bf.Deserialize(file)));
+        }
+        return aux;
 
     }
 
@@ -283,7 +286,7 @@ public static class PersistenceManager
     {
         foreach (ChildImgInfo info in GetChildrenInfo())
         {
-            if (info.pos.Equals(new Vector2((float)x, (float)y)))
+            if (info.pos.Equals(new Vector2(x, y)))
                 return info.img;
         }
         return null;
