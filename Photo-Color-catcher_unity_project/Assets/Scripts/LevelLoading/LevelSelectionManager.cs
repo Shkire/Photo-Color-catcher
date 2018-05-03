@@ -108,7 +108,7 @@ public class LevelSelectionManager : Singleton<LevelSelectionManager> {
 				currentGo.AddComponent<GUILoadLevel> ();
 				auxImg = PersistenceManager.GetImage(i,((int)Mathf.Sqrt (childrenInfo.Count)-(j+1)));
 				//Debug.Log (i+","+((int)Mathf.Sqrt (tempImg.GetChildrenCount ())-(j+1)));
-				currentGo.GetComponent<GUILoadLevel> ().SetId(auxImg.GetId());
+				//currentGo.GetComponent<GUILoadLevel> ().SetId(auxImg.GetId());
 				spr = new Sprite ();
 				if (auxImg.IsCompleted())
 					spr = Sprite.Create (auxImg.ToTexture2D (), new Rect (0, 0, 25,25), new Vector2 (0, 0));

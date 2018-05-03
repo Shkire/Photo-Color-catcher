@@ -40,8 +40,10 @@ public static class PersistenceManager
         {
             file = File.Create(Application.persistentDataPath + ROOT_PATH + i_name + IMG_DATA_EXT);
         }
-        bf.Serialize(file, i_world);
-        file.Close();
+        using (file)
+        {
+            bf.Serialize(file, i_world);
+        }
     }
 
     public static World LoadWorld(string i_path)
