@@ -2,22 +2,15 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-public class GUILoadLevel : GUITool {
+public class GUILoadLevel : GUITool
+{
 
-	public int id;
+    public string _path;
 
-	public bool isParent;
+    public Vector2 _levelPos;
 
-	public override void Execute()
-	{
-		if (isParent)
-			LevelLoader.Instance.LoadLevelSelector (id);
-		else
-			LevelLoader.Instance.LoadAndConfig(id);
-	}
-
-	public void SetId(int i_id)
-	{
-		id = i_id;
-	}
+    public override void Execute()
+    {
+        LevelLoadingManager.Instance.LoadLevel(_path, _levelPos);
+    }
 }
