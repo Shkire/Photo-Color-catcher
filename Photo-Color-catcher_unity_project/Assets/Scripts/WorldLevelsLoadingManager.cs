@@ -92,7 +92,7 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
                 auxGameObject.AddComponent<GUISelectableElement>();
 
                 //Sets up the level button.
-                auxGameObject.AddComponent<GUILoadLevel>()._path=i_path;
+                auxGameObject.AddComponent<GUILoadLevel>()._path = i_path;
                 auxGameObject.GetComponent<GUILoadLevel>()._levelPos = new Vector2(x, y);
 
                 //Adds the level image to the InputMenuController.
