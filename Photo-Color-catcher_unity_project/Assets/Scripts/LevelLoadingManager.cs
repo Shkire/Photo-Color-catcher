@@ -66,6 +66,46 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
                     auxBarrier.transform.Rotate(new Vector3(0, 0, 90));
                 }
 
+                if (x == 0)
+                {
+                    auxBarrier = (GameObject)Instantiate(p_barrier);
+
+                    auxBarrier.transform.position = auxCell.transform.position - new Vector3(p_floorTile.GetSize().x / 2f, 0, 0);
+
+                    auxBarrier.GetComponent<SpriteRenderer>().enabled = false;
+                }
+
+                if (x == max - 1)
+                {
+                    auxBarrier = (GameObject)Instantiate(p_barrier);
+
+                    auxBarrier.transform.position = auxCell.transform.position + new Vector3(p_floorTile.GetSize().x / 2f, 0, 0);
+
+                    auxBarrier.GetComponent<SpriteRenderer>().enabled = false;
+                }
+
+                if (y == 0)
+                {
+                    auxBarrier = (GameObject)Instantiate(p_barrier);
+
+                    auxBarrier.transform.position = auxCell.transform.position - new Vector3(0, p_floorTile.GetSize().y / 2f, 0);
+
+                    auxBarrier.transform.Rotate(new Vector3(0, 0, 90));
+
+                    auxBarrier.GetComponent<SpriteRenderer>().enabled = false;
+                }
+
+                if (y == max - 1)
+                {
+                    auxBarrier = (GameObject)Instantiate(p_barrier);
+
+                    auxBarrier.transform.position = auxCell.transform.position + new Vector3(0, p_floorTile.GetSize().y / 2f, 0);
+
+                    auxBarrier.transform.Rotate(new Vector3(0, 0, 90));
+
+                    auxBarrier.GetComponent<SpriteRenderer>().enabled = false;
+                }
+
                 //Creates and sets up the cell.
                 auxGoalCell = new GameObject("Goal(" + x + "," + y + ")", typeof(RectTransform));
                 auxGoalCell.transform.SetParent(p_mapGoal.transform);
