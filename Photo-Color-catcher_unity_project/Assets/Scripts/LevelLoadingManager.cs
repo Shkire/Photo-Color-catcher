@@ -10,6 +10,9 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
     private GameObject p_floorTile;
 
     [SerializeField]
+    private GameObject p_cellBackground;
+
+    [SerializeField]
     private GameObject p_barrier;
 
     [SerializeField]
@@ -36,6 +39,8 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
 
         Color goalColor;
 
+        Sprite spr;
+
         for (int x = 0; x < max; x++)
         {
             for (int y = 0; y < max; y++)
@@ -46,6 +51,14 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
                 auxCell.transform.position = new Vector3((x - (max - 1) / 2f) * p_floorTile.GetSize().x, (y - (max - 1) / 2f) * p_floorTile.GetSize().y, 0);
 
                 auxCell.GetComponent<CellColorGoal>()._RGBGoal = level._cells[new Vector2(x, y)]._rgbComponents;
+
+                auxCell = (GameObject)Instantiate(p_cellBackground, auxCell.transform.position, auxCell.transform.localRotation);
+
+                spr = Sprite.Create(level._cells[new Vector2(x, y)]._img.ToTexture2D(), new Rect(0, 0, level._cells[new Vector2(x, y)]._img._width, level._cells[new Vector2(x, y)]._img._height), new Vector2(0.5f, 0.5f));
+
+                auxCell.GetChild("Background").GetComponent<SpriteRenderer>().sprite = spr;
+
+                auxCell.GetChild("Background").SetSize(auxCell.GetChild("Border").GetSize());
 
                 if (x == 0 && y == 0)
                     ((GameObject)Instantiate(p_player)).transform.position = auxCell.transform.position;

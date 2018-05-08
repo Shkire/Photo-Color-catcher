@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using BasicDataTypes;
 
-public class EnemyController : MonoBehaviour {
+public class EnemyController : MonoBehaviour
+{
     public RGBContent _RGBComponent;
 
     [SerializeField]
@@ -43,14 +44,14 @@ public class EnemyController : MonoBehaviour {
         RemoteCollider2DEventController collider = p_barrierDetectionCollider.GetComponent<RemoteCollider2DEventController>();
         collider._onTriggerEnter2D += WayLocked;
         collider._onTriggerExit2D += WayUnlocked;
-        p_remainingTime = Random.Range(p_minTime,p_maxTime);
+        p_remainingTime = Random.Range(p_minTime, p_maxTime);
 
         p_directions = new List<Vector3>()
         {
-                new Vector3(0, 0, 0),
-                new Vector3(0, 0, 90),
-                new Vector3(0, 0, 180),
-                new Vector3(0, 0, 270)
+            new Vector3(0, 0, 0),
+            new Vector3(0, 0, 90),
+            new Vector3(0, 0, 180),
+            new Vector3(0, 0, 270)
         };
     }
 

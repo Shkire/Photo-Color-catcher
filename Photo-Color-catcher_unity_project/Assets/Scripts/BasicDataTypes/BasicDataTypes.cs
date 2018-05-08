@@ -31,6 +31,25 @@ namespace BasicDataTypes
             _g = i_g;
             _b = i_b;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            RGBContent aux = (RGBContent)obj;
+
+            if (_r != aux._r)
+                return false;
+
+            if (_g != aux._g)
+                return false;
+
+            if (_b != aux._b)
+                return false;
+
+            return true;
+        }
     }
 
     /// <summary>

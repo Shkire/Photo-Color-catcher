@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
 
     private GameObject p_barrierDetectionCollider;
 
+    private GameObject p_photoAtackCollider;
+
     void Start()
     {
         p_goal = transform.position;
@@ -29,6 +31,8 @@ public class PlayerController : MonoBehaviour
         RemoteCollider2DEventController collider = p_barrierDetectionCollider.GetComponent<RemoteCollider2DEventController>();
         collider._onTriggerEnter2D += WayLocked;
         collider._onTriggerExit2D += WayUnlocked;
+        p_photoAtackCollider = gameObject.GetChild("PhotoAttackCollider");
+        p_photoAtackCollider.SetActive(false);
     }
 
 
@@ -73,7 +77,14 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                GameObject aux = (GameObject)Instantiate(p_photoAtackCollider);
+                aux.transform.position = p_photoAtackCollider.transform.position;
+                aux.transform.localScale = new Vector3(0.8f, 0.8f, 1);
+                aux.SetActive(true);
+            }
+            else if (Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift))
             {
                 if (Input.GetKey(KeyCode.UpArrow))
                 {
