@@ -84,7 +84,7 @@ MonoBehaviour:
     _b: 0
   p_whiteCell: {fileID: 1908936524050700, guid: ee22caf9819799941b731a34b652471f,
     type: 2}
-  p_restartTime: 2
+  p_restartTime: 30
 --- !u!212 &212474824947171740
 SpriteRenderer:
   m_ObjectHideFlags: 1

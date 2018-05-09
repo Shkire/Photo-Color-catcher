@@ -37,6 +37,8 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
 
         GameObject auxGoalCell;
 
+        GameObject auxPlayer;
+
         Color goalColor;
 
         Sprite spr;
@@ -52,6 +54,8 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
 
                 auxCell.GetComponent<CellColorGoal>()._RGBGoal = level._cells[new Vector2(x, y)]._rgbComponents;
 
+                LevelController.Instance.AddCell(auxCell);
+
                 auxCell = (GameObject)Instantiate(p_cellBackground, auxCell.transform.position, auxCell.transform.localRotation);
 
                 spr = Sprite.Create(level._cells[new Vector2(x, y)]._img.ToTexture2D(), new Rect(0, 0, level._cells[new Vector2(x, y)]._img._width, level._cells[new Vector2(x, y)]._img._height), new Vector2(0.5f, 0.5f));
@@ -61,7 +65,13 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
                 auxCell.GetChild("Background").SetSize(auxCell.GetChild("Border").GetSize());
 
                 if (x == 0 && y == 0)
-                    ((GameObject)Instantiate(p_player)).transform.position = auxCell.transform.position;
+                {
+                    auxPlayer = ((GameObject)Instantiate(p_player));
+                        
+                    auxPlayer.transform.position = auxCell.transform.position;
+
+                    LevelController.Instance.NextPosition(auxPlayer, auxPlayer.transform.position);
+                }
 
                 if (x < max - 1 && !level._graph.IsAdjacent(new Vector2(x, y), new Vector2(x + 1, y)))
                 {
@@ -167,5 +177,7 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
             camYsize = xSize * (Screen.height / (float)Screen.width);
             Camera.main.orthographicSize = camYsize / 2f;
         }
+
+        LevelController.Instance.FirstEnemiesGeneration();
     }
 }

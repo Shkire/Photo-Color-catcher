@@ -57,6 +57,7 @@ public class PhotoAttackController : MonoBehaviour
     private void AttackEffect()
     {
         p_cell.GetComponent<CellColorGoal>().AddRGBComponent(p_enemy.GetComponent<EnemyController>()._RGBComponent);
+        LevelController.Instance.EnemyKilled(p_enemy);
         Destroy(p_enemy);
     }
 

@@ -104,6 +104,8 @@ public class EnemyController : MonoBehaviour
                     p_goal = transform.position - new Vector3(p_defaultFloorTile.GetSize().x, 0, 0);
                     p_timePast = 0;
                 }
+
+                LevelController.Instance.NextPosition(gameObject, p_goal);
             }
             else
             {
@@ -125,6 +127,7 @@ public class EnemyController : MonoBehaviour
                         p_startPos = transform.position;
                         p_goal = transform.position + new Vector3(0, p_defaultFloorTile.GetSize().y, 0);
                         p_timePast = 0;
+                        LevelController.Instance.NextPosition(gameObject, p_goal);
                     }
                 }
                 else
@@ -144,6 +147,7 @@ public class EnemyController : MonoBehaviour
                         p_startPos = transform.position;
                         p_goal = transform.position - new Vector3(0, p_defaultFloorTile.GetSize().y, 0);
                         p_timePast = 0;
+                        LevelController.Instance.NextPosition(gameObject, p_goal);
                     }
                 }
                 else
@@ -163,6 +167,7 @@ public class EnemyController : MonoBehaviour
                         p_startPos = transform.position;
                         p_goal = transform.position + new Vector3(p_defaultFloorTile.GetSize().x, 0, 0);
                         p_timePast = 0;
+                        LevelController.Instance.NextPosition(gameObject, p_goal);
                     }
                 }
                 else
@@ -182,6 +187,7 @@ public class EnemyController : MonoBehaviour
                         p_startPos = transform.position;
                         p_goal = transform.position - new Vector3(p_defaultFloorTile.GetSize().x, 0, 0);
                         p_timePast = 0;
+                        LevelController.Instance.NextPosition(gameObject, p_goal);
                     }
                 }
                 else

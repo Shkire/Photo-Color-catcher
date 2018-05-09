@@ -44,7 +44,10 @@ public class CellColorGoal : MonoBehaviour
             }
 
             if (_RGBGoal.Equals(p_RGBNow))
+            {
+                LevelController.Instance.CellCompleted(gameObject);
                 GetComponent<SpriteRenderer>().enabled = false;
+            }
 
             if (p_colorNow == null)
                 p_colorNow = (GameObject)Instantiate(p_whiteCell, transform.position, transform.rotation);
