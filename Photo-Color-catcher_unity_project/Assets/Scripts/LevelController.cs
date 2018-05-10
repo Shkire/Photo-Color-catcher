@@ -42,6 +42,10 @@ public class LevelController : Singleton<LevelController>
 
     private int p_lives;
 
+    private string p_path;
+
+    private Vector2 p_levelPos;
+
     protected LevelController()
     {
     }
@@ -96,6 +100,9 @@ public class LevelController : Singleton<LevelController>
 
         if (auxRGB._b)
             p_remainingB--;
+
+        if (p_remainingR == 0 && p_remainingG == 0 && p_remainingB == 0)
+            PersistenceManager.CompleteLevel(p_path, p_levelPos);
     }
 
     public void NextPosition(GameObject i_gameObject, Vector3 i_nextPos)
@@ -247,5 +254,11 @@ public class LevelController : Singleton<LevelController>
     {
         p_lives = p_maxLives;
         p_player = i_player;
+    }
+
+    public void AddLevelInfo(string i_path, Vector2 i_levelPos)
+    {
+        p_path = i_path;
+        p_levelPos = i_levelPos;
     }
 }

@@ -32,7 +32,7 @@ public static class PersistenceManager
         bf.SurrogateSelector = ss;
         if (File.Exists(Application.persistentDataPath + ROOT_PATH + i_name + IMG_DATA_EXT))
         {
-            //EXISTS
+            file = File.Open (Application.persistentDataPath + ROOT_PATH + i_name + IMG_DATA_EXT, FileMode.Create);
         }
         else
         {
@@ -69,5 +69,14 @@ public static class PersistenceManager
         }
         return aux;
 
+    }
+
+    public static void CompleteLevel(string i_path, Vector2 i_levelPos)
+    {
+        World aux = LoadWorld(i_path);
+
+        aux._levels[i_levelPos]._completed = true;
+
+        SaveWorld(aux,aux._name);
     }
 }

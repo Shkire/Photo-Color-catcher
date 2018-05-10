@@ -146,6 +146,8 @@ namespace BasicDataTypes
         /// The connected level cells graph.
         /// </summary>
         public GraphType<Vector2> _graph;
+
+        public bool _completed;
     }
 
     /// <summary>
