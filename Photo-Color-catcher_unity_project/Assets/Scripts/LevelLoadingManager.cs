@@ -70,6 +70,8 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
                         
                     auxPlayer.transform.position = auxCell.transform.position;
 
+                    LevelController.Instance.AddPlayer(auxPlayer);
+
                     LevelController.Instance.NextPosition(auxPlayer, auxPlayer.transform.position);
                 }
 

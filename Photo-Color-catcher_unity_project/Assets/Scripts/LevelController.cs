@@ -37,6 +37,11 @@ public class LevelController : Singleton<LevelController>
 
     private GameObject p_player;
 
+    [SerializeField]
+    private int p_maxLives;
+
+    private int p_lives;
+
     protected LevelController()
     {
     }
@@ -176,5 +181,71 @@ public class LevelController : Singleton<LevelController>
     public void EnemyKilled(GameObject i_enemy)
     {
         p_occupiedPositions.Remove(i_enemy);
+    }
+
+    public void PlayerHit()
+    {
+        p_lives--;
+
+        if (p_lives == 0)
+            Destroy(p_player);
+        else
+        {
+            bool validPos;
+            Vector3 pos;
+
+            do
+            {
+                pos = p_cells[Random.Range(0, p_cells.Count - 1)].transform.position;
+
+                validPos = true;
+
+                foreach (Vector3 auxPos in p_occupiedPositions.Values)
+                {
+                    if (pos == auxPos)
+                    {
+                        validPos = false;
+                        break;
+                    }
+
+                    if (pos == auxPos + new Vector3(p_cells[0].GetSize().x, 0, 0))
+                    {
+                        validPos = false;
+                        break;
+                    }
+
+                    if (pos == auxPos - new Vector3(p_cells[0].GetSize().x, 0, 0))
+                    {
+                        validPos = false;
+                        break;
+                    }
+
+                    if (pos == auxPos + new Vector3(0, p_cells[0].GetSize().y, 0))
+                    {
+                        validPos = false;
+                        break;
+                    }
+
+                    if (pos == auxPos - new Vector3(0, p_cells[0].GetSize().y, 0))
+                    {
+                        validPos = false;
+                        break;
+                    }
+                }
+            }
+            while (!validPos);
+
+            p_player.transform.position = pos;
+
+            NextPosition(p_player, pos);
+
+            p_player.GetComponent<PlayerController>().ResetPlayer();
+        }
+    }
+
+    public void AddPlayer(GameObject i_player)
+    {
+        p_lives = p_maxLives;
+        p_player = i_player;
     }
 }

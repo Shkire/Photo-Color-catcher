@@ -205,4 +205,15 @@ public class PlayerController : MonoBehaviour
     {
         p_locked = false;
     }
+
+    void OnCollisionEnter2D(Collision2D coll)
+    {
+        LevelController.Instance.PlayerHit();
+    }
+
+    public void ResetPlayer()
+    {
+        p_goal = transform.position;
+        p_willMove = false;
+    }
 }
