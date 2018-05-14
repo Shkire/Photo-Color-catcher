@@ -79,9 +79,13 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
                     (auxGameObject.transform as RectTransform).anchorMin = new Vector2(((world._imageConfig[1] - world._imageConfig[0]) / 2f + x) / (float)(world._imageConfig[1]), y / (float)(world._imageConfig[1]));
                 }
                     
-                //Creates the level sprite.
-                spr = Sprite.Create(world._levels[new Vector2(x, y)]._img.ToTexture2D(), new Rect(0, 0, world._levels[new Vector2(x, y)]._img._width, world._levels[new Vector2(x, y)]._img._height), Vector2.zero);
-
+                if (!world._levels[new Vector2(x, y)]._completed)
+                    //Creates the level sprite.
+                    spr = Sprite.Create(world._levels[new Vector2(x, y)]._img.ToTexture2D().ToGray(), new Rect(0, 0, world._levels[new Vector2(x, y)]._img._width, world._levels[new Vector2(x, y)]._img._height), Vector2.zero);
+                else
+                    //Creates the level sprite.
+                    spr = Sprite.Create(world._levels[new Vector2(x, y)]._img.ToTexture2D(), new Rect(0, 0, world._levels[new Vector2(x, y)]._img._width, world._levels[new Vector2(x, y)]._img._height), Vector2.zero);
+                
                 //Shows the level image.
                 auxGameObject.AddComponent<Image>().sprite = spr;
 

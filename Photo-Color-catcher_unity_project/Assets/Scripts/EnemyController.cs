@@ -1,11 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using BasicDataTypes;
 
-public class PlayerController : MonoBehaviour
+public class EnemyController : MonoBehaviour
 {
+    public RGBContent _RGBComponent;
+
     [SerializeField]
-    private float p_time;
+    private float p_movementTime;
+
+    [SerializeField]
+    private float p_maxTime;
+
+    [SerializeField]
+    private float p_minTime;
 
     [SerializeField]
     private GameObject p_defaultFloorTile;
@@ -16,13 +25,17 @@ public class PlayerController : MonoBehaviour
 
     private float p_timePast;
 
+    private float p_remainingTime;
+
     private bool p_locked;
 
     private bool p_willMove;
 
     private GameObject p_barrierDetectionCollider;
 
-    private GameObject p_photoAtackCollider;
+    private List<Vector3> p_directions;
+      
+    private Vector3 p_direction;
 
     void Start()
     {
@@ -31,8 +44,15 @@ public class PlayerController : MonoBehaviour
         RemoteCollider2DEventController collider = p_barrierDetectionCollider.GetComponent<RemoteCollider2DEventController>();
         collider._onTriggerEnter2D += WayLocked;
         collider._onTriggerExit2D += WayUnlocked;
-        p_photoAtackCollider = gameObject.GetChild("PhotoAttackCollider");
-        p_photoAtackCollider.SetActive(false);
+        p_remainingTime = Random.Range(p_minTime, p_maxTime);
+
+        p_directions = new List<Vector3>()
+        {
+            new Vector3(0, 0, 0),
+            new Vector3(0, 0, 90),
+            new Vector3(0, 0, 180),
+            new Vector3(0, 0, 270)
+        };
     }
 
 
@@ -41,7 +61,18 @@ public class PlayerController : MonoBehaviour
         if (p_goal != transform.position)
         {
             p_timePast += Time.fixedDeltaTime;
-            transform.position = Vector3.Lerp(p_startPos, p_goal, p_timePast / p_time);
+            transform.position = Vector3.Lerp(p_startPos, p_goal, p_timePast / p_movementTime);
+
+            if (transform.position == p_goal)
+                p_remainingTime = Random.Range(p_minTime, p_maxTime);
+
+            p_directions = new List<Vector3>()
+            {
+                new Vector3(0, 0, 0),
+                new Vector3(0, 0, 90),
+                new Vector3(0, 0, 180),
+                new Vector3(0, 0, 270)
+            };
         }
         else if (p_willMove)
         {
@@ -76,46 +107,20 @@ public class PlayerController : MonoBehaviour
 
                 LevelController.Instance.NextPosition(gameObject, p_goal);
             }
+            else
+            {
+                p_remainingTime = p_minTime;
+            }
         }
-        else
+        else if (p_remainingTime <= 0)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            p_direction = p_directions[Random.Range(0, p_directions.Count)];
+
+            p_directions.Remove(p_direction);
+
+            if (p_direction == new Vector3(0, 0, 0))
             {
-                GameObject aux = (GameObject)Instantiate(p_photoAtackCollider);
-                aux.transform.position = p_photoAtackCollider.transform.position;
-                aux.transform.localScale = new Vector3(0.8f, 0.8f, 1);
-                aux.SetActive(true);
-            }
-            else if (Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift))
-            {
-                if (Input.GetKey(KeyCode.UpArrow))
-                {
-                    p_barrierDetectionCollider.SetActive(false);
-                    transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
-                    p_barrierDetectionCollider.SetActive(true);
-                }
-                else if (Input.GetKey(KeyCode.DownArrow))
-                {
-                    p_barrierDetectionCollider.SetActive(false);
-                    transform.rotation = Quaternion.Euler(new Vector3(0, 0, 180));
-                    p_barrierDetectionCollider.SetActive(true);
-                }
-                else if (Input.GetKey(KeyCode.RightArrow))
-                {
-                    p_barrierDetectionCollider.SetActive(false);
-                    transform.rotation = Quaternion.Euler(new Vector3(0, 0, 270));
-                    p_barrierDetectionCollider.SetActive(true);
-                }
-                else if (Input.GetKey(KeyCode.LeftArrow))
-                {
-                    p_barrierDetectionCollider.SetActive(false);
-                    transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
-                    p_barrierDetectionCollider.SetActive(true);
-                }
-            }
-            else if (Input.GetKey(KeyCode.UpArrow))
-            {
-                if (transform.rotation.eulerAngles == new Vector3(0, 0, 0))
+                if (transform.rotation.eulerAngles == p_direction)
                 {
                     if (!p_locked)
                     {
@@ -133,9 +138,9 @@ public class PlayerController : MonoBehaviour
                     p_barrierDetectionCollider.SetActive(true);
                 }
             }
-            else if (Input.GetKey(KeyCode.DownArrow))
+            else if (p_direction == new Vector3(0, 0, 180))
             {
-                if (transform.rotation.eulerAngles == new Vector3(0, 0, 180))
+                if (transform.rotation.eulerAngles == p_direction)
                 {
                     if (!p_locked)
                     {
@@ -153,9 +158,9 @@ public class PlayerController : MonoBehaviour
                     p_barrierDetectionCollider.SetActive(true);
                 }
             }
-            else if (Input.GetKey(KeyCode.RightArrow))
+            else if (p_direction == new Vector3(0, 0, 270))
             {
-                if (transform.rotation.eulerAngles == new Vector3(0, 0, 270))
+                if (transform.rotation.eulerAngles == p_direction)
                 {
                     if (!p_locked)
                     {
@@ -173,9 +178,9 @@ public class PlayerController : MonoBehaviour
                     p_barrierDetectionCollider.SetActive(true);
                 }
             }
-            else if (Input.GetKey(KeyCode.LeftArrow))
+            else if (p_direction == new Vector3(0, 0, 90))
             {
-                if (transform.rotation.eulerAngles == new Vector3(0, 0, 90))
+                if (transform.rotation.eulerAngles == p_direction)
                 {
                     if (!p_locked)
                     {
@@ -194,6 +199,10 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+        else
+        {
+            p_remainingTime -= Time.fixedDeltaTime;
+        }
     }
 
     public void WayLocked()
@@ -204,16 +213,5 @@ public class PlayerController : MonoBehaviour
     public void WayUnlocked()
     {
         p_locked = false;
-    }
-
-    void OnCollisionEnter2D(Collision2D coll)
-    {
-        LevelController.Instance.PlayerHit();
-    }
-
-    public void ResetPlayer()
-    {
-        p_goal = transform.position;
-        p_willMove = false;
     }
 }
