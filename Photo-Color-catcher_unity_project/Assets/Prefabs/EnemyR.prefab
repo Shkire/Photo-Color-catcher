@@ -185,6 +185,7 @@ MonoBehaviour:
   p_minTime: 0.1
   p_defaultFloorTile: {fileID: 1471962668046138, guid: da7d27a314ae31c40b4ea3105ed85e16,
     type: 2}
+  p_viewRange: 8
 --- !u!114 &114868154592411028
 MonoBehaviour:
   m_ObjectHideFlags: 1

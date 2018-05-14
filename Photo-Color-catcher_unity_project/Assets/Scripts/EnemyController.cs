@@ -19,6 +19,9 @@ public class EnemyController : MonoBehaviour
     [SerializeField]
     private GameObject p_defaultFloorTile;
 
+    [SerializeField]
+    private float p_viewRange;
+
     private Vector3 p_startPos;
 
     private Vector3 p_goal;
@@ -36,6 +39,10 @@ public class EnemyController : MonoBehaviour
     private List<Vector3> p_directions;
       
     private Vector3 p_direction;
+
+    private Vector3 p_detectedPlayerPos;
+
+    private bool p_searching;
 
     void Start()
     {
@@ -58,28 +65,73 @@ public class EnemyController : MonoBehaviour
 
     void FixedUpdate()
     {
+        RaycastHit2D hit;
+
+        //MOVIENDOSE
         if (p_goal != transform.position)
         {
             p_timePast += Time.fixedDeltaTime;
-            transform.position = Vector3.Lerp(p_startPos, p_goal, p_timePast / p_movementTime);
-
-            if (transform.position == p_goal)
-                p_remainingTime = Random.Range(p_minTime, p_maxTime);
-
-            p_directions = new List<Vector3>()
+            if (p_searching)
             {
-                new Vector3(0, 0, 0),
-                new Vector3(0, 0, 90),
-                new Vector3(0, 0, 180),
-                new Vector3(0, 0, 270)
-            };
+                transform.position = Vector3.Lerp(p_startPos, p_goal, p_timePast / (p_movementTime*0.5f)); 
+
+                if (transform.position == p_goal)
+                    p_remainingTime = p_minTime;
+
+                if (transform.position == p_detectedPlayerPos)
+                {
+                    p_searching = false;
+
+                    p_directions = new List<Vector3>()
+                        {
+                            new Vector3(0, 0, 0),
+                            new Vector3(0, 0, 90),
+                            new Vector3(0, 0, 180),
+                            new Vector3(0, 0, 270)
+                        };
+                }
+            }
+            else
+            {
+                transform.position = Vector3.Lerp(p_startPos, p_goal, p_timePast / p_movementTime); 
+
+                if (transform.position == p_goal)
+                    p_remainingTime = Random.Range(p_minTime, p_maxTime);
+
+                p_directions = new List<Vector3>()
+                    {
+                        new Vector3(0, 0, 0),
+                        new Vector3(0, 0, 90),
+                        new Vector3(0, 0, 180),
+                        new Vector3(0, 0, 270)
+                    };
+            }
         }
+        //RECIEN GIRADO
         else if (p_willMove)
         {
             p_willMove = false;
 
-            if (!p_locked)
+            hit = Physics2D.Raycast(transform.position + Quaternion.Euler(transform.rotation.eulerAngles) * new Vector2(0, gameObject.GetSize().y/2f) ,Quaternion.Euler(transform.rotation.eulerAngles) * Vector2.up,p_viewRange*p_defaultFloorTile.GetSize().x, LayerMask.GetMask("Barrier","Enemy","Player"));
+
+            Debug.DrawRay(transform.position, Quaternion.Euler(transform.rotation.eulerAngles) * Vector2.up, Color.white, 2);
+
+            if (hit != null)
+                Debug.Log(hit.collider.gameObject);
+
+            if (hit != null && hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
             {
+                if (transform.rotation.eulerAngles == new Vector3(0, 0, 0) || transform.rotation.eulerAngles == new Vector3(0, 0, 180))
+                {
+                    p_detectedPlayerPos = new Vector3(transform.position.x,transform.position.y + Mathf.Round((hit.transform.position.y - transform.position.y)/p_defaultFloorTile.GetSize().y) *  p_defaultFloorTile.GetSize().y,transform.position.z);
+                }
+                else
+                {
+                    p_detectedPlayerPos = new Vector3(transform.position.x + Mathf.Round((hit.transform.position.x - transform.position.x)/p_defaultFloorTile.GetSize().x) *  p_defaultFloorTile.GetSize().x,transform.position.y ,transform.position.z);
+                }
+
+                p_searching = true;
+
                 if (transform.rotation.eulerAngles == new Vector3(0, 0, 0))
                 {
                     p_startPos = transform.position;
@@ -105,103 +157,265 @@ public class EnemyController : MonoBehaviour
                     p_timePast = 0;
                 }
 
-                LevelController.Instance.NextPosition(gameObject, p_goal);
+                LevelController.Instance.NextPosition(gameObject, p_goal); 
             }
             else
             {
-                p_remainingTime = p_minTime;
-            }
-        }
-        else if (p_remainingTime <= 0)
-        {
-            p_direction = p_directions[Random.Range(0, p_directions.Count)];
-
-            p_directions.Remove(p_direction);
-
-            if (p_direction == new Vector3(0, 0, 0))
-            {
-                if (transform.rotation.eulerAngles == p_direction)
+                if (!p_locked)
                 {
-                    if (!p_locked)
+                    if (transform.rotation.eulerAngles == new Vector3(0, 0, 0))
                     {
                         p_startPos = transform.position;
                         p_goal = transform.position + new Vector3(0, p_defaultFloorTile.GetSize().y, 0);
                         p_timePast = 0;
-                        LevelController.Instance.NextPosition(gameObject, p_goal);
                     }
-                }
-                else
-                {
-                    p_barrierDetectionCollider.SetActive(false);
-                    transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
-                    p_willMove = true;
-                    p_barrierDetectionCollider.SetActive(true);
-                }
-            }
-            else if (p_direction == new Vector3(0, 0, 180))
-            {
-                if (transform.rotation.eulerAngles == p_direction)
-                {
-                    if (!p_locked)
+                    else if (transform.rotation.eulerAngles == new Vector3(0, 0, 180))
                     {
                         p_startPos = transform.position;
                         p_goal = transform.position - new Vector3(0, p_defaultFloorTile.GetSize().y, 0);
                         p_timePast = 0;
-                        LevelController.Instance.NextPosition(gameObject, p_goal);
                     }
-                }
-                else
-                {
-                    p_barrierDetectionCollider.SetActive(false);
-                    transform.rotation = Quaternion.Euler(new Vector3(0, 0, 180));
-                    p_willMove = true;
-                    p_barrierDetectionCollider.SetActive(true);
-                }
-            }
-            else if (p_direction == new Vector3(0, 0, 270))
-            {
-                if (transform.rotation.eulerAngles == p_direction)
-                {
-                    if (!p_locked)
+                    else if (transform.rotation.eulerAngles == new Vector3(0, 0, 270))
                     {
                         p_startPos = transform.position;
                         p_goal = transform.position + new Vector3(p_defaultFloorTile.GetSize().x, 0, 0);
                         p_timePast = 0;
-                        LevelController.Instance.NextPosition(gameObject, p_goal);
                     }
-                }
-                else
-                {
-                    p_barrierDetectionCollider.SetActive(false);
-                    transform.rotation = Quaternion.Euler(new Vector3(0, 0, 270));
-                    p_willMove = true;
-                    p_barrierDetectionCollider.SetActive(true);
-                }
-            }
-            else if (p_direction == new Vector3(0, 0, 90))
-            {
-                if (transform.rotation.eulerAngles == p_direction)
-                {
-                    if (!p_locked)
+                    else if (transform.rotation.eulerAngles == new Vector3(0, 0, 90))
                     {
                         p_startPos = transform.position;
                         p_goal = transform.position - new Vector3(p_defaultFloorTile.GetSize().x, 0, 0);
                         p_timePast = 0;
-                        LevelController.Instance.NextPosition(gameObject, p_goal);
                     }
+
+                    LevelController.Instance.NextPosition(gameObject, p_goal);
                 }
                 else
                 {
-                    p_barrierDetectionCollider.SetActive(false);
-                    transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
-                    p_willMove = true;
-                    p_barrierDetectionCollider.SetActive(true);
+                    p_remainingTime = p_minTime;
                 }
             }
         }
+        //A PUNTO DE ACTUAR
+        else if (p_remainingTime <= 0)
+        {
+            hit = Physics2D.Raycast(transform.position + Quaternion.Euler(transform.rotation.eulerAngles) * new Vector2(0, gameObject.GetSize().y/2f) ,Quaternion.Euler(transform.rotation.eulerAngles) * Vector2.up,p_viewRange*p_defaultFloorTile.GetSize().x, LayerMask.GetMask("Barrier","Enemy","Player"));
+
+            Debug.DrawRay(transform.position, Quaternion.Euler(transform.rotation.eulerAngles) * Vector2.up, Color.white, 2);
+
+            if (hit != null)
+                Debug.Log(hit.collider.gameObject);
+
+            if (hit != null && hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
+            {
+                if (transform.rotation.eulerAngles == new Vector3(0, 0, 0) || transform.rotation.eulerAngles == new Vector3(0, 0, 180))
+                {
+                    p_detectedPlayerPos = new Vector3(transform.position.x, transform.position.y + Mathf.Round((hit.transform.position.y - transform.position.y) / p_defaultFloorTile.GetSize().y) * p_defaultFloorTile.GetSize().y, transform.position.z);
+                }
+                else
+                {
+                    p_detectedPlayerPos = new Vector3(transform.position.x + Mathf.Round((hit.transform.position.x - transform.position.x) / p_defaultFloorTile.GetSize().x) * p_defaultFloorTile.GetSize().x, transform.position.y, transform.position.z);
+                }
+
+                p_searching = true;
+
+                if (transform.rotation.eulerAngles == new Vector3(0, 0, 0))
+                {
+                    p_startPos = transform.position;
+                    p_goal = transform.position + new Vector3(0, p_defaultFloorTile.GetSize().y, 0);
+                    p_timePast = 0;
+                }
+                else if (transform.rotation.eulerAngles == new Vector3(0, 0, 180))
+                {
+                    p_startPos = transform.position;
+                    p_goal = transform.position - new Vector3(0, p_defaultFloorTile.GetSize().y, 0);
+                    p_timePast = 0;
+                }
+                else if (transform.rotation.eulerAngles == new Vector3(0, 0, 270))
+                {
+                    p_startPos = transform.position;
+                    p_goal = transform.position + new Vector3(p_defaultFloorTile.GetSize().x, 0, 0);
+                    p_timePast = 0;
+                }
+                else if (transform.rotation.eulerAngles == new Vector3(0, 0, 90))
+                {
+                    p_startPos = transform.position;
+                    p_goal = transform.position - new Vector3(p_defaultFloorTile.GetSize().x, 0, 0);
+                    p_timePast = 0;
+                }
+
+                LevelController.Instance.NextPosition(gameObject, p_goal); 
+            }
+            else if (p_searching)
+            {
+                if (transform.rotation.eulerAngles == new Vector3(0, 0, 0))
+                {
+                    p_startPos = transform.position;
+                    p_goal = transform.position + new Vector3(0, p_defaultFloorTile.GetSize().y, 0);
+                    p_timePast = 0;
+                }
+                else if (transform.rotation.eulerAngles == new Vector3(0, 0, 180))
+                {
+                    p_startPos = transform.position;
+                    p_goal = transform.position - new Vector3(0, p_defaultFloorTile.GetSize().y, 0);
+                    p_timePast = 0;
+                }
+                else if (transform.rotation.eulerAngles == new Vector3(0, 0, 270))
+                {
+                    p_startPos = transform.position;
+                    p_goal = transform.position + new Vector3(p_defaultFloorTile.GetSize().x, 0, 0);
+                    p_timePast = 0;
+                }
+                else if (transform.rotation.eulerAngles == new Vector3(0, 0, 90))
+                {
+                    p_startPos = transform.position;
+                    p_goal = transform.position - new Vector3(p_defaultFloorTile.GetSize().x, 0, 0);
+                    p_timePast = 0;
+                }
+            }
+            else
+            {
+
+                p_direction = p_directions[Random.Range(0, p_directions.Count)];
+
+                p_directions.Remove(p_direction);
+
+                if (p_direction == new Vector3(0, 0, 0))
+                {
+                    if (transform.rotation.eulerAngles == p_direction)
+                    {
+                        if (!p_locked)
+                        {
+                            p_startPos = transform.position;
+                            p_goal = transform.position + new Vector3(0, p_defaultFloorTile.GetSize().y, 0);
+                            p_timePast = 0;
+                            LevelController.Instance.NextPosition(gameObject, p_goal);
+                        }
+                    }
+                    else
+                    {
+                        p_barrierDetectionCollider.SetActive(false);
+                        transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+                        p_willMove = true;
+                        p_barrierDetectionCollider.SetActive(true);
+                    }
+                }
+                else if (p_direction == new Vector3(0, 0, 180))
+                {
+                    if (transform.rotation.eulerAngles == p_direction)
+                    {
+                        if (!p_locked)
+                        {
+                            p_startPos = transform.position;
+                            p_goal = transform.position - new Vector3(0, p_defaultFloorTile.GetSize().y, 0);
+                            p_timePast = 0;
+                            LevelController.Instance.NextPosition(gameObject, p_goal);
+                        }
+                    }
+                    else
+                    {
+                        p_barrierDetectionCollider.SetActive(false);
+                        transform.rotation = Quaternion.Euler(new Vector3(0, 0, 180));
+                        p_willMove = true;
+                        p_barrierDetectionCollider.SetActive(true);
+                    }
+                }
+                else if (p_direction == new Vector3(0, 0, 270))
+                {
+                    if (transform.rotation.eulerAngles == p_direction)
+                    {
+                        if (!p_locked)
+                        {
+                            p_startPos = transform.position;
+                            p_goal = transform.position + new Vector3(p_defaultFloorTile.GetSize().x, 0, 0);
+                            p_timePast = 0;
+                            LevelController.Instance.NextPosition(gameObject, p_goal);
+                        }
+                    }
+                    else
+                    {
+                        p_barrierDetectionCollider.SetActive(false);
+                        transform.rotation = Quaternion.Euler(new Vector3(0, 0, 270));
+                        p_willMove = true;
+                        p_barrierDetectionCollider.SetActive(true);
+                    }
+                }
+                else if (p_direction == new Vector3(0, 0, 90))
+                {
+                    if (transform.rotation.eulerAngles == p_direction)
+                    {
+                        if (!p_locked)
+                        {
+                            p_startPos = transform.position;
+                            p_goal = transform.position - new Vector3(p_defaultFloorTile.GetSize().x, 0, 0);
+                            p_timePast = 0;
+                            LevelController.Instance.NextPosition(gameObject, p_goal);
+                        }
+                    }
+                    else
+                    {
+                        p_barrierDetectionCollider.SetActive(false);
+                        transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
+                        p_willMove = true;
+                        p_barrierDetectionCollider.SetActive(true);
+                    }
+                }
+            }
+        }
+        //ESPERANDO
         else
         {
-            p_remainingTime -= Time.fixedDeltaTime;
+            hit = Physics2D.Raycast(transform.position + Quaternion.Euler(transform.rotation.eulerAngles) * new Vector2(0, gameObject.GetSize().y/2f) ,Quaternion.Euler(transform.rotation.eulerAngles) * Vector2.up,p_viewRange*p_defaultFloorTile.GetSize().x, LayerMask.GetMask("Barrier","Enemy","Player"));
+
+            Debug.DrawRay(transform.position, Quaternion.Euler(transform.rotation.eulerAngles) * Vector2.up, Color.white, 2);
+
+            if (hit != null)
+                Debug.Log(hit.collider.gameObject);
+
+            if (hit != null && hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
+            {
+                if (transform.rotation.eulerAngles == new Vector3(0, 0, 0) || transform.rotation.eulerAngles == new Vector3(0, 0, 180))
+                {
+                    p_detectedPlayerPos = new Vector3(transform.position.x, transform.position.y + Mathf.Round((hit.transform.position.y - transform.position.y) / p_defaultFloorTile.GetSize().y) * p_defaultFloorTile.GetSize().y, transform.position.z);
+                }
+                else
+                {
+                    p_detectedPlayerPos = new Vector3(transform.position.x + Mathf.Round((hit.transform.position.x - transform.position.x) / p_defaultFloorTile.GetSize().x) * p_defaultFloorTile.GetSize().x, transform.position.y, transform.position.z);
+                }
+
+                p_searching = true;
+
+                if (transform.rotation.eulerAngles == new Vector3(0, 0, 0))
+                {
+                    p_startPos = transform.position;
+                    p_goal = transform.position + new Vector3(0, p_defaultFloorTile.GetSize().y, 0);
+                    p_timePast = 0;
+                }
+                else if (transform.rotation.eulerAngles == new Vector3(0, 0, 180))
+                {
+                    p_startPos = transform.position;
+                    p_goal = transform.position - new Vector3(0, p_defaultFloorTile.GetSize().y, 0);
+                    p_timePast = 0;
+                }
+                else if (transform.rotation.eulerAngles == new Vector3(0, 0, 270))
+                {
+                    p_startPos = transform.position;
+                    p_goal = transform.position + new Vector3(p_defaultFloorTile.GetSize().x, 0, 0);
+                    p_timePast = 0;
+                }
+                else if (transform.rotation.eulerAngles == new Vector3(0, 0, 90))
+                {
+                    p_startPos = transform.position;
+                    p_goal = transform.position - new Vector3(p_defaultFloorTile.GetSize().x, 0, 0);
+                    p_timePast = 0;
+                }
+
+                LevelController.Instance.NextPosition(gameObject, p_goal); 
+
+                p_remainingTime = (p_remainingTime > p_minTime) ? p_minTime : -Time.fixedDeltaTime;
+            }
+            else
+                p_remainingTime -= Time.fixedDeltaTime;
         }
     }
 
