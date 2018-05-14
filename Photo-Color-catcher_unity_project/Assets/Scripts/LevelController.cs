@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using BasicDataTypes;
+using UnityEngine.UI;
 
 public class LevelController : Singleton<LevelController>
 {
@@ -46,6 +47,14 @@ public class LevelController : Singleton<LevelController>
 
     private Vector2 p_levelPos;
 
+    [SerializeField]
+
+    private GameObject p_gameHud;
+
+    private List<GameObject> p_fullLives;
+
+    private List<GameObject> p_emptyLives;
+
     protected LevelController()
     {
     }
@@ -53,6 +62,19 @@ public class LevelController : Singleton<LevelController>
     void Start()
     {
         p_remainingTime = Random.Range(p_minSpawnTime, p_maxSpawnTime);
+
+        p_fullLives = new List<GameObject>();
+
+        //Param args ,,,, 1,Full
+        p_fullLives.Add(p_gameHud.GetChild("1").GetChild("Full"));
+        p_fullLives.Add(p_gameHud.GetChild("2").GetChild("Full"));
+        p_fullLives.Add(p_gameHud.GetChild("3").GetChild("Full"));
+
+        p_emptyLives = new List<GameObject>();
+
+        p_emptyLives.Add(p_gameHud.GetChild("1").GetChild("Empty"));
+        p_emptyLives.Add(p_gameHud.GetChild("2").GetChild("Empty"));
+        p_emptyLives.Add(p_gameHud.GetChild("3").GetChild("Empty"));
     }
 
     void Update()
@@ -194,6 +216,18 @@ public class LevelController : Singleton<LevelController>
     {
         p_lives--;
 
+        for (int i = 0; i < p_maxLives; i++)
+            if (i <= p_lives-1)
+            {
+                p_emptyLives[i].SetActive(false);
+                p_fullLives[i].SetActive(true);
+            }
+            else
+            {
+                p_emptyLives[i].SetActive(true);
+                p_fullLives[i].SetActive(false);
+            }
+
         if (p_lives == 0)
             Destroy(p_player);
         else
@@ -254,11 +288,21 @@ public class LevelController : Singleton<LevelController>
     {
         p_lives = p_maxLives;
         p_player = i_player;
+
+        foreach (GameObject aux in p_fullLives)
+            aux.SetActive(true);
+
+        foreach (GameObject aux in p_emptyLives)
+            aux.SetActive(false);
     }
 
-    public void AddLevelInfo(string i_path, Vector2 i_levelPos)
+    public void AddLevelInfo(string i_name, string i_path, Vector2 i_levelPos)
     {
         p_path = i_path;
         p_levelPos = i_levelPos;
+
+        p_gameHud.GetChild("WorldName").GetComponentInChildren<Text>().text = i_name;
+
+        p_gameHud.GetChild("LevelName").GetComponentInChildren<Text>().text = "("+(int)i_levelPos.x+","+(int)i_levelPos.y+")";
     }
 }

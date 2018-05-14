@@ -27,9 +27,11 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
 
     public void LoadLevel(string i_path, Vector2 i_levelPos)
     {
-        LevelController.Instance.AddLevelInfo(i_path, i_levelPos);
+        World world = PersistenceManager.LoadWorld(i_path);
 
-        Level level = PersistenceManager.LoadWorld(i_path)._levels[i_levelPos];
+        LevelController.Instance.AddLevelInfo(world._name,i_path, i_levelPos);
+
+        Level level = world._levels[i_levelPos];
 
         int max = (int)Mathf.Pow(level._cells.Count, 0.5f);
 
