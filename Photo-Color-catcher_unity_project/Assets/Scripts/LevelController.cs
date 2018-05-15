@@ -48,12 +48,21 @@ public class LevelController : Singleton<LevelController>
     private Vector2 p_levelPos;
 
     [SerializeField]
-
     private GameObject p_gameHud;
 
     private List<GameObject> p_fullLives;
 
     private List<GameObject> p_emptyLives;
+
+    [SerializeField]
+    private int p_maxGarbage;
+
+    [SerializeField]
+    private Sprite p_garbageSprite;
+
+    private List<RGBContent> p_garbageCells;
+
+    private GameObject p_garbagePrint;
 
     protected LevelController()
     {
@@ -122,6 +131,10 @@ public class LevelController : Singleton<LevelController>
 
         if (auxRGB._b)
             p_remainingB--;
+
+        p_garbageCells.RemoveAll(garbage => garbage.Equals(auxRGB));
+
+        PrintGarbage();
 
         if (p_remainingR == 0 && p_remainingG == 0 && p_remainingB == 0)
             PersistenceManager.CompleteLevel(p_path, p_levelPos);
@@ -294,6 +307,8 @@ public class LevelController : Singleton<LevelController>
 
         foreach (GameObject aux in p_emptyLives)
             aux.SetActive(false);
+
+        p_garbageCells = new List<RGBContent>();
     }
 
     public void AddLevelInfo(string i_name, string i_path, Vector2 i_levelPos)
@@ -304,5 +319,58 @@ public class LevelController : Singleton<LevelController>
         p_gameHud.GetChild("WorldName").GetComponentInChildren<Text>().text = i_name;
 
         p_gameHud.GetChild("LevelName").GetComponentInChildren<Text>().text = "("+(int)i_levelPos.x+","+(int)i_levelPos.y+")";
+    }
+
+    public void AddGarbage(RGBContent i_garbage)
+    {
+        p_garbageCells.Add(i_garbage);
+
+        if (p_garbageCells.Count > p_maxGarbage)
+            PlayerHit();
+
+        PrintGarbage();
+    }
+
+    private void PrintGarbage()
+    {
+        if (p_garbagePrint != null)
+            Destroy(p_garbagePrint);
+        p_garbagePrint = new GameObject("GarbagePrint",typeof(RectTransform));
+
+        p_garbagePrint.transform.SetParent(p_gameHud.GetChild("GarbageCells").GetChild("Margin").transform);
+
+        (p_garbagePrint.transform as RectTransform).offsetMin = Vector2.zero;
+        (p_garbagePrint.transform as RectTransform).offsetMax = Vector2.zero;
+        (p_garbagePrint.transform as RectTransform).anchorMin = Vector2.zero;
+        (p_garbagePrint.transform as RectTransform).anchorMax = Vector2.one;
+
+        GameObject aux;
+        Color auxCol;
+
+        for (int i = 0; i < p_garbageCells.Count; i++)
+        {
+            aux = new GameObject("Garbage"+i,typeof(RectTransform));
+
+            aux.transform.SetParent(p_garbagePrint.transform);
+            (aux.transform as RectTransform).offsetMin = Vector2.zero;
+            (aux.transform as RectTransform).offsetMax = Vector2.zero;
+            (aux.transform as RectTransform).anchorMin = new Vector2(0,i/(float)p_maxGarbage);
+            (aux.transform as RectTransform).anchorMax = new Vector2(1,(i+1)/(float)p_maxGarbage);
+
+            auxCol = Color.black;
+
+            if (p_garbageCells[i]._r)
+                auxCol.r = 1;
+
+            if (p_garbageCells[i]._g)
+                auxCol.g = 1;
+
+            if (p_garbageCells[i]._b)
+                auxCol.b = 1;
+
+            aux.AddComponent<Image>().sprite = p_garbageSprite;
+            aux.GetComponent<Image>().color = auxCol;
+            aux.GetComponent<Image>().preserveAspect = true;
+        }
     }
 }

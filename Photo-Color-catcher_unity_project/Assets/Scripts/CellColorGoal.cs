@@ -22,7 +22,11 @@ public class CellColorGoal : MonoBehaviour
 
     public void AddRGBComponent(RGBContent i_RGBContent)
     {
-        if (!_RGBGoal.Equals(p_RGBNow))
+        if (_RGBGoal.Equals(p_RGBNow))
+        {
+            LevelController.Instance.AddGarbage(i_RGBContent);
+        }
+        else
         {
             if (p_RGBNow == null)
                 p_RGBNow = new RGBContent(false, false, false);
@@ -73,7 +77,10 @@ public class CellColorGoal : MonoBehaviour
             {
                 Destroy(p_colorNow);
                 if (!p_RGBNow.Equals(_RGBGoal))
+                {
+                    LevelController.Instance.AddGarbage(p_RGBNow);
                     p_RGBNow = new RGBContent(false, false, false);
+                }
             }
             else
             {
