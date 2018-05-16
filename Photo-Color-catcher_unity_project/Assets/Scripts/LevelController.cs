@@ -373,4 +373,14 @@ public class LevelController : Singleton<LevelController>
             aux.GetComponent<Image>().preserveAspect = true;
         }
     }
+
+    public bool EmptySpace(Vector3 i_pos)
+    {
+        foreach (KeyValuePair<GameObject,Vector3> entry in p_occupiedPositions)
+        {
+            if (entry.Value == i_pos && entry.Key != p_player)
+                return false;
+        }
+        return true;
+    }
 }
