@@ -44,6 +44,8 @@ public class EnemyController : MonoBehaviour
 
     private bool p_searching;
 
+    private Animator p_animator;
+
     void Start()
     {
         p_goal = transform.position;
@@ -52,6 +54,7 @@ public class EnemyController : MonoBehaviour
         collider._onTriggerEnter2D += WayLocked;
         collider._onTriggerExit2D += WayUnlocked;
         p_remainingTime = Random.Range(p_minTime, p_maxTime);
+        p_animator = GetComponent<Animator>();
 
         p_directions = new List<Vector3>()
         {
@@ -75,6 +78,8 @@ public class EnemyController : MonoBehaviour
 
                 if (transform.position == p_goal)
                 {
+                    p_animator.SetTrigger("Idle");
+
                     if (transform.position != p_detectedPlayerPos)
                         p_remainingTime = p_minTime;
                     else
@@ -98,7 +103,10 @@ public class EnemyController : MonoBehaviour
                 transform.position = Vector3.Lerp(p_startPos, p_goal, p_timePast / p_movementTime); 
 
                 if (transform.position == p_goal)
+                {
+                    p_animator.SetTrigger("Idle");
                     p_remainingTime = Random.Range(p_minTime, p_maxTime);
+                }
 
                 p_directions = new List<Vector3>()
                 {
@@ -193,6 +201,10 @@ public class EnemyController : MonoBehaviour
         p_goal = i_pos;
         p_timePast = 0;
         LevelController.Instance.NextPosition(gameObject, p_goal); 
+        if (p_searching)
+            p_animator.SetTrigger("Following");
+        else
+            p_animator.SetTrigger("Moving");
     }
 
     private void DetectPlayer()

@@ -62,6 +62,16 @@ public static class ExtensionMethods
         {
             return coll.bounds.extents * 2;
         }
+        rend = go.GetComponentInChildren<Renderer>();
+        if (rend != null)
+        {
+            return rend.bounds.extents * 2;
+        }
+        coll = go.GetComponentInChildren<Collider>();
+        if (coll != null)
+        {
+            return coll.bounds.extents * 2;
+        }
         return Vector3.zero;
     }
 
