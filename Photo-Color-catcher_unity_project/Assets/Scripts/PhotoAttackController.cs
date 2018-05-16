@@ -25,7 +25,7 @@ public class PhotoAttackController : MonoBehaviour
         {
             if (p_enemy == null)
             {
-                p_enemy = other.gameObject;
+                p_enemy = other.gameObject.GetComponentInParent<EnemyController>().gameObject;
             }
         }
         else if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
