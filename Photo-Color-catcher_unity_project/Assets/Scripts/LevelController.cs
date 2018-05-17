@@ -64,6 +64,10 @@ public class LevelController : Singleton<LevelController>
 
     private GameObject p_garbagePrint;
 
+    private RGBContent p_storedColor;
+
+    private GameObject p_storedPrint;
+
     protected LevelController()
     {
     }
@@ -84,6 +88,9 @@ public class LevelController : Singleton<LevelController>
         p_emptyLives.Add(p_gameHud.GetChild("1").GetChild("Empty"));
         p_emptyLives.Add(p_gameHud.GetChild("2").GetChild("Empty"));
         p_emptyLives.Add(p_gameHud.GetChild("3").GetChild("Empty"));
+
+        p_storedPrint = p_gameHud.GetChild("Color");
+        p_storedPrint.SetActive(false);
     }
 
     void Update()
@@ -382,5 +389,45 @@ public class LevelController : Singleton<LevelController>
                 return false;
         }
         return true;
+    }
+
+    public void StoreColor(RGBContent i_color)
+    {
+        p_storedColor = i_color;
+        p_player.GetComponent<PlayerController>()._colorStored = true;
+        PrintStoredColor();
+    }
+
+    private void PrintStoredColor()
+    {
+        if (p_storedColor == null)
+        {
+            p_storedPrint.SetActive(false);
+        }
+        else
+        {
+            p_storedPrint.SetActive(true);
+            if (p_storedColor._r)
+                p_storedPrint.GetComponent<Image>().color = Color.red;
+            else if (p_storedColor._g)
+                p_storedPrint.GetComponent<Image>().color = Color.green;
+            else if (p_storedColor._b)
+                p_storedPrint.GetComponent<Image>().color = Color.blue;
+        }
+    }
+
+    public void ReleaseColor()
+    {
+        foreach (GameObject cell in p_cells)
+            if (p_player.transform.position == cell.transform.position)
+            {
+                cell.GetComponent<CellColorGoal>().AddRGBComponent(p_storedColor);
+                break;
+            }
+        p_storedColor = null;
+
+        p_player.GetComponent<PlayerController>()._colorStored = false;
+
+        PrintStoredColor();
     }
 }

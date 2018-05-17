@@ -256,6 +256,9 @@ MonoBehaviour:
   p_time: 0.5
   p_defaultFloorTile: {fileID: 1471962668046138, guid: da7d27a314ae31c40b4ea3105ed85e16,
     type: 2}
+  p_timeBetweenAttacks: 1
+  p_attackCooldown: 1
+  p_storeColorCooldown: 5
 --- !u!114 &114696381305495338
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -279,6 +282,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   p_time: 1
+  _storeColor: 0
 --- !u!212 &212347467865810326
 SpriteRenderer:
   m_ObjectHideFlags: 1

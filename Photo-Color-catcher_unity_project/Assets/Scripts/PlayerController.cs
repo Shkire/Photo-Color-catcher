@@ -24,6 +24,31 @@ public class PlayerController : MonoBehaviour
 
     private GameObject p_photoAtackCollider;
 
+    private bool p_colorStored;
+
+    public bool _colorStored
+    {
+        set
+        { 
+            p_colorStored = value;
+        }
+    }
+
+    [SerializeField]
+    private float p_timeBetweenAttacks;
+
+    [SerializeField]
+    private float p_attackCooldown;
+
+    [SerializeField]
+    private float p_storeColorCooldown;
+
+    private float p_attackRemainingTime;
+
+    private float p_attackRemainingCooldown;
+
+    private float p_storeRemainingCooldown;
+
     void Start()
     {
         p_goal = transform.position;
@@ -38,6 +63,15 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (p_attackRemainingCooldown > 0)
+            p_attackRemainingCooldown -= Time.fixedDeltaTime;
+
+        if (p_storeRemainingCooldown > 0)
+            p_storeRemainingCooldown -= Time.fixedDeltaTime;
+
+        if (p_attackRemainingTime > 0)
+            p_attackRemainingTime -= Time.fixedDeltaTime;
+
         if (p_goal != transform.position)
         {
             p_timePast += Time.fixedDeltaTime;
@@ -79,12 +113,31 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (p_attackRemainingTime <= 0 && p_attackRemainingCooldown <= 0 && Input.GetKey(KeyCode.Space))
             {
                 GameObject aux = (GameObject)Instantiate(p_photoAtackCollider);
                 aux.transform.position = p_photoAtackCollider.transform.position;
                 aux.transform.localScale = new Vector3(0.8f, 0.8f, 1);
                 aux.SetActive(true);
+                p_attackRemainingCooldown = p_attackCooldown;
+                p_attackRemainingTime = p_timeBetweenAttacks;
+            }
+            else if (p_attackRemainingTime <= 0 && p_storeRemainingCooldown <= 0 && Input.GetKey(KeyCode.C))
+            {
+                if (!p_colorStored)
+                {
+                    GameObject aux = (GameObject)Instantiate(p_photoAtackCollider);
+                    aux.GetComponent<PhotoAttackController>()._storeColor = true;
+                    aux.transform.position = p_photoAtackCollider.transform.position;
+                    aux.transform.localScale = new Vector3(0.8f, 0.8f, 1);
+                    aux.SetActive(true);
+                }
+                else
+                {
+                    LevelController.Instance.ReleaseColor();
+                }
+                p_storeRemainingCooldown = p_storeColorCooldown;
+                p_attackRemainingTime = p_timeBetweenAttacks;
             }
             else if (Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift))
             {

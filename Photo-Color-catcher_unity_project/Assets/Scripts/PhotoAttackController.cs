@@ -8,6 +8,8 @@ public class PhotoAttackController : MonoBehaviour
     [SerializeField]
     private float p_time;
 
+    public bool _storeColor;
+
     private GameObject p_cell;
 
     private GameObject p_enemy;
@@ -28,7 +30,7 @@ public class PhotoAttackController : MonoBehaviour
                 p_enemy = other.gameObject.GetComponentInParent<EnemyController>().gameObject;
             }
         }
-        else if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        else if (!_storeColor && other.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
             if (p_cell == null)
             {
@@ -36,7 +38,7 @@ public class PhotoAttackController : MonoBehaviour
             }
         }
 
-        if (p_cell != null && p_enemy != null)
+        if ((_storeColor && p_enemy!=null) || (p_cell != null && p_enemy != null))
         {
             if (p_destroy != null)
                 StopCoroutine(p_destroy);
@@ -56,7 +58,12 @@ public class PhotoAttackController : MonoBehaviour
 
     private void AttackEffect()
     {
-        p_cell.GetComponent<CellColorGoal>().AddRGBComponent(p_enemy.GetComponent<EnemyController>()._RGBComponent);
+        if (_storeColor)
+        {
+            LevelController.Instance.StoreColor(p_enemy.GetComponent<EnemyController>()._RGBComponent);
+        }
+        else
+            p_cell.GetComponent<CellColorGoal>().AddRGBComponent(p_enemy.GetComponent<EnemyController>()._RGBComponent);
         LevelController.Instance.EnemyKilled(p_enemy);
         Destroy(p_enemy);
     }
