@@ -159,15 +159,15 @@ public class LevelController : Singleton<LevelController>
 
     public void GenerateEnemy()
     {
-        int aux = Random.Range(1, p_remainingR + 1 + p_remainingG + 1 + p_remainingB + 1);
+        int aux = Random.Range(1, p_remainingR*2 + 1 + p_remainingG*2 + 1 + p_remainingB*2 + 1);
 
         GameObject enemy = null;
 
-        if (aux <= p_remainingR + 1)
+        if (aux <= p_remainingR*2 + 1)
             enemy = (GameObject)Instantiate(p_enemyR);
-        else if (aux <= p_remainingR + 1 + p_remainingG + 1)
+        else if (aux <= p_remainingR*2 + 1 + p_remainingG*2 + 1)
             enemy = (GameObject)Instantiate(p_enemyG);
-        else if (aux <= p_remainingR + 1 + p_remainingG + 1 + p_remainingB + 1)
+        else
             enemy = (GameObject)Instantiate(p_enemyB);
 
         bool validPos;
@@ -221,7 +221,7 @@ public class LevelController : Singleton<LevelController>
 
     public void FirstEnemiesGeneration()
     {
-        int aux = Random.Range(0, p_maxEnemies);
+        int aux = Random.Range(1, p_maxEnemies);
 
         for (int i = 0; i < aux; i++)
             GenerateEnemy();

@@ -227,7 +227,8 @@ MonoBehaviour:
     _r: 0
     _g: 1
     _b: 0
-  p_movementTime: 0.5
+  p_movementTime: 0.75
+  p_followingMovementTime: 0.6
   p_maxTime: 1
   p_minTime: 0.1
   p_defaultFloorTile: {fileID: 1471962668046138, guid: da7d27a314ae31c40b4ea3105ed85e16,

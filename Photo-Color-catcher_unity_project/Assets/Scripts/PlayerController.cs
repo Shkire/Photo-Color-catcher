@@ -38,14 +38,9 @@ public class PlayerController : MonoBehaviour
     private float p_timeBetweenAttacks;
 
     [SerializeField]
-    private float p_attackCooldown;
-
-    [SerializeField]
     private float p_storeColorCooldown;
 
     private float p_attackRemainingTime;
-
-    private float p_attackRemainingCooldown;
 
     private float p_storeRemainingCooldown;
 
@@ -63,9 +58,6 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (p_attackRemainingCooldown > 0)
-            p_attackRemainingCooldown -= Time.fixedDeltaTime;
-
         if (p_storeRemainingCooldown > 0)
             p_storeRemainingCooldown -= Time.fixedDeltaTime;
 
@@ -113,13 +105,12 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (p_attackRemainingTime <= 0 && p_attackRemainingCooldown <= 0 && Input.GetKey(KeyCode.Space))
+            if (p_attackRemainingTime <= 0 && Input.GetKey(KeyCode.Space))
             {
                 GameObject aux = (GameObject)Instantiate(p_photoAtackCollider);
                 aux.transform.position = p_photoAtackCollider.transform.position;
                 aux.transform.localScale = new Vector3(0.8f, 0.8f, 1);
                 aux.SetActive(true);
-                p_attackRemainingCooldown = p_attackCooldown;
                 p_attackRemainingTime = p_timeBetweenAttacks;
             }
             else if (p_attackRemainingTime <= 0 && p_storeRemainingCooldown <= 0 && Input.GetKey(KeyCode.C))
