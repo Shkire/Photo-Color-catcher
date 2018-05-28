@@ -11,6 +11,9 @@ public class EnemyController : MonoBehaviour
     private float p_movementTime;
 
     [SerializeField]
+    private float p_followingMovementTime;
+
+    [SerializeField]
     private float p_maxTime;
 
     [SerializeField]
@@ -74,7 +77,7 @@ public class EnemyController : MonoBehaviour
             p_timePast += Time.fixedDeltaTime;
             if (p_searching)
             {
-                transform.position = Vector3.Lerp(p_startPos, p_goal, p_timePast / (p_movementTime * 0.5f)); 
+                transform.position = Vector3.Lerp(p_startPos, p_goal, p_timePast / (p_followingMovementTime)); 
 
                 if (transform.position == p_goal)
                 {
