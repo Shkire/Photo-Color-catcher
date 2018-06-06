@@ -29,6 +29,13 @@ public class FileSystemManager : Singleton<FileSystemManager>
     [SerializeField]
     private Text actualDirectoryText;
 
+
+    [SerializeField]
+    private GameObject backButton;
+
+    [SerializeField]
+    private GameObject p_selectImageFX;
+
     /// <summary>
     /// The file system explorer page list.
     /// </summary>
@@ -86,7 +93,11 @@ public class FileSystemManager : Singleton<FileSystemManager>
 
         //Creates the input menu controller for the first page of the file system explorer.
         inputMenuControllerList.Add(new GameObject("InputMenuController"));
+        inputMenuControllerList[inputMenuControllerList.Count - 1].transform.SetParent(canvas.transform);
         inputMenuControllerList[inputMenuControllerList.Count - 1].AddComponent<InputMenuController>().uiElements = new List<GameObject>();
+
+
+        inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(backButton);
 
         //Creates the first page of the file system explorer.
         pageList.Add((GameObject)Instantiate(fileSystemModelPrefab));
@@ -140,6 +151,7 @@ public class FileSystemManager : Singleton<FileSystemManager>
                 aux = pageList[pageList.Count - 1].GetChild("Image " + i % 9);
 
                 //Sets up the image button.
+                aux.AddComponent<GUILaunchFX>()._target=p_selectImageFX;
                 aux.GetComponentInChildren<GUIConfigImage>().path = images[i - directories.Length - 1];
                 pathSplit = images[i - directories.Length - 1].Split(Path.DirectorySeparatorChar);
                 aux.GetComponentInChildren<Text>().text = pathSplit[pathSplit.Length - 1];
@@ -180,7 +192,10 @@ public class FileSystemManager : Singleton<FileSystemManager>
             {
                 //Creates the input menu controller for the next page of the file system explorer.
                 inputMenuControllerList.Add(new GameObject("InputMenuController"));
+                inputMenuControllerList[inputMenuControllerList.Count - 1].transform.SetParent(canvas.transform);
                 inputMenuControllerList[inputMenuControllerList.Count - 1].AddComponent<InputMenuController>().uiElements = new List<GameObject>();
+
+                inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(backButton);
 
                 //Creates the next page of the file system explorer.
                 pageList.Add((GameObject)Instantiate(fileSystemModelPrefab));
@@ -235,7 +250,7 @@ public class FileSystemManager : Singleton<FileSystemManager>
                 inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(aux);
             }
         }
-
+        /*
         //For each page.
         foreach (GameObject page in pageList)
         {
@@ -266,6 +281,7 @@ public class FileSystemManager : Singleton<FileSystemManager>
                 }
             }
         }
+        */
     }
 
     /// <summary>

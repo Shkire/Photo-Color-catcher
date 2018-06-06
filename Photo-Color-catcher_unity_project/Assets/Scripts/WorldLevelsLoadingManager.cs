@@ -15,14 +15,23 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
     [SerializeField]
     private GameObject p_divisionCell;
 
+    [SerializeField]
+    private GameObject p_backButtonFX;
+
+    [SerializeField]
+    private GameObject p_selectLevelFX;
+
+
+    private GameObject levelSelectionScreen;
+
+    private GameObject inputMenuController;
+
     protected WorldLevelsLoadingManager()
     {
     }
 
     public void LoadLevels(string i_path)
     {
-        GameObject levelSelectionScreen;
-        GameObject inputMenuController;
         GameObject auxGameObject;
         Sprite spr = null;
         GUIObjectEnable objectEnable;
@@ -30,11 +39,18 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
         World world = PersistenceManager.LoadWorld(i_path);
 
         //Creates the level selection screen.
+        if (levelSelectionScreen!=null)
+            Destroy(levelSelectionScreen);
         levelSelectionScreen = ((GameObject)Instantiate(p_levelSelectionModel));
         levelSelectionScreen.transform.SetParent(p_parentCanvas.transform, false);
 
         //Creates the InputMenuController.
+        if (inputMenuController != null)
+            Destroy(inputMenuController);
         inputMenuController = new GameObject("InputMenuController");
+
+        inputMenuController.transform.SetParent(p_parentCanvas.transform);
+
         inputMenuController.AddComponent<InputMenuController>().uiElements = new List<GameObject>();
 
         //Shows the image name.
@@ -42,6 +58,8 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
 
         //Gets the "Back" button of the page.
         auxGameObject = levelSelectionScreen.GetChild("Back button");
+
+        auxGameObject.GetComponent<GUILaunchFX>()._target = p_backButtonFX;
 
         //Sets up the "Back" button.
         //auxGameObject.GetComponent<GUIChangeDirectory>().path = Directory.GetParent(i_path).FullName;
@@ -95,6 +113,8 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
                 //Makes the GameObject selectable.
                 auxGameObject.AddComponent<GUISelectableElement>();
 
+                auxGameObject.AddComponent<GUILaunchFX>()._target = p_selectLevelFX;
+
                 //Sets up the level button.
                 auxGameObject.AddComponent<GUILoadLevel>()._path = i_path;
                 auxGameObject.GetComponent<GUILoadLevel>()._levelPos = new Vector2(x, y);
@@ -122,6 +142,8 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
             }
         }
             
+        /*
+
         //Gets the "Back" button.
         auxGameObject = levelSelectionScreen.GetChild("Back button");
 
@@ -130,5 +152,6 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
 
         //Adds an GUIDestroy component to the image button.
         auxGameObject.AddComponent<GUIDestroy>().target = inputMenuController;
+        */
     }
 }
