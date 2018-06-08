@@ -20,6 +20,9 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
     /// </summary>
     public int _mapSize;
 
+    [SerializeField]
+    private GameObject p_worldCreatedFX;
+
     protected ImgProcessManager()
     {
     }
@@ -371,5 +374,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
 
         //Stores the world on disk.
         PersistenceManager.SaveWorld(world, i_name);
+
+        p_worldCreatedFX.SendMessage("Launch",SendMessageOptions.DontRequireReceiver);
     }
 }

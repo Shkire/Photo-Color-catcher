@@ -14,6 +14,23 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
     [SerializeField]
     private GameObject p_parentCanvas;
 
+    [SerializeField]
+    private GameObject p_backButtonFX;
+
+    [SerializeField]
+    private GameObject p_acceptButtonFX;
+
+
+    /// <summary>
+    /// The file system explorer page list.
+    /// </summary>
+    private List<GameObject> pageList;
+
+    /// <summary>
+    /// The input menu controller list.
+    /// </summary>
+    private List<GameObject> inputMenuControllerList;
+
     protected WorldLoadingManager()
     {
     }
@@ -27,8 +44,18 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
             auxWorlds.Add(PersistenceManager.LoadWorld(worldPath));
         }
 
-        List<GameObject> pageList = new List<GameObject>();
-        List<GameObject> inputMenuControllerList = new List<GameObject>();
+        //Destroys the previous page list.
+        if (pageList != null)
+            for (int i = 0; i < pageList.Count; i++)
+                Destroy(pageList[i]);
+
+        pageList = new List<GameObject>();
+
+        //Destroys the previous input menu controller list.
+        if (inputMenuControllerList != null)
+            for (int i = 0; i < inputMenuControllerList.Count; i++)
+                Destroy(inputMenuControllerList[i]);
+        inputMenuControllerList = new List<GameObject>();
         GameObject auxGameObject;
         Sprite spr = null;
         GUIObjectEnable objectEnable;
@@ -50,8 +77,12 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
             //Creates the first InputMenuController.
             inputMenuControllerList.Add(new GameObject("InputMenuController"));
 
+            inputMenuControllerList[inputMenuControllerList.Count - 1].transform.SetParent(p_parentCanvas.transform);
+
             //Gets the "Back" button of the page.
             auxGameObject = pageList[pageList.Count - 1].GetChild("Back button");
+
+            auxGameObject.GetComponent<GUILaunchFX>()._target = p_backButtonFX;
 
             //Sets up the "Back" button.
             //auxGameObject.GetComponent<GUIChangeDirectory>().path = Directory.GetParent(i_path).FullName;
@@ -74,6 +105,9 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
 
             //Creates the first InputMenuController.
             inputMenuControllerList.Add(new GameObject("InputMenuController"));
+
+            inputMenuControllerList[inputMenuControllerList.Count - 1].transform.SetParent(p_parentCanvas.transform);
+
             inputMenuControllerList[inputMenuControllerList.Count - 1].AddComponent<InputMenuController>().uiElements = new List<GameObject>();
 
             //For each world.
@@ -95,6 +129,8 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
                 //Gets the "Back" button of the page.
                 auxGameObject = pageList[pageList.Count - 1].GetChild("Back button");
 
+                auxGameObject.GetComponent<GUILaunchFX>()._target = p_backButtonFX;
+
                 //Sets up the "Back" button.
                 //auxGameObject.GetComponent<GUIChangeDirectory>().path = Directory.GetParent(i_path).FullName;
 
@@ -104,6 +140,8 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
 
                 //Gets the "Accept" button of the page.
                 auxGameObject = pageList[pageList.Count - 1].GetChild("Accept button");
+
+                auxGameObject.GetComponent<GUILaunchFX>()._target = p_acceptButtonFX;
 
                 //Sets up the "Accept" button.
                 auxGameObject.GetComponent<GUILoadLevels>()._path = worldPaths[i];
@@ -127,6 +165,9 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
 
                     //Creates the next InputMenuController.
                     inputMenuControllerList.Add(new GameObject("InputMenuController"));
+
+                    inputMenuControllerList[inputMenuControllerList.Count - 1].transform.SetParent(p_parentCanvas.transform);
+
                     inputMenuControllerList[inputMenuControllerList.Count - 1].AddComponent<InputMenuController>().uiElements = new List<GameObject>();
 
                     //Deactivates the page and the InputMenuController.
@@ -180,6 +221,8 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
             }
         }
 
+        /*
+
         //For each page.
         foreach (GameObject page in pageList)
         {
@@ -217,6 +260,7 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
                 auxGameObject.AddComponent<GUIDestroy>().target = inputMenuController;
             }
         }
+        */
     }
 
     public string[] GetWorlds()

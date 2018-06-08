@@ -44,7 +44,7 @@ public static class ExtensionMethods
 
     public static GameObject GetChild(this GameObject go, string name)
     {
-        foreach (Transform aux in go.GetComponentsInChildren<Transform>())
+        foreach (Transform aux in go.GetComponentsInChildren<Transform>(true))
             if (aux.gameObject.GetInstanceID() != go.GetInstanceID() && aux.gameObject.name.Equals(name))
                 return aux.gameObject;
         return null;
@@ -58,6 +58,16 @@ public static class ExtensionMethods
             return rend.bounds.extents * 2;
         }
         Collider coll = go.GetComponent<Collider>();
+        if (coll != null)
+        {
+            return coll.bounds.extents * 2;
+        }
+        rend = go.GetComponentInChildren<Renderer>();
+        if (rend != null)
+        {
+            return rend.bounds.extents * 2;
+        }
+        coll = go.GetComponentInChildren<Collider>();
         if (coll != null)
         {
             return coll.bounds.extents * 2;
