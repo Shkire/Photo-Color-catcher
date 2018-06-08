@@ -105,7 +105,9 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (p_attackRemainingTime <= 0 && Input.GetKey(KeyCode.Space))
+            if (Input.GetKey(KeyCode.P))
+                LevelController.Instance.Pause();
+            else if (p_attackRemainingTime <= 0 && Input.GetKey(KeyCode.Space))
             {
                 GameObject aux = (GameObject)Instantiate(p_photoAtackCollider);
                 aux.transform.position = p_photoAtackCollider.transform.position;

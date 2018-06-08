@@ -68,6 +68,8 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
 
                 auxCell.GetChild("Background").SetSize(auxCell.GetChild("Border").GetSize());
 
+                LevelController.Instance.AddCellBackground(auxCell);
+
                 if (x == 0 && y == 0)
                 {
                     auxPlayer = ((GameObject)Instantiate(p_player));
@@ -84,6 +86,8 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
                     auxBarrier = (GameObject)Instantiate(p_barrier);
 
                     auxBarrier.transform.position = auxCell.transform.position + new Vector3(p_floorTile.GetSize().x / 2f, 0, 0);
+
+                    LevelController.Instance.AddBarrier(auxBarrier);
                 }
 
                 if (y < max - 1 && !level._graph.IsAdjacent(new Vector2(x, y), new Vector2(x, y + 1)))
@@ -93,6 +97,8 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
                     auxBarrier.transform.position = auxCell.transform.position + new Vector3(0, p_floorTile.GetSize().y / 2f, 0);
 
                     auxBarrier.transform.Rotate(new Vector3(0, 0, 90));
+
+                    LevelController.Instance.AddBarrier(auxBarrier);
                 }
 
                 if (x == 0)
@@ -102,6 +108,8 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
                     auxBarrier.transform.position = auxCell.transform.position - new Vector3(p_floorTile.GetSize().x / 2f, 0, 0);
 
                     auxBarrier.GetComponent<SpriteRenderer>().enabled = false;
+
+                    LevelController.Instance.AddBarrier(auxBarrier);
                 }
 
                 if (x == max - 1)
@@ -111,6 +119,8 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
                     auxBarrier.transform.position = auxCell.transform.position + new Vector3(p_floorTile.GetSize().x / 2f, 0, 0);
 
                     auxBarrier.GetComponent<SpriteRenderer>().enabled = false;
+
+                    LevelController.Instance.AddBarrier(auxBarrier);
                 }
 
                 if (y == 0)
@@ -122,6 +132,8 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
                     auxBarrier.transform.Rotate(new Vector3(0, 0, 90));
 
                     auxBarrier.GetComponent<SpriteRenderer>().enabled = false;
+
+                    LevelController.Instance.AddBarrier(auxBarrier);
                 }
 
                 if (y == max - 1)
@@ -133,6 +145,8 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
                     auxBarrier.transform.Rotate(new Vector3(0, 0, 90));
 
                     auxBarrier.GetComponent<SpriteRenderer>().enabled = false;
+
+                    LevelController.Instance.AddBarrier(auxBarrier);
                 }
 
                 //Creates and sets up the cell.
@@ -163,6 +177,8 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
                 }
 
                 auxGoalCell.AddComponent<Image>().color = goalColor;
+
+                LevelController.Instance.AddGoal(auxGoalCell);
             }
         }
 

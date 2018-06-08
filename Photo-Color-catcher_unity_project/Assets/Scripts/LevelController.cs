@@ -68,12 +68,21 @@ public class LevelController : Singleton<LevelController>
 
     private GameObject p_storedPrint;
 
+    [SerializeField]
+    private GameObject p_pauseFX;
+
+    private GameObject p_parentGameObject;
+
+    private List<GameObject> p_goals;
+
     protected LevelController()
     {
     }
 
     void Start()
     {
+        p_parentGameObject = new GameObject("Game");
+
         p_remainingTime = Random.Range(p_minSpawnTime, p_maxSpawnTime);
 
         p_fullLives = new List<GameObject>();
@@ -124,6 +133,8 @@ public class LevelController : Singleton<LevelController>
         
         if (auxRGB._b)
             p_remainingB++;
+
+        i_cell.transform.SetParent(p_parentGameObject.transform);
     }
 
     public void CellCompleted(GameObject i_cell)
@@ -217,6 +228,8 @@ public class LevelController : Singleton<LevelController>
         enemy.transform.position = pos;
 
         NextPosition(enemy, pos);
+
+        enemy.transform.SetParent(p_parentGameObject.transform);
     }
 
     public void FirstEnemiesGeneration()
@@ -316,6 +329,8 @@ public class LevelController : Singleton<LevelController>
             aux.SetActive(false);
 
         p_garbageCells = new List<RGBContent>();
+
+        i_player.transform.SetParent(p_parentGameObject.transform);
     }
 
     public void AddLevelInfo(string i_name, string i_path, Vector2 i_levelPos)
@@ -429,5 +444,59 @@ public class LevelController : Singleton<LevelController>
         p_player.GetComponent<PlayerController>()._colorStored = false;
 
         PrintStoredColor();
+    }
+
+    public void Pause()
+    {
+        p_pauseFX.SendMessage("Launch", SendMessageOptions.DontRequireReceiver);
+    }
+
+    public void Quit()
+    {
+        Destroy(p_parentGameObject);
+
+        p_parentGameObject = new GameObject("Game");
+
+        //Reset game
+        p_remainingTime = Random.Range(p_minSpawnTime, p_maxSpawnTime);
+
+        p_occupiedPositions = null;
+
+        p_cells = null;
+
+        p_remainingR = 0;
+
+        p_remainingG = 0;
+
+        p_remainingB = 0;
+
+        p_player = null;
+
+        Destroy(p_garbagePrint);
+
+        p_storedColor = null;
+
+        PrintStoredColor();
+
+        for (int i = 0; i < p_goals.Count; i++)
+            Destroy(p_goals[i]);
+        p_goals = null;
+    }
+
+    public void AddBarrier(GameObject i_barrier)
+    {
+        i_barrier.transform.SetParent(p_parentGameObject.transform);
+    }
+
+    public void AddCellBackground(GameObject i_cell)
+    {
+        i_cell.transform.SetParent(p_parentGameObject.transform);
+    }
+
+    public void AddGoal(GameObject i_goal)
+    {
+        if (p_goals == null)
+            p_goals = new List<GameObject>();
+        p_goals.Add(i_goal);
     }
 }
