@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 864a5626ba755b540acebde05bcab756
+timeCreated: 1526637515
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - p_enemyR: {fileID: 1394149957139550, guid: 41ac06c3ebe1bf249b03be1f827683c0, type: 2}
+  - p_enemyG: {fileID: 1930251409977160, guid: 7e15375cedaffd9409c07aec3b8176a0, type: 2}
+  - p_enemyB: {fileID: 1374911481661942, guid: 997040551fcf7cc4b823d67de8269f45, type: 2}
+  - p_gameHud: {instanceID: 0}
+  - p_garbageSprite: {fileID: 21300000, guid: 122a1188ff236d7419daf96e328adbf5, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

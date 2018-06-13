@@ -26,6 +26,9 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
     [SerializeField]
     private GameObject p_pageCanvas;
 
+    [SerializeField]
+    private GameObject p_backButtonFX;
+
     [Header("Division Cell Tiles")]
 
     /// <summary>
@@ -58,6 +61,16 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
     [SerializeField]
     private GameObject p_leftDecorationDivisionCell;
 
+    /// <summary>
+    /// The file system explorer page list.
+    /// </summary>
+    private List<GameObject> pageList;
+
+    /// <summary>
+    /// The input menu controller list.
+    /// </summary>
+    private List<GameObject> inputMenuControllerList;
+
     protected ImageConfigurationManager()
     {
     }
@@ -74,8 +87,19 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
         List<int[]> imageConfigs = new List<int[]>();
         int cellSize;
         int aux;
-        List<GameObject> pageList = new List<GameObject>();
-        List<GameObject> inputMenuControllerList = new List<GameObject>();
+
+        //Destroys the previous page list.
+        if (pageList != null)
+            for (int i = 0; i < pageList.Count; i++)
+                Destroy(pageList[i]);
+
+        pageList = new List<GameObject>();
+
+        //Destroys the previous input menu controller list.
+        if (inputMenuControllerList != null)
+            for (int i = 0; i < inputMenuControllerList.Count; i++)
+                Destroy(inputMenuControllerList[i]);
+        inputMenuControllerList = new List<GameObject>();
         GameObject auxGameObject;
         string[] pathSplit;
         GUIObjectEnable objectEnable;
@@ -117,6 +141,8 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
             }
         }
 
+
+
         //If there aren't any valid configuration.
         if (imageConfigs.Count == 0)
         {
@@ -129,7 +155,7 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
             Destroy(pageList[pageList.Count - 1].GetChild("Next page"));
             Destroy(pageList[pageList.Count - 1].GetChild("Accept button"));
             Destroy(pageList[pageList.Count - 1].GetChild("Cells config"));
-            Destroy(pageList[pageList.Count - 1].GetChild("Backgrounf image"));
+            Destroy(pageList[pageList.Count - 1].GetChild("Background image"));
 
             //Shows the image name.
             pathSplit = i_path.Split(Path.DirectorySeparatorChar);
@@ -139,11 +165,13 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
             //Creates the first InputMenuController.
             inputMenuControllerList.Add(new GameObject("InputMenuController"));
 
+            inputMenuControllerList[inputMenuControllerList.Count - 1].transform.SetParent(p_pageCanvas.transform);
+
             //Gets the "Back" button of the page.
             auxGameObject = pageList[pageList.Count - 1].GetChild("Back button");
 
             //Sets up the "Back" button.
-            auxGameObject.GetComponent<GUIChangeDirectory>().path = Directory.GetParent(i_path).FullName;
+            auxGameObject.GetComponent<GUILaunchFX>()._target=p_backButtonFX;
 
             //Adds the button to the InputMenuController.
             inputMenuControllerList[inputMenuControllerList.Count - 1].AddComponent<InputMenuController>().startingElem = auxGameObject;
@@ -163,6 +191,7 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
 
             //Creates the first InputMenuController.
             inputMenuControllerList.Add(new GameObject("InputMenuController"));
+            inputMenuControllerList[inputMenuControllerList.Count - 1].transform.SetParent(p_pageCanvas.transform);
             inputMenuControllerList[inputMenuControllerList.Count - 1].AddComponent<InputMenuController>().uiElements = new List<GameObject>();
 
             //For each image configuration.
@@ -171,11 +200,12 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
                 //Destroys the error text label.
                 Destroy(pageList[pageList.Count - 1].GetChild("Error text"));
 
+
                 //Shows the image name.
                 pathSplit = i_path.Split(Path.DirectorySeparatorChar);
                 aux = Path.GetExtension(pathSplit[pathSplit.Length - 1]).Length;
                 pageList[pageList.Count - 1].GetChild("Image name").GetComponent<Text>().text = pathSplit[pathSplit.Length - 1].Remove(pathSplit[pathSplit.Length - 1].Length - aux, aux);
-
+               
                 //Shows the columns x rows configuration.
                 pageList[pageList.Count - 1].GetChild("Cells config").GetComponent<Text>().text = imageConfigs[i][0] + "x" + imageConfigs[i][1];
 
@@ -277,7 +307,7 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
                 auxGameObject = pageList[pageList.Count - 1].GetChild("Back button");
 
                 //Sets up the "Back" button.
-                auxGameObject.GetComponent<GUIChangeDirectory>().path = Directory.GetParent(i_path).FullName;
+                auxGameObject.GetComponent<GUILaunchFX>()._target=p_backButtonFX;
 
                 //Adds the button to the InputMenuController.
                 inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().startingElem = auxGameObject;
@@ -310,6 +340,7 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
 
                     //Creates the next InputMenuController.
                     inputMenuControllerList.Add(new GameObject("InputMenuController"));
+                    inputMenuControllerList[inputMenuControllerList.Count - 1].transform.SetParent(p_pageCanvas.transform);
                     inputMenuControllerList[inputMenuControllerList.Count - 1].AddComponent<InputMenuController>().uiElements = new List<GameObject>();
 
                     //Deactivates the page and the InputMenuController.
@@ -363,6 +394,8 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
             }
         }
 
+
+        /*
         //For each page.
         foreach (GameObject page in pageList)
         {
@@ -400,6 +433,7 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
                 auxGameObject.AddComponent<GUIDestroy>().target = inputMenuController;
             }
         }
+        */
     }
 
 }

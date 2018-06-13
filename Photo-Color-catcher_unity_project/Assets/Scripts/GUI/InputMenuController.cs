@@ -19,7 +19,7 @@ public class InputMenuController : MonoBehaviour
     [SerializeField]
     private float uiResponseTime = 0.2f;
 
-    private float leftUiResponseTime;
+    private float lastResponseTime;
 
     // Use this for initialization
     void Start()
@@ -31,7 +31,7 @@ public class InputMenuController : MonoBehaviour
     void Update()
     {
 
-        if (leftUiResponseTime <= 0)
+        if (Time.realtimeSinceStartup - lastResponseTime >= uiResponseTime)
         {
             if (actualElem != null)
             {
@@ -42,7 +42,7 @@ public class InputMenuController : MonoBehaviour
                         actualElem.SendMessage("NonFocused");
                         actualElem = uiMap[actualElem].up;
                         actualElem.SendMessage("Focused");
-                        leftUiResponseTime = uiResponseTime;
+                        lastResponseTime = Time.realtimeSinceStartup;
                         Debug.Log("PARRIBA");
                     }
                 }
@@ -53,7 +53,7 @@ public class InputMenuController : MonoBehaviour
                         actualElem.SendMessage("NonFocused");
                         actualElem = uiMap[actualElem].down;
                         actualElem.SendMessage("Focused");
-                        leftUiResponseTime = uiResponseTime;
+                        lastResponseTime = Time.realtimeSinceStartup;
                         Debug.Log("PABAJO");
                     }
                 }
@@ -64,7 +64,7 @@ public class InputMenuController : MonoBehaviour
                         actualElem.SendMessage("NonFocused");
                         actualElem = uiMap[actualElem].right;
                         actualElem.SendMessage("Focused");
-                        leftUiResponseTime = uiResponseTime;
+                        lastResponseTime = Time.realtimeSinceStartup;
                     }
                 }
                 else if (Input.GetKey(KeyCode.LeftArrow))
@@ -74,20 +74,16 @@ public class InputMenuController : MonoBehaviour
                         actualElem.SendMessage("NonFocused");
                         actualElem = uiMap[actualElem].left;
                         actualElem.SendMessage("Focused");
-                        leftUiResponseTime = uiResponseTime;
+                        lastResponseTime = Time.realtimeSinceStartup;
                     }
                 }
                 else if (Input.GetKeyDown(KeyCode.Return))
                 {
                     actualElem.SendMessage("Selected");
-                    leftUiResponseTime = uiResponseTime;
+                    lastResponseTime = Time.realtimeSinceStartup;
                 }
             }
 	
-        }
-        else
-        {
-            leftUiResponseTime -= Time.deltaTime;
         }
     }
 

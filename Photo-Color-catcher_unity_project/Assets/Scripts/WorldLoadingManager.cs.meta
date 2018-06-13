@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e930e2a6e050a5b4eadb6df1c93ebace
+timeCreated: 1524921488
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - p_worldSelectionModel: {fileID: 1172824801250410, guid: 302fc806317a9bb4f9121721afa3da78,
+      type: 2}
+  - p_parentCanvas: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

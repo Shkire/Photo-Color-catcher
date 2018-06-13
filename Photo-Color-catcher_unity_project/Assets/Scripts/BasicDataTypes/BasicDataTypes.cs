@@ -31,6 +31,25 @@ namespace BasicDataTypes
             _g = i_g;
             _b = i_b;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            RGBContent aux = (RGBContent)obj;
+
+            if (_r != aux._r)
+                return false;
+
+            if (_g != aux._g)
+                return false;
+
+            if (_b != aux._b)
+                return false;
+
+            return true;
+        }
     }
 
     /// <summary>
@@ -39,6 +58,9 @@ namespace BasicDataTypes
     [System.Serializable]
     public class OnArrayImage
     {
+
+        //CHANGE TO TEXTURE2D AND SURROGATE??
+
         /// <summary>
         /// Pixel array.
         /// </summary>
@@ -66,6 +88,14 @@ namespace BasicDataTypes
             _width = i_img.width;
             _height = i_img.height;
             _pixels = i_img.GetPixels();
+        }
+
+        public Texture2D ToTexture2D()
+        {
+            Texture2D aux = new Texture2D(_width, _height);
+            aux.SetPixels(_pixels);
+            aux.Apply();
+            return aux;
         }
     }
 
@@ -116,6 +146,8 @@ namespace BasicDataTypes
         /// The connected level cells graph.
         /// </summary>
         public GraphType<Vector2> _graph;
+
+        public bool _completed;
     }
 
     /// <summary>
@@ -124,6 +156,10 @@ namespace BasicDataTypes
     [System.Serializable]
     public class World
     {
+        public string _name;
+
+        public int[] _imageConfig;
+
         /// <summary>
         /// The level image stored as an array.
         /// </summary>

@@ -20,6 +20,9 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
     /// </summary>
     public int _mapSize;
 
+    [SerializeField]
+    private GameObject p_worldCreatedFX;
+
     protected ImgProcessManager()
     {
     }
@@ -74,6 +77,12 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         //Assings the world image.
         world._img = new OnArrayImage(auxText);
 
+        //Assigns the world name.
+        world._name = i_name;
+
+        //Assings the image configuration.
+        world._imageConfig = i_imageConfig;
+
         yield return null;
 
         //Creates levels map and initializes it.
@@ -86,13 +95,13 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
             for (int y = 0; y < i_imageConfig[1]; y++)
             {
                 //Creates a new level and adds it to the map.
-                world._levels.Add(new Vector2((float)x, (float)y), new Level());
+                world._levels.Add(new Vector2(x, y), new Level());
 
                 //Initializes the level image.
-                world._levels[new Vector2((float)x, (float)y)]._img = new OnArrayImage(cellSize, cellSize);
+                world._levels[new Vector2(x, y)]._img = new OnArrayImage(cellSize, cellSize);
 
                 //Assings the level image.
-                world._levels[new Vector2((float)x, (float)y)]._img._pixels = auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize);
+                world._levels[new Vector2(x, y)]._img._pixels = auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize);
 
                 yield return null;
             }
@@ -156,13 +165,13 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                 for (int y = 0; y < _mapSize; y++)
                 {
                     //Creates a new level cell and adds it to the map.
-                    world._levels[pos]._cells.Add(new Vector2((float)x, (float)y), new LevelCell());
+                    world._levels[pos]._cells.Add(new Vector2(x, y), new LevelCell());
 
                     //Initializes the cell image.
-                    world._levels[pos]._cells[new Vector2((float)x, (float)y)]._img = new OnArrayImage(cellSize, cellSize);
+                    world._levels[pos]._cells[new Vector2(x, y)]._img = new OnArrayImage(cellSize, cellSize);
 
                     //Assings the cell image.
-                    world._levels[pos]._cells[new Vector2((float)x, (float)y)]._img._pixels = auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize);
+                    world._levels[pos]._cells[new Vector2(x, y)]._img._pixels = auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize);
 
                     yield return null;
                 }
@@ -241,16 +250,16 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                 for (int x = 0; x < _mapSize; x++)
                 {
                     //Checks if grayscale difference between the cell and adjacent < 0.5.
-                    if (x < _mapSize - 1 && Mathf.Abs(world._levels[pos]._cells[new Vector2((float)x, (float)y)]._grayscale - world._levels[pos]._cells[new Vector2((float)x + 1, (float)y)]._grayscale) < 0.5f)
+                    if (x < _mapSize - 1 && Mathf.Abs(world._levels[pos]._cells[new Vector2(x, y)]._grayscale - world._levels[pos]._cells[new Vector2(x + 1, y)]._grayscale) < 0.5f)
 
                         //Makes the vertices adjacent: no barrier between cells.
-                        world._levels[pos]._graph.AddAdjacent(new Vector2((float)x, (float)y), new Vector2((float)x + 1, (float)y));
+                        world._levels[pos]._graph.AddAdjacent(new Vector2(x, y), new Vector2(x + 1, y));
 
                     //Checks if grayscale difference between the cell and adjacent < 0.5.
-                    if (y < _mapSize - 1 && Mathf.Abs(world._levels[pos]._cells[new Vector2((float)x, (float)y)]._grayscale - world._levels[pos]._cells[new Vector2((float)x, (float)y + 1)]._grayscale) < 0.5f)
+                    if (y < _mapSize - 1 && Mathf.Abs(world._levels[pos]._cells[new Vector2(x, y)]._grayscale - world._levels[pos]._cells[new Vector2(x, y + 1)]._grayscale) < 0.5f)
 
                         //Makes the vertices adjacent: no barrier between cells.
-                        world._levels[pos]._graph.AddAdjacent(new Vector2((float)x, (float)y), new Vector2((float)x, (float)y + 1));
+                        world._levels[pos]._graph.AddAdjacent(new Vector2(x, y), new Vector2(x, y + 1));
                 }
             }
 
@@ -280,14 +289,14 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                             for (int i = 0; i < connectedVertices.Count; i++)
                             {
                                 //If the vertices are connected (on the same list).
-                                if (foundVertices == 0 && connectedVertices[i].Contains(new Vector2((float)x, (float)y)) && connectedVertices[i].Contains(new Vector2((float)x + 1, (float)y)))
+                                if (foundVertices == 0 && connectedVertices[i].Contains(new Vector2(x, y)) && connectedVertices[i].Contains(new Vector2(x + 1, y)))
                                 {
                                     notConnected = false;
                                     break;
                                 }
 
                                 //If one of the vertex is on the list.
-                                if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) || connectedVertices[i].Contains(new Vector2((float)x + 1, (float)y)))
+                                if (connectedVertices[i].Contains(new Vector2(x, y)) || connectedVertices[i].Contains(new Vector2(x + 1, y)))
                                 {
                                     foundVertices++;
 
@@ -298,16 +307,16 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                             }
 
                             //If the cells are not connected and the grayscale difference between both is lower.
-                            if (notConnected && Mathf.Abs(world._levels[pos]._cells[new Vector2((float)x, (float)y)]._grayscale - world._levels[pos]._cells[new Vector2((float)x + 1, (float)y)]._grayscale) < minGrayDif)
+                            if (notConnected && Mathf.Abs(world._levels[pos]._cells[new Vector2(x, y)]._grayscale - world._levels[pos]._cells[new Vector2(x + 1, y)]._grayscale) < minGrayDif)
                             {
                                 //Sets new min grayscale difference. 
-                                minGrayDif = Mathf.Abs(world._levels[pos]._cells[new Vector2((float)x, (float)y)]._grayscale - world._levels[pos]._cells[new Vector2((float)x + 1, (float)y)]._grayscale);
+                                minGrayDif = Mathf.Abs(world._levels[pos]._cells[new Vector2(x, y)]._grayscale - world._levels[pos]._cells[new Vector2(x + 1, y)]._grayscale);
 
                                 //Gets vertex.
-                                vertex = new Vector2((float)x, (float)y);
+                                vertex = new Vector2(x, y);
 
                                 //Gets adjacent vertex.
-                                adjacent = new Vector2((float)x + 1, (float)y);
+                                adjacent = new Vector2(x + 1, y);
                             }
                         }
                         if (y < _mapSize - 1)
@@ -319,14 +328,14 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                             for (int i = 0; i < connectedVertices.Count; i++)
                             {
                                 //If the vertices are connected (on the same list).
-                                if (foundVertices == 0 && connectedVertices[i].Contains(new Vector2((float)x, (float)y)) && connectedVertices[i].Contains(new Vector2((float)x, (float)y + 1)))
+                                if (foundVertices == 0 && connectedVertices[i].Contains(new Vector2(x, y)) && connectedVertices[i].Contains(new Vector2(x, y + 1)))
                                 {
                                     notConnected = false;
                                     break;
                                 }
 
                                 //If one of the vertex is on the list.
-                                if (connectedVertices[i].Contains(new Vector2((float)x, (float)y)) || connectedVertices[i].Contains(new Vector2((float)x, (float)y + 1)))
+                                if (connectedVertices[i].Contains(new Vector2(x, y)) || connectedVertices[i].Contains(new Vector2(x, y + 1)))
                                 {
                                     foundVertices++;
 
@@ -337,16 +346,16 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                             }
 
                             //If the cells are not connected and the grayscale difference between both is lower.
-                            if (notConnected && Mathf.Abs(world._levels[pos]._cells[new Vector2((float)x, (float)y)]._grayscale - world._levels[pos]._cells[new Vector2((float)x, (float)y + 1)]._grayscale) < minGrayDif)
+                            if (notConnected && Mathf.Abs(world._levels[pos]._cells[new Vector2(x, y)]._grayscale - world._levels[pos]._cells[new Vector2(x, y + 1)]._grayscale) < minGrayDif)
                             {
                                 //Sets new min grayscale difference.
-                                minGrayDif = Mathf.Abs(world._levels[pos]._cells[new Vector2((float)x, (float)y)]._grayscale - world._levels[pos]._cells[new Vector2((float)x, (float)y + 1)]._grayscale);
+                                minGrayDif = Mathf.Abs(world._levels[pos]._cells[new Vector2(x, y)]._grayscale - world._levels[pos]._cells[new Vector2(x, y + 1)]._grayscale);
 
                                 //Gets vertex.
-                                vertex = new Vector2((float)x, (float)y);
+                                vertex = new Vector2(x, y);
 
                                 //Gets adjacent vertex.
-                                adjacent = new Vector2((float)x, (float)y + 1);
+                                adjacent = new Vector2(x, y + 1);
                             }
                         }
 
@@ -365,5 +374,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
 
         //Stores the world on disk.
         PersistenceManager.SaveWorld(world, i_name);
+
+        p_worldCreatedFX.SendMessage("Launch",SendMessageOptions.DontRequireReceiver);
     }
 }
