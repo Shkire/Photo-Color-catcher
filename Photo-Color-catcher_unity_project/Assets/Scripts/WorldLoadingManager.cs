@@ -20,6 +20,12 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
     [SerializeField]
     private GameObject p_acceptButtonFX;
 
+    [SerializeField]
+    private GameObject p_progress;
+
+    [SerializeField]
+    private GameObject p_loadingWorldsText;
+
 
     /// <summary>
     /// The file system explorer page list.
@@ -35,13 +41,20 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
     {
     }
 
-    public void LoadWorlds()
+    public void StartLoadWorlds()
+    {
+        StartCoroutine(LoadWorlds());
+    }
+
+    public IEnumerator LoadWorlds()
     {
         List<World> auxWorlds = new List<World>();
         string[] worldPaths = GetWorlds();
         foreach (string worldPath in worldPaths)
         {
             auxWorlds.Add(PersistenceManager.LoadWorld(worldPath));
+
+            yield return null;
         }
 
         //Destroys the previous page list.

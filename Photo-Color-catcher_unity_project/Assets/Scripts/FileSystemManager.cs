@@ -46,23 +46,50 @@ public class FileSystemManager : Singleton<FileSystemManager>
     /// </summary>
     private List<GameObject> inputMenuControllerList;
 
+    [SerializeField]
+    private GameObject p_progress;
+
+    [SerializeField]
+    private GameObject p_loadingText;
+
+    [SerializeField]
+    private GameObject p_startFX;
+
+    [SerializeField]
+    private GameObject p_finishFX;
+
     protected FileSystemManager()
     {
+    }
+
+    public void StartChangeDirectory(string i_path)
+    {
+        StartCoroutine(ChangeDirectory(i_path));
     }
 
     /// <summary>
     /// Changes the actual directory and load the available directories and images.
     /// </summary>
     /// <param name="i_path">The new directory.</param>
-    public void ChangeDirectory(string i_path)
+    /// 
+    /// 
+    IEnumerator ChangeDirectory(string i_path)
     {
+        p_startFX.SendMessage("Launch", SendMessageOptions.DontRequireReceiver);
+
+        string path = (i_path == null || i_path.Equals(string.Empty)) ? Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) : i_path;
+
+        p_loadingText.GetComponent<Text>().text = "Loading...";
+
+        (p_progress.transform as RectTransform).anchorMin = (new Vector2(0,0));
+
         //Shows the new directory path as actual.
         if (actualDirectoryText != null)
-            actualDirectoryText.text = i_path;
+            actualDirectoryText.text = path;
 
         //Get the directories and images that are available in the new directory.
-        string[] directories = GetDirectories(i_path);
-        string[] images = GetImages(i_path);
+        string[] directories = GetDirectories(path);
+        string[] images = GetImages(path);
 
         //Destroys the previous page list.
         if (pageList != null)
@@ -89,7 +116,7 @@ public class FileSystemManager : Singleton<FileSystemManager>
         GUIObjectEnable objectEnable;
 
         //If there is a parent directory available = 1; otherwise 0;
-        int parent = (Directory.GetParent(i_path) == null) ? 0 : 1;
+        int parent = (Directory.GetParent(path) == null) ? 0 : 1;
 
         //Creates the input menu controller for the first page of the file system explorer.
         inputMenuControllerList.Add(new GameObject("InputMenuController"));
@@ -99,12 +126,17 @@ public class FileSystemManager : Singleton<FileSystemManager>
 
         inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(backButton);
 
+
+        inputMenuControllerList[inputMenuControllerList.Count - 1].SetActive(false);
+
         //Creates the first page of the file system explorer.
         pageList.Add((GameObject)Instantiate(fileSystemModelPrefab));
         pageList[pageList.Count - 1].transform.SetParent(canvas.transform, false);
 
         //Destroys the "previous page" button
         Destroy(pageList[pageList.Count - 1].GetChild("Prev page"));
+
+        yield return null;
 
         //For each element to show in the file system explorer (directories and images).
         for (int i = 0; i < directories.Length + images.Length + parent; i++)
@@ -122,7 +154,7 @@ public class FileSystemManager : Singleton<FileSystemManager>
                 if (i == 0 && parent == 1)
                 {
                     //Sets up the directory button.
-                    aux.GetComponentInChildren<GUIChangeDirectory>().path = Directory.GetParent(i_path).FullName;
+                    aux.GetComponentInChildren<GUIChangeDirectory>().path = Directory.GetParent(path).FullName;
                     aux.GetComponentInChildren<Text>().text = "back";
                 }
                 else
@@ -249,6 +281,10 @@ public class FileSystemManager : Singleton<FileSystemManager>
                 //Adds the "previous page" button to the next input menu controller.
                 inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(aux);
             }
+
+            (p_progress.transform as RectTransform).anchorMin = (new Vector2(i /(float) (directories.Length + images.Length + parent),0));
+
+            yield return null;
         }
         /*
         //For each page.
@@ -282,6 +318,10 @@ public class FileSystemManager : Singleton<FileSystemManager>
             }
         }
         */
+
+        inputMenuControllerList[0].SetActive(true);
+
+        p_finishFX.SendMessage("Launch", SendMessageOptions.DontRequireReceiver);
     }
 
     /// <summary>

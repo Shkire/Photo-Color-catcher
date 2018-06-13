@@ -6,6 +6,6 @@ public class GUILoadWorlds : GUITool {
 
     public override void Execute()
     {
-        WorldLoadingManager.Instance.LoadWorlds();
+        WorldLoadingManager.Instance.StartLoadWorlds();
     }
 }
