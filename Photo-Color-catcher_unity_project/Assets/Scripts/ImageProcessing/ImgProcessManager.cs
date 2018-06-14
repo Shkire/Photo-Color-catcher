@@ -75,7 +75,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         auxText = auxText.ResizeBilinear(cellSize * i_imageConfig[0], cellSize * i_imageConfig[1]);
 
         //Assings the world image.
-        world._img = new OnArrayImage(auxText);
+        world._img = auxText;
 
         //Assigns the world name.
         world._name = i_name;
@@ -98,10 +98,12 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                 world._levels.Add(new Vector2(x, y), new Level());
 
                 //Initializes the level image.
-                world._levels[new Vector2(x, y)]._img = new OnArrayImage(cellSize, cellSize);
+                world._levels[new Vector2(x, y)]._img = new Texture2D(cellSize, cellSize);
 
                 //Assings the level image.
-                world._levels[new Vector2(x, y)]._img._pixels = auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize);
+                world._levels[new Vector2(x, y)]._img.SetPixels(auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize));
+
+                world._levels[new Vector2(x, y)]._img.Apply();
 
                 yield return null;
             }
@@ -144,9 +146,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         foreach (Vector2 pos in world._levels.Keys)
         {
             //Gets the level image as Texture2D.
-            auxText = new Texture2D(world._levels[pos]._img._width, world._levels[pos]._img._height);
-            auxText.SetPixels(world._levels[pos]._img._pixels);
-            auxText.Apply();
+            auxText = world._levels[pos]._img;
 
             //Calculates cell size (width/columns)
             cellSize = Mathf.CeilToInt(auxText.width / (float)_mapSize);
@@ -168,10 +168,10 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                     world._levels[pos]._cells.Add(new Vector2(x, y), new LevelCell());
 
                     //Initializes the cell image.
-                    world._levels[pos]._cells[new Vector2(x, y)]._img = new OnArrayImage(cellSize, cellSize);
+                    world._levels[pos]._cells[new Vector2(x, y)]._img = new Texture2D(cellSize, cellSize);
 
                     //Assings the cell image.
-                    world._levels[pos]._cells[new Vector2(x, y)]._img._pixels = auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize);
+                    world._levels[pos]._cells[new Vector2(x, y)]._img.SetPixels(auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize));
 
                     yield return null;
                 }
@@ -188,15 +188,15 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                 cell._average = Color.black;
 
                 //For each pixel.
-                for (int i = 0; i < cell._img._pixels.Length; i++)
+                for (int i = 0; i < cell._img.GetPixels().Length; i++)
                 {
                     //Adds pixel colors to cell average color.
-                    cell._average.r += cell._img._pixels[i].r / cell._img._pixels.Length;
-                    cell._average.g += cell._img._pixels[i].g / cell._img._pixels.Length;
-                    cell._average.b += cell._img._pixels[i].b / cell._img._pixels.Length;
+                    cell._average.r += cell._img.GetPixels()[i].r / cell._img.GetPixels().Length;
+                    cell._average.g += cell._img.GetPixels()[i].g / cell._img.GetPixels().Length;
+                    cell._average.b += cell._img.GetPixels()[i].b / cell._img.GetPixels().Length;
 
                     //Adds pixel grayscale value to cell average grayscale value.
-                    cell._grayscale += cell._img._pixels[i].grayscale / cell._img._pixels.Length;
+                    cell._grayscale += cell._img.GetPixels()[i].grayscale / cell._img.GetPixels().Length;
                 }
 
                 yield return null;
@@ -373,7 +373,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         }
 
         //Stores the world on disk.
-        PersistenceManager.SaveWorld(world, i_name);
+        yield return StartCoroutine(PersistenceManager.Instance.SaveWorld(world, i_name));
 
         p_worldCreatedFX.SendMessage("Launch",SendMessageOptions.DontRequireReceiver);
     }
