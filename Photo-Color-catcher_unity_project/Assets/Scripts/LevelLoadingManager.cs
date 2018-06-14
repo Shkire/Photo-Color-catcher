@@ -62,7 +62,7 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
 
                 auxCell = (GameObject)Instantiate(p_cellBackground, auxCell.transform.position, auxCell.transform.localRotation);
 
-                spr = Sprite.Create(level._cells[new Vector2(x, y)]._img.ToTexture2D(), new Rect(0, 0, level._cells[new Vector2(x, y)]._img._width, level._cells[new Vector2(x, y)]._img._height), new Vector2(0.5f, 0.5f));
+                spr = Sprite.Create(level._cells[new Vector2(x, y)]._img, new Rect(0, 0, level._cells[new Vector2(x, y)]._img._width, level._cells[new Vector2(x, y)]._img._height), new Vector2(0.5f, 0.5f));
 
                 auxCell.GetChild("Background").GetComponent<SpriteRenderer>().sprite = spr;
 

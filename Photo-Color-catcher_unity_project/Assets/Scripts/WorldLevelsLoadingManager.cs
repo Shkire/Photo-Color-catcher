@@ -99,10 +99,10 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
                     
                 if (!world._levels[new Vector2(x, y)]._completed)
                     //Creates the level sprite.
-                    spr = Sprite.Create(world._levels[new Vector2(x, y)]._img.ToTexture2D().ToGray(), new Rect(0, 0, world._levels[new Vector2(x, y)]._img._width, world._levels[new Vector2(x, y)]._img._height), Vector2.zero);
+                    spr = Sprite.Create(world._levels[new Vector2(x, y)]._img.ToGray(), new Rect(0, 0, world._levels[new Vector2(x, y)]._img.width, world._levels[new Vector2(x, y)]._img.height), Vector2.zero);
                 else
                     //Creates the level sprite.
-                    spr = Sprite.Create(world._levels[new Vector2(x, y)]._img.ToTexture2D(), new Rect(0, 0, world._levels[new Vector2(x, y)]._img._width, world._levels[new Vector2(x, y)]._img._height), Vector2.zero);
+                    spr = Sprite.Create(world._levels[new Vector2(x, y)]._img, new Rect(0, 0, world._levels[new Vector2(x, y)]._img.width, world._levels[new Vector2(x, y)]._img.height), Vector2.zero);
                 
                 //Shows the level image.
                 auxGameObject.AddComponent<Image>().sprite = spr;

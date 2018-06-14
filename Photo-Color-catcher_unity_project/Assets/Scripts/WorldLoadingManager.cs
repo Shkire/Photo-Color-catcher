@@ -133,7 +133,7 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
                 pageList[pageList.Count - 1].GetChild("Image name").GetComponent<Text>().text = auxWorlds[i]._name + " - " + auxWorlds[i]._imageConfig[0] + "x" + auxWorlds[i]._imageConfig[1];
 
                 //Creates the sprite using the world image.
-                spr = Sprite.Create(auxWorlds[i]._img.ToTexture2D(), new Rect(0, 0, auxWorlds[i]._img._width, auxWorlds[i]._img._height), new Vector2(0, 0));
+                spr = Sprite.Create(auxWorlds[i]._img, new Rect(0, 0, auxWorlds[i]._img.width, auxWorlds[i]._img.height), new Vector2(0, 0));
 
                 //Shows the image.
                 auxGameObject = pageList[pageList.Count - 1].GetChild("Background image");
@@ -281,7 +281,9 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
         if (!Directory.Exists(Application.persistentDataPath))
             return null;
 
-        string[] worlds = Directory.GetFiles(Application.persistentDataPath).Where(x => Path.GetExtension(x).Equals(".pccw")).ToArray();
+        string[] worlds = Directory.GetDirectories(Application.persistentDataPath).Where(x => Directory.GetFiles(x).Length == 2).ToArray();
+        worlds = worlds.Where(x => (Path.GetExtension(Directory.GetFiles(x)[0]).ToLower().Equals(".jpg") && Path.GetExtension(Directory.GetFiles(x)[1]).ToLower().Equals(PersistenceManager.WORLD_EXT)) || (Path.GetExtension(Directory.GetFiles(x)[0]).ToLower().Equals(PersistenceManager.WORLD_EXT) && Path.GetExtension(Directory.GetFiles(x)[1]).ToLower().Equals(".jpg"))).ToArray();
+        worlds = worlds.Where(x => Directory.GetFiles(x)[0].Remove(Directory.GetFiles(x)[0].Length - Path.GetExtension(Directory.GetFiles(x)[0]).Length, Path.GetExtension(Directory.GetFiles(x)[0]).Length).Equals(Directory.GetFiles(x)[1].Remove(Directory.GetFiles(x)[1].Length - Path.GetExtension(Directory.GetFiles(x)[1]).Length, Path.GetExtension(Directory.GetFiles(x)[1]).Length))).ToArray();
         return worlds;
     }
 }
