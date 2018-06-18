@@ -71,6 +71,8 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
     /// </summary>
     private List<GameObject> inputMenuControllerList;
 
+    private GameObject activeMenuController;
+
     protected ImageConfigurationManager()
     {
     }
@@ -436,4 +438,19 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
         */
     }
 
+    public void DisableMenuController()
+    {
+        foreach (GameObject inputMenuController in inputMenuControllerList)
+            if (inputMenuController.activeSelf)
+            {
+                activeMenuController = inputMenuController;
+                inputMenuController.SetActive(false);
+                break;
+            }
+    }
+
+    public void EnableMenuController()
+    {
+        activeMenuController.SetActive(true);
+    }
 }

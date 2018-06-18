@@ -11,6 +11,6 @@ public class GUILoadLevel : GUITool
 
     public override void Execute()
     {
-        LevelLoadingManager.Instance.LoadLevel(_path, _levelPos);
+        LevelLoadingManager.Instance.StartLoadLevel(_path, _levelPos);
     }
 }

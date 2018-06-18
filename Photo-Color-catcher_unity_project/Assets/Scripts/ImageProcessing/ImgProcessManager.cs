@@ -65,6 +65,8 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
     {
         p_startFX.SendMessage("Launch", SendMessageOptions.DontRequireReceiver);
 
+        ImageConfigurationManager.Instance.DisableMenuController();
+
         p_creatingWorldText.GetComponent<Text>().text = "Creating world...";
 
         float progress = 0;
@@ -160,6 +162,7 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         bool notConnected;
         int foundVertices;
         int count = 0;
+        Color[] pixels;
 
         //For each level.
         foreach (Vector2 pos in world._levels.Keys)
@@ -212,16 +215,18 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                 //Sets average color as black.
                 cell._average = Color.black;
 
+                pixels = cell._img.GetPixels();
+
                 //For each pixel.
-                for (int i = 0; i < cell._img.GetPixels().Length; i++)
+                for (int i = 0; i < pixels.Length; i++)
                 {
                     //Adds pixel colors to cell average color.
-                    cell._average.r += cell._img.GetPixels()[i].r / cell._img.GetPixels().Length;
-                    cell._average.g += cell._img.GetPixels()[i].g / cell._img.GetPixels().Length;
-                    cell._average.b += cell._img.GetPixels()[i].b / cell._img.GetPixels().Length;
+                    cell._average.r += pixels[i].r / pixels.Length;
+                    cell._average.g += pixels[i].g / pixels.Length;
+                    cell._average.b += pixels[i].b / pixels.Length;
 
                     //Adds pixel grayscale value to cell average grayscale value.
-                    cell._grayscale += cell._img.GetPixels()[i].grayscale / cell._img.GetPixels().Length;
+                    cell._grayscale += pixels[i].grayscale / pixels.Length;
                 }
 
                 progress += (1 - 0.25f) / (float)(world._levels.Count + 1) / 5f / (float)world._levels[pos]._cells.Count;
@@ -414,13 +419,15 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         }
 
         //Stores the world on disk.
-        yield return StartCoroutine(PersistenceManager.Instance.SaveWorld(world, i_name));
+        yield return StartCoroutine(PersistenceManager.Instance.SaveWorld(world));
 
         progress =1;
 
         (p_progress.transform as RectTransform).anchorMin = (new Vector2(progress,0));
 
         yield return null;
+
+        ImageConfigurationManager.Instance.EnableMenuController();
 
         p_finishFX.SendMessage("Launch",SendMessageOptions.DontRequireReceiver);
     }
