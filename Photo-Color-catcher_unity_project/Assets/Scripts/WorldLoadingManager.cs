@@ -20,6 +20,18 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
     [SerializeField]
     private GameObject p_acceptButtonFX;
 
+    [SerializeField]
+    private GameObject p_progress;
+
+    [SerializeField]
+    private GameObject p_loadingWorldsText;
+
+    [SerializeField]
+    private GameObject p_startFX;
+
+    [SerializeField]
+    private GameObject p_finishFX;
+
 
     /// <summary>
     /// The file system explorer page list.
@@ -31,17 +43,44 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
     /// </summary>
     private List<GameObject> inputMenuControllerList;
 
+    private GameObject activeMenuController;
+
     protected WorldLoadingManager()
     {
     }
 
-    public void LoadWorlds()
+    public void StartLoadWorlds()
     {
+        StartCoroutine(LoadWorlds());
+    }
+
+    public IEnumerator LoadWorlds()
+    {
+        p_startFX.SendMessage("Launch", SendMessageOptions.DontRequireReceiver);
+
+        p_loadingWorldsText.GetComponent<Text>().text = "Loading created worlds...";
+
+        (p_progress.transform as RectTransform).anchorMin = (new Vector2(0,0));
+
         List<World> auxWorlds = new List<World>();
+        World auxWorld;
         string[] worldPaths = GetWorlds();
+
+        float progress = 0;
+
         foreach (string worldPath in worldPaths)
         {
-            auxWorlds.Add(PersistenceManager.LoadWorld(worldPath));
+            auxWorld = new World();
+
+            yield return StartCoroutine(PersistenceManager.Instance.LoadWorld(worldPath,x=> auxWorld=x));
+
+            auxWorlds.Add(auxWorld);
+
+            progress += 1/(float)worldPaths.Length;
+
+            (p_progress.transform as RectTransform).anchorMin = (new Vector2(progress,0));
+
+            yield return null;
         }
 
         //Destroys the previous page list.
@@ -120,7 +159,7 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
                 pageList[pageList.Count - 1].GetChild("Image name").GetComponent<Text>().text = auxWorlds[i]._name + " - " + auxWorlds[i]._imageConfig[0] + "x" + auxWorlds[i]._imageConfig[1];
 
                 //Creates the sprite using the world image.
-                spr = Sprite.Create(auxWorlds[i]._img.ToTexture2D(), new Rect(0, 0, auxWorlds[i]._img._width, auxWorlds[i]._img._height), new Vector2(0, 0));
+                spr = Sprite.Create(auxWorlds[i]._img, new Rect(0, 0, auxWorlds[i]._img.width, auxWorlds[i]._img.height), new Vector2(0, 0));
 
                 //Shows the image.
                 auxGameObject = pageList[pageList.Count - 1].GetChild("Background image");
@@ -261,6 +300,8 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
             }
         }
         */
+
+        p_finishFX.SendMessage("Launch", SendMessageOptions.DontRequireReceiver);
     }
 
     public string[] GetWorlds()
@@ -268,7 +309,25 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
         if (!Directory.Exists(Application.persistentDataPath))
             return null;
 
-        string[] worlds = Directory.GetFiles(Application.persistentDataPath).Where(x => Path.GetExtension(x).Equals(".pccw")).ToArray();
+        string[] worlds = Directory.GetDirectories(Application.persistentDataPath).Where(x => Directory.GetFiles(x).Length == 2).ToArray();
+        worlds = worlds.Where(x => (Path.GetExtension(Directory.GetFiles(x)[0]).ToLower().Equals(".jpg") && Path.GetExtension(Directory.GetFiles(x)[1]).ToLower().Equals(PersistenceManager.WORLD_EXT)) || (Path.GetExtension(Directory.GetFiles(x)[0]).ToLower().Equals(PersistenceManager.WORLD_EXT) && Path.GetExtension(Directory.GetFiles(x)[1]).ToLower().Equals(".jpg"))).ToArray();
+        worlds = worlds.Where(x => Directory.GetFiles(x)[0].Remove(Directory.GetFiles(x)[0].Length - Path.GetExtension(Directory.GetFiles(x)[0]).Length, Path.GetExtension(Directory.GetFiles(x)[0]).Length).Equals(Directory.GetFiles(x)[1].Remove(Directory.GetFiles(x)[1].Length - Path.GetExtension(Directory.GetFiles(x)[1]).Length, Path.GetExtension(Directory.GetFiles(x)[1]).Length))).ToArray();
         return worlds;
+    }
+
+    public void DisableMenuController()
+    {
+        foreach (GameObject inputMenuController in inputMenuControllerList)
+            if (inputMenuController.activeSelf)
+            {
+                activeMenuController = inputMenuController;
+                inputMenuController.SetActive(false);
+                break;
+            }
+    }
+
+    public void EnableMenuController()
+    {
+        activeMenuController.SetActive(true);
     }
 }

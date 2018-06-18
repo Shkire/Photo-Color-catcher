@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using CIEColor;
 using System;
 using BasicDataTypes;
+using UnityEngine.UI;
 
 /// <summary>
 /// Singleton object for image processing.
@@ -21,7 +22,16 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
     public int _mapSize;
 
     [SerializeField]
-    private GameObject p_worldCreatedFX;
+    private GameObject p_progress;
+
+    [SerializeField]
+    private GameObject p_creatingWorldText;
+
+    [SerializeField]
+    private GameObject p_startFX;
+
+    [SerializeField]
+    private GameObject p_finishFX;
 
     protected ImgProcessManager()
     {
@@ -53,6 +63,16 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
     /// <param name="i_name">Image name.</param>
     public IEnumerator ProcessImageAndGenerateWorld(Texture2D i_img, int[] i_imageConfig, string i_name)
     {
+        p_startFX.SendMessage("Launch", SendMessageOptions.DontRequireReceiver);
+
+        ImageConfigurationManager.Instance.DisableMenuController();
+
+        p_creatingWorldText.GetComponent<Text>().text = "Creating world...";
+
+        float progress = 0;
+
+        (p_progress.transform as RectTransform).anchorMin = (new Vector2(0,0));
+
         World world = new World();
         Texture2D auxText = i_img;
         int cellSize;
@@ -75,15 +95,13 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         auxText = auxText.ResizeBilinear(cellSize * i_imageConfig[0], cellSize * i_imageConfig[1]);
 
         //Assings the world image.
-        world._img = new OnArrayImage(auxText);
+        world._img = auxText;
 
         //Assigns the world name.
         world._name = i_name;
 
         //Assings the image configuration.
         world._imageConfig = i_imageConfig;
-
-        yield return null;
 
         //Creates levels map and initializes it.
         world._levels = new Dictionary<Vector2,Level>();
@@ -98,10 +116,16 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                 world._levels.Add(new Vector2(x, y), new Level());
 
                 //Initializes the level image.
-                world._levels[new Vector2(x, y)]._img = new OnArrayImage(cellSize, cellSize);
+                world._levels[new Vector2(x, y)]._img = new Texture2D(cellSize, cellSize);
 
                 //Assings the level image.
-                world._levels[new Vector2(x, y)]._img._pixels = auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize);
+                world._levels[new Vector2(x, y)]._img.SetPixels(auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize));
+
+                world._levels[new Vector2(x, y)]._img.Apply();
+
+                progress += 0.25f / (float)(i_imageConfig[0] * i_imageConfig[1]);
+
+                (p_progress.transform as RectTransform).anchorMin = (new Vector2(progress,0));
 
                 yield return null;
             }
@@ -127,8 +151,6 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         auxCIELab = (new Color(1, 1, 1)).ToCIELab();
         sampleColors.Add(new Vector3(auxCIELab.l, auxCIELab.a, auxCIELab.b), new RGBContent(true, true, true));
 
-        yield return null;
-
         Vector3 goal = Vector3.zero;
         Vector3 average;
         float distance;
@@ -139,14 +161,16 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
         Vector2 adjacent = Vector2.zero;
         bool notConnected;
         int foundVertices;
+        int count = 0;
+        Color[] pixels;
 
         //For each level.
         foreach (Vector2 pos in world._levels.Keys)
         {
+            yield return null;
+
             //Gets the level image as Texture2D.
-            auxText = new Texture2D(world._levels[pos]._img._width, world._levels[pos]._img._height);
-            auxText.SetPixels(world._levels[pos]._img._pixels);
-            auxText.Apply();
+            auxText = world._levels[pos]._img;
 
             //Calculates cell size (width/columns)
             cellSize = Mathf.CeilToInt(auxText.width / (float)_mapSize);
@@ -168,10 +192,14 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                     world._levels[pos]._cells.Add(new Vector2(x, y), new LevelCell());
 
                     //Initializes the cell image.
-                    world._levels[pos]._cells[new Vector2(x, y)]._img = new OnArrayImage(cellSize, cellSize);
+                    world._levels[pos]._cells[new Vector2(x, y)]._img = new Texture2D(cellSize, cellSize);
 
                     //Assings the cell image.
-                    world._levels[pos]._cells[new Vector2(x, y)]._img._pixels = auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize);
+                    world._levels[pos]._cells[new Vector2(x, y)]._img.SetPixels(auxText.GetPixels(x * cellSize, y * cellSize, cellSize, cellSize));
+
+                    progress += (1 - 0.25f) / (float)(world._levels.Count + 1) / 5f / (float)(_mapSize * _mapSize);
+
+                    (p_progress.transform as RectTransform).anchorMin = (new Vector2(progress,0));
 
                     yield return null;
                 }
@@ -187,17 +215,23 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                 //Sets average color as black.
                 cell._average = Color.black;
 
+                pixels = cell._img.GetPixels();
+
                 //For each pixel.
-                for (int i = 0; i < cell._img._pixels.Length; i++)
+                for (int i = 0; i < pixels.Length; i++)
                 {
                     //Adds pixel colors to cell average color.
-                    cell._average.r += cell._img._pixels[i].r / cell._img._pixels.Length;
-                    cell._average.g += cell._img._pixels[i].g / cell._img._pixels.Length;
-                    cell._average.b += cell._img._pixels[i].b / cell._img._pixels.Length;
+                    cell._average.r += pixels[i].r / pixels.Length;
+                    cell._average.g += pixels[i].g / pixels.Length;
+                    cell._average.b += pixels[i].b / pixels.Length;
 
                     //Adds pixel grayscale value to cell average grayscale value.
-                    cell._grayscale += cell._img._pixels[i].grayscale / cell._img._pixels.Length;
+                    cell._grayscale += pixels[i].grayscale / pixels.Length;
                 }
+
+                progress += (1 - 0.25f) / (float)(world._levels.Count + 1) / 5f / (float)world._levels[pos]._cells.Count;
+
+                (p_progress.transform as RectTransform).anchorMin = (new Vector2(progress,0));
 
                 yield return null;
             }
@@ -240,6 +274,10 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                 //Adds the vertex to the graph.
                 world._levels[pos]._graph.AddVertex(pos2);
 
+                progress += (1 - 0.25f) / (float)(world._levels.Count + 1) / 5f / (float)world._levels[pos]._cells.Count;
+
+                (p_progress.transform as RectTransform).anchorMin = (new Vector2(progress,0));
+
                 yield return null;
             }
 
@@ -262,6 +300,10 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                         world._levels[pos]._graph.AddAdjacent(new Vector2(x, y), new Vector2(x, y + 1));
                 }
             }
+
+            progress += (1 - 0.25f) / (float)(world._levels.Count + 1) / 5f;
+
+            (p_progress.transform as RectTransform).anchorMin = (new Vector2(progress,0));
 
             yield return null;
 
@@ -370,11 +412,23 @@ public class ImgProcessManager : Singleton<ImgProcessManager>
                 //Gets connected vertices list.
                 connectedVertices = world._levels[pos]._graph.GetConnectedVertices();
             }
+
+            progress += (1 - 0.25f) / (float)(world._levels.Count + 1) / 5f;
+
+            (p_progress.transform as RectTransform).anchorMin = (new Vector2(progress,0));
         }
 
         //Stores the world on disk.
-        PersistenceManager.SaveWorld(world, i_name);
+        yield return StartCoroutine(PersistenceManager.Instance.SaveWorld(world));
 
-        p_worldCreatedFX.SendMessage("Launch",SendMessageOptions.DontRequireReceiver);
+        progress =1;
+
+        (p_progress.transform as RectTransform).anchorMin = (new Vector2(progress,0));
+
+        yield return null;
+
+        ImageConfigurationManager.Instance.EnableMenuController();
+
+        p_finishFX.SendMessage("Launch",SendMessageOptions.DontRequireReceiver);
     }
 }

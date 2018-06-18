@@ -9,7 +9,7 @@ public class GUILoadLevels : GUITool
 
     public override void Execute()
     {
-        WorldLevelsLoadingManager.Instance.LoadLevels(_path);
+        WorldLevelsLoadingManager.Instance.StartLoadLevels(_path);
     }
 
 }

@@ -108,7 +108,7 @@ namespace BasicDataTypes
         /// <summary>
         /// The cell image stored as an array.
         /// </summary>
-        public OnArrayImage _img;
+        public Texture2D _img;
 
         /// <summary>
         /// The cell average color.
@@ -135,7 +135,7 @@ namespace BasicDataTypes
         /// <summary>
         /// The level image stored as an array.
         /// </summary>
-        public OnArrayImage _img;
+        public Texture2D _img;
 
         /// <summary>
         /// The level cells map.
@@ -163,7 +163,7 @@ namespace BasicDataTypes
         /// <summary>
         /// The level image stored as an array.
         /// </summary>
-        public OnArrayImage _img;
+        public Texture2D _img;
 
         /// <summary>
         /// The world levels map.

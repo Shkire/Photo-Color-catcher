@@ -19,7 +19,16 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
     private GameObject p_backButtonFX;
 
     [SerializeField]
-    private GameObject p_selectLevelFX;
+    private GameObject p_progress;
+
+    [SerializeField]
+    private GameObject p_loadingText;
+
+    [SerializeField]
+    private GameObject p_startFX;
+
+    [SerializeField]
+    private GameObject p_finishFX;
 
 
     private GameObject levelSelectionScreen;
@@ -30,13 +39,28 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
     {
     }
 
-    public void LoadLevels(string i_path)
+    public void StartLoadLevels(string i_path)
     {
+        StartCoroutine(LoadLevels(i_path));
+    }
+
+    public IEnumerator LoadLevels(string i_path)
+    {
+        p_startFX.SendMessage("Launch", SendMessageOptions.DontRequireReceiver);
+
+        WorldLoadingManager.Instance.DisableMenuController();
+
+        p_loadingText.GetComponent<Text>().text = "Loading levels...";
+
+        (p_progress.transform as RectTransform).anchorMin = (new Vector2(0,0));
+
         GameObject auxGameObject;
         Sprite spr = null;
         GUIObjectEnable objectEnable;
 
-        World world = PersistenceManager.LoadWorld(i_path);
+        World world = null;
+            
+        yield return StartCoroutine(PersistenceManager.Instance.LoadLevels(i_path,x=> world=x,p_progress));
 
         //Creates the level selection screen.
         if (levelSelectionScreen!=null)
@@ -99,10 +123,10 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
                     
                 if (!world._levels[new Vector2(x, y)]._completed)
                     //Creates the level sprite.
-                    spr = Sprite.Create(world._levels[new Vector2(x, y)]._img.ToTexture2D().ToGray(), new Rect(0, 0, world._levels[new Vector2(x, y)]._img._width, world._levels[new Vector2(x, y)]._img._height), Vector2.zero);
+                    spr = Sprite.Create(world._levels[new Vector2(x, y)]._img.ToGray(), new Rect(0, 0, world._levels[new Vector2(x, y)]._img.width, world._levels[new Vector2(x, y)]._img.height), Vector2.zero);
                 else
                     //Creates the level sprite.
-                    spr = Sprite.Create(world._levels[new Vector2(x, y)]._img.ToTexture2D(), new Rect(0, 0, world._levels[new Vector2(x, y)]._img._width, world._levels[new Vector2(x, y)]._img._height), Vector2.zero);
+                    spr = Sprite.Create(world._levels[new Vector2(x, y)]._img, new Rect(0, 0, world._levels[new Vector2(x, y)]._img.width, world._levels[new Vector2(x, y)]._img.height), Vector2.zero);
                 
                 //Shows the level image.
                 auxGameObject.AddComponent<Image>().sprite = spr;
@@ -112,8 +136,6 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
 
                 //Makes the GameObject selectable.
                 auxGameObject.AddComponent<GUISelectableElement>();
-
-                auxGameObject.AddComponent<GUILaunchFX>()._target = p_selectLevelFX;
 
                 //Sets up the level button.
                 auxGameObject.AddComponent<GUILoadLevel>()._path = i_path;
@@ -153,5 +175,19 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
         //Adds an GUIDestroy component to the image button.
         auxGameObject.AddComponent<GUIDestroy>().target = inputMenuController;
         */
+
+        WorldLoadingManager.Instance.EnableMenuController();
+
+        p_finishFX.SendMessage("Launch", SendMessageOptions.DontRequireReceiver);
+    }
+
+    public void DisableMenuController()
+    {
+        inputMenuController.SetActive(false);
+    }
+
+    public void EnableMenuController()
+    {
+        inputMenuController.SetActive(true);
     }
 }

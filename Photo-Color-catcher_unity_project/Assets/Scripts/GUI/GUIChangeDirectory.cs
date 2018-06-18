@@ -14,6 +14,6 @@ public class GUIChangeDirectory : GUITool
 
     public override void Execute()
     {
-        FileSystemManager.Instance.ChangeDirectory(path);
+        FileSystemManager.Instance.StartChangeDirectory(path);
     }
 }

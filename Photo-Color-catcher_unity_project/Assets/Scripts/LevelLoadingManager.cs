@@ -21,13 +21,40 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
     [SerializeField]
     private GameObject p_player;
 
+    [SerializeField]
+    private GameObject p_progress;
+
+    [SerializeField]
+    private GameObject p_loadingText;
+
+    [SerializeField]
+    private GameObject p_startFX;
+
+    [SerializeField]
+    private GameObject p_finishFX;
+
     protected LevelLoadingManager()
     {
     }
 
-    public void LoadLevel(string i_path, Vector2 i_levelPos)
+    public void StartLoadLevel(string i_path, Vector2 i_levelPos)
     {
-        World world = PersistenceManager.LoadWorld(i_path);
+        StartCoroutine(LoadLevel(i_path,i_levelPos));
+    }
+
+    public IEnumerator LoadLevel(string i_path, Vector2 i_levelPos)
+    {
+        p_startFX.SendMessage("Launch", SendMessageOptions.DontRequireReceiver);
+
+        WorldLevelsLoadingManager.Instance.DisableMenuController();
+
+        p_loadingText.GetComponent<Text>().text = "Loading level...";
+
+        (p_progress.transform as RectTransform).anchorMin = (new Vector2(0,0));
+
+        World world = null;
+
+        yield return StartCoroutine(PersistenceManager.Instance.LoadLevel(i_path, i_levelPos, x => world=x,p_progress));
 
         LevelController.Instance.AddLevelInfo(world._name,i_path, i_levelPos);
 
@@ -62,7 +89,7 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
 
                 auxCell = (GameObject)Instantiate(p_cellBackground, auxCell.transform.position, auxCell.transform.localRotation);
 
-                spr = Sprite.Create(level._cells[new Vector2(x, y)]._img.ToTexture2D(), new Rect(0, 0, level._cells[new Vector2(x, y)]._img._width, level._cells[new Vector2(x, y)]._img._height), new Vector2(0.5f, 0.5f));
+                spr = Sprite.Create(level._cells[new Vector2(x, y)]._img, new Rect(0, 0, level._cells[new Vector2(x, y)]._img.width, level._cells[new Vector2(x, y)]._img.height), new Vector2(0.5f, 0.5f));
 
                 auxCell.GetChild("Background").GetComponent<SpriteRenderer>().sprite = spr;
 
@@ -201,5 +228,9 @@ public class LevelLoadingManager: Singleton<LevelLoadingManager>
         }
 
         LevelController.Instance.FirstEnemiesGeneration();
+
+        WorldLevelsLoadingManager.Instance.EnableMenuController();
+
+        p_finishFX.SendMessage("Launch", SendMessageOptions.DontRequireReceiver);
     }
 }
