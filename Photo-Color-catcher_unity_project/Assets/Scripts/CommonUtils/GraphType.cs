@@ -10,17 +10,17 @@ public class GraphType<E>
     /// <summary>
     /// List of vertices of the graph.
     /// </summary>
-    public List<E> vertices;
+    public List<E> _vertices;
 
     /// <summary>
-    /// Dictionary of adjacent list of vertices.
+    /// Dictionary of list of adjacent vertices.
     /// </summary>
-    public Dictionary<E,List<E>> adjacentVertices;
+    public Dictionary<E,List<E>> _adjacentVertices;
 
     public GraphType()
     {
-        vertices = new List<E>();
-        adjacentVertices = new Dictionary<E, List<E>>();
+        _vertices = new List<E>();
+        _adjacentVertices = new Dictionary<E, List<E>>();
     }
 
     /// <summary>
@@ -29,10 +29,10 @@ public class GraphType<E>
     /// <param name="i_element">Vertex.</param>
     public void AddVertex(E i_element)
     {
-        if (!vertices.Contains(i_element))
+        if (!_vertices.Contains(i_element))
         {
-            vertices.Add(i_element);
-            adjacentVertices.Add(i_element, new List<E>());
+            _vertices.Add(i_element);
+            _adjacentVertices.Add(i_element, new List<E>());
         }
     }
 
@@ -43,12 +43,12 @@ public class GraphType<E>
     /// <param name="i_adjacent">Adjacent vertex.</param>
     public void AddAdjacent(E i_vertex, E i_adjacent)
     {
-        if (vertices.Contains(i_vertex) && vertices.Contains(i_adjacent))
+        if (_vertices.Contains(i_vertex) && _vertices.Contains(i_adjacent))
         {
-            List<E> aux = adjacentVertices[i_vertex];
+            List<E> aux = _adjacentVertices[i_vertex];
             if (!aux.Contains(i_adjacent))
                 aux.Add(i_adjacent);
-            aux = adjacentVertices[i_adjacent];
+            aux = _adjacentVertices[i_adjacent];
             if (!aux.Contains(i_vertex))
                 aux.Add(i_vertex);
         }
@@ -62,7 +62,7 @@ public class GraphType<E>
     /// <param name="i_adjacent">Adjacent vertex.</param>
     public bool IsAdjacent(E i_vertex, E i_adjacent)
     {
-        if (vertices.Contains(i_vertex) && vertices.Contains(i_adjacent) && adjacentVertices[i_vertex].Contains(i_adjacent))
+        if (_vertices.Contains(i_vertex) && _vertices.Contains(i_adjacent) && _adjacentVertices[i_vertex].Contains(i_adjacent))
             return true;
         else
             return false;
@@ -85,7 +85,7 @@ public class GraphType<E>
         do
         {
             traveledVertices.Add(activeVertices[0]);
-            aux = adjacentVertices[activeVertices[0]];
+            aux = _adjacentVertices[activeVertices[0]];
             activeVertices.RemoveAt(0);
 
             //Adds all the adjacent vertices to the active vertex that haven't been reached.
@@ -107,14 +107,14 @@ public class GraphType<E>
     {
         List<E> traveledVertices = new List<E>();
         List<E> activeVertices = new List<E>();
-        activeVertices.Add(vertices[0]);
+        activeVertices.Add(_vertices[0]);
         List<E> aux;
 
         //While there are active vertices to explore.
         do
         {
             traveledVertices.Add(activeVertices[0]);
-            aux = adjacentVertices[activeVertices[0]];
+            aux = _adjacentVertices[activeVertices[0]];
             activeVertices.RemoveAt(0);
 
             //Adds all the adjacent vertices to the active vertex that haven't been reached.
@@ -127,7 +127,7 @@ public class GraphType<E>
         while (activeVertices.Count != 0);
 
         //Checks if all vertices have been reached.
-        foreach (E vertex in vertices)
+        foreach (E vertex in _vertices)
         {
             if (!traveledVertices.Contains(vertex))
                 return false;
@@ -142,7 +142,7 @@ public class GraphType<E>
     public List<List<E>> GetConnectedVertices()
     {
         List<List<E>> connectedVertex = new List<List<E>>();
-        List<E> remainingVertices = new List<E>(vertices);
+        List<E> remainingVertices = new List<E>(_vertices);
         List<E> traveledVertices;
         List<E> activeVertices = new List<E>();
         List<E> aux;
@@ -155,7 +155,7 @@ public class GraphType<E>
             do
             {
                 traveledVertices.Add(activeVertices[0]);
-                aux = adjacentVertices[activeVertices[0]];
+                aux = _adjacentVertices[activeVertices[0]];
                 remainingVertices.Remove(activeVertices[0]);
                 activeVertices.RemoveAt(0);
 

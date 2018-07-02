@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+/// <summary>
+/// Component used to assign Actions to Collider2D physics events.
+/// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class RemoteCollider2DEventController : MonoBehaviour
 {

@@ -2,10 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GUILaunchFX : GUITool{
+/// <summary>
+/// A GUITool used to launch a FXSequence.
+/// </summary>
+public class GUILaunchFX : GUITool
+{
 
+    /// <summary>
+    /// The target FXSequence.
+    /// </summary>
     public GameObject _target;
 
+    /// <summary>
+    /// Executes the action associated with the GUITool.
+    /// </summary>
     public override void Execute()
     {
         if (_target != null)

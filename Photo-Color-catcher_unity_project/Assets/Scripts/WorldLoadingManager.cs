@@ -6,304 +6,292 @@ using System.Linq;
 using BasicDataTypes;
 using UnityEngine.UI;
 
+/// <summary>
+/// Singleton used to manage the loading previously generated Worlds for showing them in a world selection screen.
+/// </summary>
 public class WorldLoadingManager : Singleton<WorldLoadingManager>
 {
+    /// <summary>
+    /// The GameObject used as a model for the world selection screen instantiation.
+    /// </summary>
     [SerializeField]
     private GameObject p_worldSelectionModel;
 
+    /// <summary>
+    /// The parent canvas of the world selection screen.
+    /// </summary>
     [SerializeField]
-    private GameObject p_parentCanvas;
+    private Transform p_parentCanvas;
 
+    /// <summary>
+    /// The GameObject that contains the FXSequence launched when the Back button is pressed.
+    /// </summary>
     [SerializeField]
     private GameObject p_backButtonFX;
 
+    /// <summary>
+    /// The GameObject that contains the FXSequence launched when the Accept button is pressed.
+    /// </summary>
     [SerializeField]
     private GameObject p_acceptButtonFX;
 
+    /// <summary>
+    /// The bar that shows the progress of the level selection screen loading.
+    /// </summary>
     [SerializeField]
-    private GameObject p_progress;
-
-    [SerializeField]
-    private GameObject p_loadingWorldsText;
-
-    [SerializeField]
-    private GameObject p_startFX;
-
-    [SerializeField]
-    private GameObject p_finishFX;
-
+    private RectTransform p_progressBar;
 
     /// <summary>
-    /// The file system explorer page list.
+    /// The Text label of the loading screen.
     /// </summary>
-    private List<GameObject> pageList;
+    [SerializeField]
+    private Text p_loadingWorldsText;
+
+    /// <summary>
+    /// The FXSequence launched when the world selection screen loading starts.
+    /// </summary>
+    [SerializeField]
+    private FXSequence p_startFX;
+
+    /// <summary>
+    /// The FXSequence launched when the level selection screen loading ends.
+    /// </summary>
+    [SerializeField]
+    private FXSequence p_finishFX;
+
+    /// <summary>
+    /// The world selection page list.
+    /// </summary>
+    private List<GameObject> p_pageList;
 
     /// <summary>
     /// The input menu controller list.
     /// </summary>
-    private List<GameObject> inputMenuControllerList;
+    private List<GameObject> p_inputMenuControllerList;
 
-    private GameObject activeMenuController;
+    /// <summary>
+    /// The InputMenuController that was active and has been disabled.
+    /// </summary>
+    private GameObject p_activeMenuController;
 
     protected WorldLoadingManager()
     {
     }
 
+    /// <summary>
+    /// Coroutine that starts the loading of the world selector screen.
+    /// </summary>
     public void StartLoadWorlds()
     {
         StartCoroutine(LoadWorlds());
     }
 
+    /// <summary>
+    /// Creates a world selector screen with the images of the previously generated Worlds.
+    /// </summary>
     public IEnumerator LoadWorlds()
     {
-        p_startFX.SendMessage("Launch", SendMessageOptions.DontRequireReceiver);
+        //Launches the starting FXSequence.
+        p_startFX.Launch();
 
-        p_loadingWorldsText.GetComponent<Text>().text = "Loading created worlds...";
-
-        (p_progress.transform as RectTransform).anchorMin = (new Vector2(0,0));
-
-        List<World> auxWorlds = new List<World>();
-        World auxWorld;
-        string[] worldPaths = GetWorlds();
-
+        //Sets up the Loading screen.
+        p_loadingWorldsText.text = "Loading created worlds...";
+        p_progressBar.anchorMin = (new Vector2(0, 0));
         float progress = 0;
 
+        List<World> auxWorlds = new List<World>();
+
+        //Gets the path of all the previously generated Worlds.
+        string[] worldPaths = GetWorlds();
+
+        //For each world path.
         foreach (string worldPath in worldPaths)
         {
-            auxWorld = new World();
+            World auxWorld = new World();
 
-            yield return StartCoroutine(PersistenceManager.Instance.LoadWorld(worldPath,x=> auxWorld=x));
-
+            //Loads the information of the World needed for creating the world selection screen.
+            yield return StartCoroutine(PersistenceManager.Instance.LoadWorld(worldPath, x => auxWorld = x));
             auxWorlds.Add(auxWorld);
 
-            progress += 1/(float)worldPaths.Length;
-
-            (p_progress.transform as RectTransform).anchorMin = (new Vector2(progress,0));
+            //Updates the progress bar.
+            progress += 1 / (float)worldPaths.Length;
+            p_progressBar.anchorMin = (new Vector2(progress, 0));
 
             yield return null;
         }
 
         //Destroys the previous page list.
-        if (pageList != null)
-            for (int i = 0; i < pageList.Count; i++)
-                Destroy(pageList[i]);
+        if (p_pageList != null)
+            for (int i = 0; i < p_pageList.Count; i++)
+                Destroy(p_pageList[i]);
 
-        pageList = new List<GameObject>();
+        p_pageList = new List<GameObject>();
 
         //Destroys the previous input menu controller list.
-        if (inputMenuControllerList != null)
-            for (int i = 0; i < inputMenuControllerList.Count; i++)
-                Destroy(inputMenuControllerList[i]);
-        inputMenuControllerList = new List<GameObject>();
+        if (p_inputMenuControllerList != null)
+            for (int i = 0; i < p_inputMenuControllerList.Count; i++)
+                Destroy(p_inputMenuControllerList[i]);
+        p_inputMenuControllerList = new List<GameObject>();
+
         GameObject auxGameObject;
-        Sprite spr = null;
-        GUIObjectEnable objectEnable;
 
         //If there aren't any playable world.
         if (auxWorlds.Count == 0)
         {
             //Creates the first page of the world selector.
-            pageList.Add((GameObject)Instantiate(p_worldSelectionModel));
-            pageList[pageList.Count - 1].transform.SetParent(p_parentCanvas.transform, false);
+            p_pageList.Add((GameObject)Instantiate(p_worldSelectionModel));
+            p_pageList[p_pageList.Count - 1].transform.SetParent(p_parentCanvas.transform, false);
 
             //Destroys all the useless elements of the page.
-            Destroy(pageList[pageList.Count - 1].GetChild("Prev page"));
-            Destroy(pageList[pageList.Count - 1].GetChild("Next page"));
-            Destroy(pageList[pageList.Count - 1].GetChild("Accept button"));
-            Destroy(pageList[pageList.Count - 1].GetChild("Image name"));
-            Destroy(pageList[pageList.Count - 1].GetChild("Background image"));
+            Destroy(p_pageList[p_pageList.Count - 1].GetChild("Prev page"));
+            Destroy(p_pageList[p_pageList.Count - 1].GetChild("Next page"));
+            Destroy(p_pageList[p_pageList.Count - 1].GetChild("Accept button"));
+            Destroy(p_pageList[p_pageList.Count - 1].GetChild("Image name"));
+            Destroy(p_pageList[p_pageList.Count - 1].GetChild("Background image"));
 
             //Creates the first InputMenuController.
-            inputMenuControllerList.Add(new GameObject("InputMenuController"));
-
-            inputMenuControllerList[inputMenuControllerList.Count - 1].transform.SetParent(p_parentCanvas.transform);
+            p_inputMenuControllerList.Add(new GameObject("InputMenuController"));
+            p_inputMenuControllerList[p_inputMenuControllerList.Count - 1].transform.SetParent(p_parentCanvas.transform);
 
             //Gets the "Back" button of the page.
-            auxGameObject = pageList[pageList.Count - 1].GetChild("Back button");
-
-            auxGameObject.GetComponent<GUILaunchFX>()._target = p_backButtonFX;
+            auxGameObject = p_pageList[p_pageList.Count - 1].GetChild("Back button");
 
             //Sets up the "Back" button.
-            //auxGameObject.GetComponent<GUIChangeDirectory>().path = Directory.GetParent(i_path).FullName;
+            auxGameObject.GetComponent<GUILaunchFX>()._target = p_backButtonFX;
 
             //Adds the button to the InputMenuController.
-            inputMenuControllerList[inputMenuControllerList.Count - 1].AddComponent<InputMenuController>().startingElem = auxGameObject;
-            inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements = new List<GameObject>();
-            inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(auxGameObject);
+            p_inputMenuControllerList[p_inputMenuControllerList.Count - 1].AddComponent<InputMenuController>()._startingElem = auxGameObject;
+            p_inputMenuControllerList[p_inputMenuControllerList.Count - 1].GetComponent<InputMenuController>()._uiElements = new List<GameObject>();
+            p_inputMenuControllerList[p_inputMenuControllerList.Count - 1].GetComponent<InputMenuController>()._uiElements.Add(auxGameObject);
         }
 
         //If there are some worlds to play.
         else
         {
-            //Creates the first page of the configuration selector.
-            pageList.Add((GameObject)Instantiate(p_worldSelectionModel));
-            pageList[pageList.Count - 1].transform.SetParent(p_parentCanvas.transform, false);
+            //Creates the first page of the world selector.
+            p_pageList.Add((GameObject)Instantiate(p_worldSelectionModel));
+            p_pageList[p_pageList.Count - 1].transform.SetParent(p_parentCanvas.transform, false);
 
             //Destroys the "Previous page" button.
-            Destroy(pageList[pageList.Count - 1].GetChild("Prev page"));
+            Destroy(p_pageList[p_pageList.Count - 1].GetChild("Prev page"));
 
             //Creates the first InputMenuController.
-            inputMenuControllerList.Add(new GameObject("InputMenuController"));
-
-            inputMenuControllerList[inputMenuControllerList.Count - 1].transform.SetParent(p_parentCanvas.transform);
-
-            inputMenuControllerList[inputMenuControllerList.Count - 1].AddComponent<InputMenuController>().uiElements = new List<GameObject>();
+            p_inputMenuControllerList.Add(new GameObject("InputMenuController"));
+            p_inputMenuControllerList[p_inputMenuControllerList.Count - 1].transform.SetParent(p_parentCanvas.transform);
+            p_inputMenuControllerList[p_inputMenuControllerList.Count - 1].AddComponent<InputMenuController>()._uiElements = new List<GameObject>();
 
             //For each world.
             for (int i = 0; i < auxWorlds.Count; i++)
             {
                 //Destroys the error text label.
-                Destroy(pageList[pageList.Count - 1].GetChild("Error text"));
+                Destroy(p_pageList[p_pageList.Count - 1].GetChild("Error text"));
 
                 //Shows the image name.
-                pageList[pageList.Count - 1].GetChild("Image name").GetComponent<Text>().text = auxWorlds[i]._name + " - " + auxWorlds[i]._imageConfig[0] + "x" + auxWorlds[i]._imageConfig[1];
+                p_pageList[p_pageList.Count - 1].GetChild("Image name").GetComponent<Text>().text = auxWorlds[i]._name + " - " + auxWorlds[i]._imageDivisionConfig[0] + "x" + auxWorlds[i]._imageDivisionConfig[1];
 
                 //Creates the sprite using the world image.
-                spr = Sprite.Create(auxWorlds[i]._img, new Rect(0, 0, auxWorlds[i]._img.width, auxWorlds[i]._img.height), new Vector2(0, 0));
+                Sprite spr = Sprite.Create(auxWorlds[i]._img, new Rect(0, 0, auxWorlds[i]._img.width, auxWorlds[i]._img.height), new Vector2(0, 0));
 
                 //Shows the image.
-                auxGameObject = pageList[pageList.Count - 1].GetChild("Background image");
+                auxGameObject = p_pageList[p_pageList.Count - 1].GetChild("Background image");
                 auxGameObject.GetComponent<Image>().sprite = spr;
 
                 //Gets the "Back" button of the page.
-                auxGameObject = pageList[pageList.Count - 1].GetChild("Back button");
-
+                auxGameObject = p_pageList[p_pageList.Count - 1].GetChild("Back button");
                 auxGameObject.GetComponent<GUILaunchFX>()._target = p_backButtonFX;
 
-                //Sets up the "Back" button.
-                //auxGameObject.GetComponent<GUIChangeDirectory>().path = Directory.GetParent(i_path).FullName;
-
                 //Adds the button to the InputMenuController.
-                inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().startingElem = auxGameObject;
-                inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(auxGameObject);
+                p_inputMenuControllerList[p_inputMenuControllerList.Count - 1].GetComponent<InputMenuController>()._startingElem = auxGameObject;
+                p_inputMenuControllerList[p_inputMenuControllerList.Count - 1].GetComponent<InputMenuController>()._uiElements.Add(auxGameObject);
 
                 //Gets the "Accept" button of the page.
-                auxGameObject = pageList[pageList.Count - 1].GetChild("Accept button");
-
-                auxGameObject.GetComponent<GUILaunchFX>()._target = p_acceptButtonFX;
+                auxGameObject = p_pageList[p_pageList.Count - 1].GetChild("Accept button");
 
                 //Sets up the "Accept" button.
+                auxGameObject.GetComponent<GUILaunchFX>()._target = p_acceptButtonFX;
                 auxGameObject.GetComponent<GUILoadLevels>()._path = worldPaths[i];
 
                 //Adds the button to the InputMenuController.
-                inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(auxGameObject);
+                p_inputMenuControllerList[p_inputMenuControllerList.Count - 1].GetComponent<InputMenuController>()._uiElements.Add(auxGameObject);
 
                 //If it is the last world.
                 if (i == auxWorlds.Count - 1)
                 {
                     //Destroys the "Next page" button.
-                    Destroy(pageList[pageList.Count - 1].GetChild("Next page"));
+                    Destroy(p_pageList[p_pageList.Count - 1].GetChild("Next page"));
                 }
 
                 //Otherwise.
                 else
                 {
-                    //Creates the next page of the configuration selector.
-                    pageList.Add((GameObject)Instantiate(p_worldSelectionModel));
-                    pageList[pageList.Count - 1].transform.SetParent(p_parentCanvas.transform, false);
+                    //Creates the next page of the world selector.
+                    p_pageList.Add((GameObject)Instantiate(p_worldSelectionModel));
+                    p_pageList[p_pageList.Count - 1].transform.SetParent(p_parentCanvas.transform, false);
 
                     //Creates the next InputMenuController.
-                    inputMenuControllerList.Add(new GameObject("InputMenuController"));
-
-                    inputMenuControllerList[inputMenuControllerList.Count - 1].transform.SetParent(p_parentCanvas.transform);
-
-                    inputMenuControllerList[inputMenuControllerList.Count - 1].AddComponent<InputMenuController>().uiElements = new List<GameObject>();
+                    p_inputMenuControllerList.Add(new GameObject("InputMenuController"));
+                    p_inputMenuControllerList[p_inputMenuControllerList.Count - 1].transform.SetParent(p_parentCanvas.transform);
+                    p_inputMenuControllerList[p_inputMenuControllerList.Count - 1].AddComponent<InputMenuController>()._uiElements = new List<GameObject>();
 
                     //Deactivates the page and the InputMenuController.
-                    pageList[pageList.Count - 1].SetActive(false);
-                    inputMenuControllerList[pageList.Count - 1].SetActive(false);
+                    p_pageList[p_pageList.Count - 1].SetActive(false);
+                    p_inputMenuControllerList[p_pageList.Count - 1].SetActive(false);
 
                     //Gets the "Next page" button of this page.
-                    auxGameObject = pageList[pageList.Count - 2].GetChild("Next page");
+                    auxGameObject = p_pageList[p_pageList.Count - 2].GetChild("Next page");
 
                     //Sets up the "Next page" button (activate the next page and the next input menu controller).
+                    GUIObjectEnable objectEnable = auxGameObject.AddComponent<GUIObjectEnable>();
+                    objectEnable._enable = true;
+                    objectEnable._target = p_inputMenuControllerList[p_inputMenuControllerList.Count - 1];
                     objectEnable = auxGameObject.AddComponent<GUIObjectEnable>();
-                    objectEnable.enable = true;
-                    objectEnable.target = inputMenuControllerList[inputMenuControllerList.Count - 1];
-                    objectEnable = auxGameObject.AddComponent<GUIObjectEnable>();
-                    objectEnable.enable = true;
-                    objectEnable.target = pageList[pageList.Count - 1];
+                    objectEnable._enable = true;
+                    objectEnable._target = p_pageList[p_pageList.Count - 1];
 
                     //Sets up the "Next page" button (deactivate this page and this input menu controller).
                     objectEnable = auxGameObject.AddComponent<GUIObjectEnable>();
-                    objectEnable.enable = false;
-                    objectEnable.target = inputMenuControllerList[inputMenuControllerList.Count - 2];
+                    objectEnable._enable = false;
+                    objectEnable._target = p_inputMenuControllerList[p_inputMenuControllerList.Count - 2];
                     objectEnable = auxGameObject.AddComponent<GUIObjectEnable>();
-                    objectEnable.enable = false;
-                    objectEnable.target = pageList[pageList.Count - 2];
+                    objectEnable._enable = false;
+                    objectEnable._target = p_pageList[p_pageList.Count - 2];
 
                     //Adds the "Next page" button to the input menu controller.
-                    inputMenuControllerList[inputMenuControllerList.Count - 2].GetComponent<InputMenuController>().uiElements.Add(auxGameObject);
+                    p_inputMenuControllerList[p_inputMenuControllerList.Count - 2].GetComponent<InputMenuController>()._uiElements.Add(auxGameObject);
 
                     //Gets the "Previous page" button of the next page.
-                    auxGameObject = pageList[pageList.Count - 1].GetChild("Prev page");
+                    auxGameObject = p_pageList[p_pageList.Count - 1].GetChild("Prev page");
 
                     //Sets up the "Previous page" button (activate this page and this input menu controller).
                     objectEnable = auxGameObject.AddComponent<GUIObjectEnable>();
-                    objectEnable.enable = true;
-                    objectEnable.target = inputMenuControllerList[inputMenuControllerList.Count - 2];
+                    objectEnable._enable = true;
+                    objectEnable._target = p_inputMenuControllerList[p_inputMenuControllerList.Count - 2];
                     objectEnable = auxGameObject.AddComponent<GUIObjectEnable>();
-                    objectEnable.enable = true;
-                    objectEnable.target = pageList[pageList.Count - 2];
+                    objectEnable._enable = true;
+                    objectEnable._target = p_pageList[p_pageList.Count - 2];
 
                     //Sets up the "Previous page" button (deactivate the next page and the next input menu controller).
                     objectEnable = auxGameObject.AddComponent<GUIObjectEnable>();
-                    objectEnable.enable = false;
-                    objectEnable.target = inputMenuControllerList[inputMenuControllerList.Count - 1];
+                    objectEnable._enable = false;
+                    objectEnable._target = p_inputMenuControllerList[p_inputMenuControllerList.Count - 1];
                     objectEnable = auxGameObject.AddComponent<GUIObjectEnable>();
-                    objectEnable.enable = false;
-                    objectEnable.target = pageList[pageList.Count - 1];
+                    objectEnable._enable = false;
+                    objectEnable._target = p_pageList[p_pageList.Count - 1];
 
                     //Adds the "Previous page" button to the next input menu controller.
-                    inputMenuControllerList[inputMenuControllerList.Count - 1].GetComponent<InputMenuController>().uiElements.Add(auxGameObject);
+                    p_inputMenuControllerList[p_inputMenuControllerList.Count - 1].GetComponent<InputMenuController>()._uiElements.Add(auxGameObject);
                 }
             }
         }
-
-        /*
-
-        //For each page.
-        foreach (GameObject page in pageList)
-        {
-            //Gets the "Back" button.
-            auxGameObject = page.GetChild("Back button");
-
-            //For each page.
-            foreach (GameObject page2 in pageList)
-            {
-                //Adds an GUIDestroy component to the image button.
-                auxGameObject.AddComponent<GUIDestroy>().target = page2;
-            }
-
-            //For each InputMenuController.
-            foreach (GameObject inputMenuController in inputMenuControllerList)
-            {
-                //Adds an GUIDestroy component to the image button.
-                auxGameObject.AddComponent<GUIDestroy>().target = inputMenuController;
-            }
-
-            //Gets the "Accept" button.
-            auxGameObject = page.GetChild("Accept button");
-
-            //For each page.
-            foreach (GameObject page2 in pageList)
-            {
-                //Adds an GUIDestroy component to the image button.
-                auxGameObject.AddComponent<GUIDestroy>().target = page2;
-            }
-
-            //For each InputMenuController.
-            foreach (GameObject inputMenuController in inputMenuControllerList)
-            {
-                //Adds an GUIDestroy component to the image button.
-                auxGameObject.AddComponent<GUIDestroy>().target = inputMenuController;
-            }
-        }
-        */
-
-        p_finishFX.SendMessage("Launch", SendMessageOptions.DontRequireReceiver);
+            
+        //Launches the finishing FXSequence.
+        p_finishFX.Launch();
     }
 
+    /// <summary>
+    /// Gets the path of all the previously generated Worlds.
+    /// </summary>
+    /// <returns>All the available World paths.</returns>
     public string[] GetWorlds()
     {
         if (!Directory.Exists(Application.persistentDataPath))
@@ -315,19 +303,25 @@ public class WorldLoadingManager : Singleton<WorldLoadingManager>
         return worlds;
     }
 
+    /// <summary>
+    /// Disables the InputMenuController of the world selector.
+    /// </summary>
     public void DisableMenuController()
     {
-        foreach (GameObject inputMenuController in inputMenuControllerList)
+        foreach (GameObject inputMenuController in p_inputMenuControllerList)
             if (inputMenuController.activeSelf)
             {
-                activeMenuController = inputMenuController;
+                p_activeMenuController = inputMenuController;
                 inputMenuController.SetActive(false);
                 break;
             }
     }
 
+    /// <summary>
+    /// Enables the InputMenuController that was active.
+    /// </summary>
     public void EnableMenuController()
     {
-        activeMenuController.SetActive(true);
+        p_activeMenuController.SetActive(true);
     }
 }

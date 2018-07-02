@@ -1,9 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// GUIObject that reacts when is focused or unfocused.
+/// </summary>
 public class GUIDecoration : GUIObject
 {
 
+    /// <summary>
+    /// Describes the possible situations when the decoration is activated.
+    /// </summary>
     public enum DecorationContext
     {
         WhenFocused,
@@ -13,12 +19,12 @@ public class GUIDecoration : GUIObject
         Never
     }
 
-    public DecorationContext behaviour;
+    public DecorationContext _behaviour;
 
     public override void Focused()
     {
         base.Focused();
-        if (behaviour.Equals(DecorationContext.Always) || behaviour.Equals(DecorationContext.WhenFocused))
+        if (_behaviour.Equals(DecorationContext.Always) || _behaviour.Equals(DecorationContext.WhenFocused))
         {
             foreach (MonoBehaviour script in GetComponents<MonoBehaviour>())
                 script.enabled = true;
@@ -41,7 +47,7 @@ public class GUIDecoration : GUIObject
     public override void NonFocused()
     {
         base.NonFocused();
-        if (behaviour.Equals(DecorationContext.Always) || behaviour.Equals(DecorationContext.WhenNonFocused))
+        if (_behaviour.Equals(DecorationContext.Always) || _behaviour.Equals(DecorationContext.WhenNonFocused))
         {
             foreach (MonoBehaviour script in GetComponents<MonoBehaviour>())
                 script.enabled = true;
@@ -64,7 +70,7 @@ public class GUIDecoration : GUIObject
     public override void Selected()
     {
         base.Selected();
-        if (behaviour.Equals(DecorationContext.WhenSelected))
+        if (_behaviour.Equals(DecorationContext.WhenSelected))
         {
             foreach (MonoBehaviour script in GetComponents<MonoBehaviour>())
                 script.enabled = true;

@@ -8,99 +8,195 @@ using CIEColor;
 /// </summary>
 public static class ExtensionMethods
 {
-    public static Texture2D ResizeBilinear(this Texture2D text, int newXSize, int newYSize)
+    /// <summary>
+    /// Resizes the texture using bilinear interpolation.
+    /// </summary>
+    /// <returns>The resized texture.</returns>
+    /// <param name="i_newXSize">New X size.</param>
+    /// <param name="i_newYSize">New Y size.</param>
+    public static Texture2D ResizeBilinear(this Texture2D i_texture, int i_newXSize, int i_newYSize)
     {
-        //Create result texture and get pixels
-        Texture2D result = new Texture2D(newXSize, newYSize, text.format, true);
+        //Creates result texture and get pixels.
+        Texture2D result = new Texture2D(i_newXSize, i_newYSize, i_texture.format, true);
         UnityEngine.Color[] rpixels = result.GetPixels();
-        //Calculate inc
-        float incX = (1.0f / (float)newXSize);
-        float incY = (1.0f / (float)newYSize);
+
+        //Calculates image size increment.
+        float incX = (1.0f / (float)i_newXSize);
+        float incY = (1.0f / (float)i_newYSize);
+
+        //For each pixel of the result texture.
         for (int px = 0; px < rpixels.Length; px++)
         {
-            rpixels[px] = text.GetPixelBilinear(incX * ((float)px % newXSize), incY * ((float)Mathf.Floor(px / newXSize)));
+
+            //Gets pixel color value.
+            rpixels[px] = i_texture.GetPixelBilinear(incX * ((float)px % i_newXSize), incY * ((float)Mathf.Floor(px / i_newXSize)));
         }
+
+        //Sets result texture pixels.
         result.SetPixels(rpixels); 
         result.Apply(); 
+
         return result;
     }
 
-    public static GameObject GetChild(this GameObject go)
+    /// <summary>
+    /// Gets a GameObject that is child of this GameObject.
+    /// </summary>
+    /// <returns>The child GameObject.</returns>
+    public static GameObject GetChild(this GameObject i_gameObject)
     {
-        foreach (Transform aux in go.GetComponentsInChildren<Transform>())
-            if (aux.gameObject.GetInstanceID() != go.GetInstanceID())
+        //For each Transform component in children GameObjects.
+        foreach (Transform aux in i_gameObject.GetComponentsInChildren<Transform>(true))
+
+            //If the GameObject is not the parent GameObject.
+            if (aux.gameObject.GetInstanceID() != i_gameObject.GetInstanceID())
                 return aux.gameObject;
+        
         return null;
     }
 
-    public static GameObject[] GetChildren(this GameObject go)
+    /// <summary>
+    /// Gets a GameObject that is child of this GameObject.
+    /// </summary>
+    /// <returns>The child GameObject.</returns>
+    /// <param name="i_name">The name of the GameObject to get.</param>
+    public static GameObject GetChild(this GameObject i_gameObject, string i_name)
     {
-        List<GameObject> auxList = new List<GameObject>();
-        foreach (Transform aux in go.GetComponentsInChildren<Transform>())
-            if (aux.gameObject.GetInstanceID() != go.GetInstanceID())
-                auxList.Add(aux.gameObject);
-        return auxList.ToArray();
-    }
+        //For each Transform component in children GameObjects.
+        foreach (Transform aux in i_gameObject.GetComponentsInChildren<Transform>(true))
 
-    public static GameObject GetChild(this GameObject go, string name)
-    {
-        foreach (Transform aux in go.GetComponentsInChildren<Transform>(true))
-            if (aux.gameObject.GetInstanceID() != go.GetInstanceID() && aux.gameObject.name.Equals(name))
+            //If the GameObject is not the parent GameObject and the name of the GameObject is i_name.
+            if (aux.gameObject.GetInstanceID() != i_gameObject.GetInstanceID() && aux.gameObject.name.Equals(i_name))
                 return aux.gameObject;
+        
         return null;
     }
 
-    public static Vector3 GetSize(this GameObject go)
+    /// <summary>
+    /// Gets all the GameObjects that are children of this GameObject.
+    /// </summary>
+    /// <returns>The children GameObjects.</returns>
+    public static GameObject[] GetChildren(this GameObject i_gameObject)
     {
-        Renderer rend = go.GetComponent<Renderer>();
+        //The list of children GameObjects.
+        List<GameObject> childrenList = new List<GameObject>();
+
+        //For each Transform component in children GameObjects.
+        foreach (Transform aux in i_gameObject.GetComponentsInChildren<Transform>(true))
+
+            //If the GameObject is not the parent GameObject.
+            if (aux.gameObject.GetInstanceID() != i_gameObject.GetInstanceID())
+
+                //Adds the GameObject to the list.
+                childrenList.Add(aux.gameObject);
+        
+        return childrenList.ToArray();
+    }
+
+    //NEEDS TO BE IMPROVED
+    /// <summary>
+    /// Gets the size of this GameObject.
+    /// </summary>
+    /// <returns>The size of the GameObject.</returns>
+    public static Vector3 GetSize(this GameObject i_gameObject)
+    {
+        //Gets the Renderer of the GameObject.
+        Renderer rend = i_gameObject.GetComponent<Renderer>();
+
+        //If there is a Renderer.
         if (rend != null)
         {
+
+            //Returns the size of the Renderer.
             return rend.bounds.extents * 2;
         }
-        Collider coll = go.GetComponent<Collider>();
+
+        //Gets the Collider.
+        Collider coll = i_gameObject.GetComponent<Collider>();
+
+        //If there is a Collider.
         if (coll != null)
         {
+
+            //Returns the size of the Collider.
             return coll.bounds.extents * 2;
         }
-        rend = go.GetComponentInChildren<Renderer>();
+
+        //Gets a Renderer from the children GameObjects.
+        rend = i_gameObject.GetComponentInChildren<Renderer>();
+
+
+        //If there is a Renderer.
         if (rend != null)
         {
+
+            //Returns the size of the Renderer.
             return rend.bounds.extents * 2;
         }
-        coll = go.GetComponentInChildren<Collider>();
+
+        //Gets a Collider from the children GameObjects.
+        coll = i_gameObject.GetComponentInChildren<Collider>();
+
+        //If there is a Collider.
         if (coll != null)
         {
+
+            //Returns the size of the Collider.
             return coll.bounds.extents * 2;
         }
+
         return Vector3.zero;
     }
 
-    public static void SetSize(this GameObject go, Vector3 i_size)
+    /// <summary>
+    /// Sets the size of this GameObject.
+    /// </summary>
+    /// <param name="i_size">The new size of the GameObject.</param>
+    public static void SetSize(this GameObject i_gameObject, Vector3 i_size)
     {
-        if (go.GetSize() != Vector3.zero)
+        //If the size of the GameObject is not 0.
+        if (i_gameObject.GetSize() != Vector3.zero)
         {
-            go.transform.localScale = new Vector3(go.transform.localScale.x * (i_size.x / go.GetSize().x), go.transform.localScale.y * (i_size.y / go.GetSize().y), go.transform.localScale.z * (i_size.z / go.GetSize().z));
+
+            //Resizes the GameObject.
+            i_gameObject.transform.localScale = new Vector3(i_gameObject.transform.localScale.x * (i_size.x / i_gameObject.GetSize().x), i_gameObject.transform.localScale.y * (i_size.y / i_gameObject.GetSize().y), i_gameObject.transform.localScale.z * (i_size.z / i_gameObject.GetSize().z));
         }
     }
 
-    public static Texture2D ToGray(this Texture2D texture)
+    /// <summary>
+    /// Gets the grayscale version of this Texture2D.
+    /// </summary>
+    /// <returns>The grayscale texture.<returns>
+    public static Texture2D ToGrayscale(this Texture2D i_texture)
     {
-        Texture2D resTexture = new Texture2D(texture.width, texture.height);
-        UnityEngine.Color[] temp = texture.GetPixels();
-        for (int i = 0; i < temp.Length; i++)
+        //Creates the result texture.
+        Texture2D resTexture = new Texture2D(i_texture.width, i_texture.height);
+
+        //Get the pixel colors of the original texture.
+        UnityEngine.Color[] pixels = i_texture.GetPixels();
+
+        //For each pixel.
+        for (int i = 0; i < pixels.Length; i++)
         {
-            float gray = temp[i].grayscale;
-            temp[i].r = gray;
-            temp[i].g = gray;
-            temp[i].b = gray;
+
+            //Gets the grayscale value of the pixel.
+            float gray = pixels[i].grayscale;
+
+            //Sets the grayscale value as the pixel color.
+            pixels[i].r = gray;
+            pixels[i].g = gray;
+            pixels[i].b = gray;
         }
-        resTexture.SetPixels(temp);
+
+        //Set the pixels to the result texture.
+        resTexture.SetPixels(pixels);
         resTexture.Apply();
+
         return resTexture;
     }
 
     /// <summary>
-    /// Transforms the UnityEngine.Color into CIEColor.CIE_XYZColor.
+    /// Transforms this UnityEngine.Color into CIEColor.CIE_XYZColor.
     /// </summary>
     /// <returns>The CIE XYZ value of the Color.</returns>
     public static CIE_XYZColor ToCIE_XYZ(this Color color)
@@ -131,15 +227,15 @@ public static class ExtensionMethods
 
         float[][] cieXyzMatrix = MathMatrix.MatrixMultiplication(transformationMatrix, rgbMatrix);
 
-        cieXyz.x = cieXyzMatrix[0][0];
-        cieXyz.y = cieXyzMatrix[1][0];
-        cieXyz.z = cieXyzMatrix[2][0];
+        cieXyz._x = cieXyzMatrix[0][0];
+        cieXyz._y = cieXyzMatrix[1][0];
+        cieXyz._z = cieXyzMatrix[2][0];
 
         return cieXyz;
     }
 
     /// <summary>
-    /// Transforms the UnityEngine.Color into CIEColor.CIELabColor.
+    /// Transforms this UnityEngine.Color into CIEColor.CIELabColor.
     /// </summary>
     /// <returns>The CIE Lab value of the Color.</returns>
     public static CIELabColor ToCIELab(this Color color)
@@ -151,13 +247,13 @@ public static class ExtensionMethods
         CIE_XYZColor referenceWhite = Color.white.ToCIE_XYZ();
 
         //xr = X / Xr
-        float auxX = cieXyz.x / referenceWhite.x;
+        float auxX = cieXyz._x / referenceWhite._x;
 
         //yr = Y / Yr
-        float auxY = cieXyz.y / referenceWhite.y;
+        float auxY = cieXyz._y / referenceWhite._y;
 
         //zr = Z / Zr
-        float auxZ = cieXyz.z / referenceWhite.z;
+        float auxZ = cieXyz._z / referenceWhite._z;
 
         //if xr > 0.008856
         //  fx = xr ^ 1/3
@@ -180,13 +276,13 @@ public static class ExtensionMethods
         CIELabColor cieLab = new CIELabColor();
 
         //L = 116 * fy -16
-        cieLab.l = 116 * auxY - 16;
+        cieLab._l = 116 * auxY - 16;
 
         //a = 500 * (fx - fy)
-        cieLab.a = 500 * (auxX - auxY);
+        cieLab._a = 500 * (auxX - auxY);
 
         //b = 200 * (fy - fz)
-        cieLab.b = 200 * (auxY - auxZ);
+        cieLab._b = 200 * (auxY - auxZ);
 
         return cieLab;
     }

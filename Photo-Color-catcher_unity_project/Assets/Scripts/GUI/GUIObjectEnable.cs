@@ -1,14 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GUIObjectEnable : GUITool {
+/// <summary>
+/// A GUITool used to enable or disable a GameObject.
+/// </summary>
+public class GUIObjectEnable : GUITool
+{
 
-	public GameObject target;
-	public bool enable;
+    /// <summary>
+    /// The target GameObject.
+    /// </summary>
+    public GameObject _target;
 
-	public override void Execute()
-	{
-		if (target != null)
-			target.SetActive (enable);
-	}
+    /// <summary>
+    /// If the GameObject will be enabled or disabled.
+    /// </summary>
+    public bool _enable;
+
+    /// <summary>
+    /// Executes the action associated with the GUITool.
+    /// </summary>
+    public override void Execute()
+    {
+        if (_target != null)
+            _target.SetActive(_enable);
+    }
 }

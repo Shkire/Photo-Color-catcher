@@ -2,99 +2,127 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Mapped GameObjects for menu navigation.
+/// </summary>
 public class GUIElementMap
 {
-    public GameObject up;
-    public GameObject down;
-    public GameObject right;
-    public GameObject left;
+    public GameObject _up;
+    public GameObject _down;
+    public GameObject _right;
+    public GameObject _left;
 }
 
+/// <summary>
+/// Unity Component used to allow navigation through a menu of GUISelectableElements.
+/// </summary>
 public class InputMenuController : MonoBehaviour
 {
-    public List<GameObject> uiElements;
-    public GameObject startingElem;
-    private Dictionary<GameObject,GUIElementMap> uiMap;
-    private GameObject actualElem;
+
+    /// <summary>
+    /// List of elements of the menu.
+    /// </summary>
+    public List<GameObject> _uiElements;
+
+    /// <summary>
+    /// The starting element of the menu.
+    /// </summary>
+    public GameObject _startingElem;
+
+    /// <summary>
+    /// The elements of the menu after being mapped.
+    /// </summary>
+    private Dictionary<GameObject,GUIElementMap> p_uiMap;
+
+    /// <summary>
+    /// The element of the menu that is active now (where the cursor is placed).
+    /// </summary>
+    private GameObject p_actualElem;
+
+    /// <summary>
+    /// The minimun response time between menu inputs.
+    /// </summary>
     [SerializeField]
-    private float uiResponseTime = 0.2f;
+    private float p_uiResponseTime = 0.2f;
 
-    private float lastResponseTime;
+    /// <summary>
+    /// The last time when a menu input has been detected.
+    /// </summary>
+    private float p_lastResponseTime;
 
-    // Use this for initialization
     void Start()
     {
-
         MapElements();
     }
 
     void Update()
     {
-
-        if (Time.realtimeSinceStartup - lastResponseTime >= uiResponseTime)
+        
+        //If time between menu inputs has passed.
+        if (Time.realtimeSinceStartup - p_lastResponseTime >= p_uiResponseTime)
         {
-            if (actualElem != null)
+            if (p_actualElem != null)
             {
                 if (Input.GetKey(KeyCode.UpArrow))
                 {
-                    if (uiMap[actualElem].up != null)
+                    if (p_uiMap[p_actualElem]._up != null)
                     {
-                        actualElem.SendMessage("NonFocused");
-                        actualElem = uiMap[actualElem].up;
-                        actualElem.SendMessage("Focused");
-                        lastResponseTime = Time.realtimeSinceStartup;
-                        Debug.Log("PARRIBA");
+                        p_actualElem.SendMessage("NonFocused");
+                        p_actualElem = p_uiMap[p_actualElem]._up;
+                        p_actualElem.SendMessage("Focused");
+                        p_lastResponseTime = Time.realtimeSinceStartup;
                     }
                 }
                 else if (Input.GetKey(KeyCode.DownArrow))
                 {
-                    if (uiMap[actualElem].down != null)
+                    if (p_uiMap[p_actualElem]._down != null)
                     {
-                        actualElem.SendMessage("NonFocused");
-                        actualElem = uiMap[actualElem].down;
-                        actualElem.SendMessage("Focused");
-                        lastResponseTime = Time.realtimeSinceStartup;
-                        Debug.Log("PABAJO");
+                        p_actualElem.SendMessage("NonFocused");
+                        p_actualElem = p_uiMap[p_actualElem]._down;
+                        p_actualElem.SendMessage("Focused");
+                        p_lastResponseTime = Time.realtimeSinceStartup;
                     }
                 }
                 else if (Input.GetKey(KeyCode.RightArrow))
                 {
-                    if (uiMap[actualElem].right != null)
+                    if (p_uiMap[p_actualElem]._right != null)
                     {
-                        actualElem.SendMessage("NonFocused");
-                        actualElem = uiMap[actualElem].right;
-                        actualElem.SendMessage("Focused");
-                        lastResponseTime = Time.realtimeSinceStartup;
+                        p_actualElem.SendMessage("NonFocused");
+                        p_actualElem = p_uiMap[p_actualElem]._right;
+                        p_actualElem.SendMessage("Focused");
+                        p_lastResponseTime = Time.realtimeSinceStartup;
                     }
                 }
                 else if (Input.GetKey(KeyCode.LeftArrow))
                 {
-                    if (uiMap[actualElem].left != null)
+                    if (p_uiMap[p_actualElem]._left != null)
                     {
-                        actualElem.SendMessage("NonFocused");
-                        actualElem = uiMap[actualElem].left;
-                        actualElem.SendMessage("Focused");
-                        lastResponseTime = Time.realtimeSinceStartup;
+                        p_actualElem.SendMessage("NonFocused");
+                        p_actualElem = p_uiMap[p_actualElem]._left;
+                        p_actualElem.SendMessage("Focused");
+                        p_lastResponseTime = Time.realtimeSinceStartup;
                     }
                 }
                 else if (Input.GetKeyDown(KeyCode.Return))
                 {
-                    actualElem.SendMessage("Selected");
-                    lastResponseTime = Time.realtimeSinceStartup;
+                    p_actualElem.SendMessage("Selected");
+                    p_lastResponseTime = Time.realtimeSinceStartup;
                 }
             }
-	
         }
     }
 
+    /// <summary>
+    /// Maps the elements of the menu.
+    /// </summary>
     public void MapElements()
     {
-        uiMap = new Dictionary<GameObject, GUIElementMap>();
+        p_uiMap = new Dictionary<GameObject, GUIElementMap>();
 
-        foreach (GameObject go in uiElements)
+        foreach (GameObject go in _uiElements)
         {
             GUIElementMap elem = new GUIElementMap();
-            foreach (GameObject go2 in uiElements)
+            foreach (GameObject go2 in _uiElements)
             {
                 if (go2 != go)
                 {
@@ -104,42 +132,39 @@ public class InputMenuController : MonoBehaviour
                     {
                         if (xVal > 0)
                         {
-                            if (elem.right == null || (Vector3.Distance(go.transform.position, go2.transform.position) < (Vector3.Distance(go.transform.position, elem.right.transform.position))))
-                                elem.right = go2;
+                            if (elem._right == null || (Vector3.Distance(go.transform.position, go2.transform.position) < (Vector3.Distance(go.transform.position, elem._right.transform.position))))
+                                elem._right = go2;
                         }
                         else
                         {
-                            if (elem.left == null || (Vector3.Distance(go.transform.position, go2.transform.position) < (Vector3.Distance(go.transform.position, elem.left.transform.position))))
-                                elem.left = go2;
+                            if (elem._left == null || (Vector3.Distance(go.transform.position, go2.transform.position) < (Vector3.Distance(go.transform.position, elem._left.transform.position))))
+                                elem._left = go2;
                         }
                     }
                     else
                     {
                         if (yVal > 0)
                         {
-                            if (elem.up == null || (Vector3.Distance(go.transform.position, go2.transform.position) < (Vector3.Distance(go.transform.position, elem.up.transform.position))))
-                                elem.up = go2;
+                            if (elem._up == null || (Vector3.Distance(go.transform.position, go2.transform.position) < (Vector3.Distance(go.transform.position, elem._up.transform.position))))
+                                elem._up = go2;
                         }
                         else
                         {
-                            if (elem.down == null || (Vector3.Distance(go.transform.position, go2.transform.position) < (Vector3.Distance(go.transform.position, elem.down.transform.position))))
-                                elem.down = go2;
+                            if (elem._down == null || (Vector3.Distance(go.transform.position, go2.transform.position) < (Vector3.Distance(go.transform.position, elem._down.transform.position))))
+                                elem._down = go2;
                         }
                     }
                 }
             }
-            uiMap.Add(go, elem);
+            p_uiMap.Add(go, elem);
         }
-        actualElem = startingElem;
-        actualElem.SendMessage("Focused", SendMessageOptions.DontRequireReceiver);
-        Debug.Log("Actual elem " + actualElem);
-        foreach (GameObject go in uiMap.Keys)
+        p_actualElem = _startingElem;
+        foreach (GameObject go in _uiElements)
         {
-            Debug.Log("Key " + go);
-            Debug.Log("Up " + uiMap[go].up);
-            Debug.Log("Down " + uiMap[go].down);
-            Debug.Log("Right " + uiMap[go].right);
-            Debug.Log("Left " + uiMap[go].left);
+            if (go == p_actualElem)
+                go.SendMessage("Focused", SendMessageOptions.DontRequireReceiver);
+            else
+                go.SendMessage("NonFocused", SendMessageOptions.DontRequireReceiver);
         }
     }
 }

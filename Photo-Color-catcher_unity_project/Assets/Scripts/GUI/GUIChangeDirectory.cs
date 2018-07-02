@@ -10,10 +10,13 @@ public class GUIChangeDirectory : GUITool
     /// <summary>
     /// The path of the new actual directory.
     /// </summary>
-    public string path;
+    public string _path;
 
+    /// <summary>
+    /// Executes the action associated with the GUITool.
+    /// </summary>
     public override void Execute()
     {
-        FileSystemManager.Instance.StartChangeDirectory(path);
+        FileSystemManager.Instance.StartChangeDirectory(_path);
     }
 }

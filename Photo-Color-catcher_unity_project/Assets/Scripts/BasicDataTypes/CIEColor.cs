@@ -12,17 +12,17 @@ namespace CIEColor
         /// <summary>
         /// The X component: linear combination of cone response curves chosen to be nonnegative.
         /// </summary>
-        public float x;
+        public float _x;
 
         /// <summary>
         /// The Y component: luminosity.
         /// </summary>
-        public float y;
+        public float _y;
 
         /// <summary>
         /// The Z component: quasi-equal to blue stimulation.
         /// </summary>
-        public float z;
+        public float _z;
     }
 
     /// <summary>
@@ -33,17 +33,17 @@ namespace CIEColor
         /// <summary>
         /// The L component: lightness.
         /// </summary>
-        public float l;
+        public float _l;
 
         /// <summary>
         /// The a component: position between red and green.
         /// </summary>
-        public float a;
+        public float _a;
 
         /// <summary>
         /// The b component: position between yellow and blue.
         /// </summary>
-        public float b;
+        public float _b;
     }
 
 }

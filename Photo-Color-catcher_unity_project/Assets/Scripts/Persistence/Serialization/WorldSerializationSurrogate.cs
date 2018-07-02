@@ -8,14 +8,14 @@ sealed class WorldSerializationSurrogate : ISerializationSurrogate
     {
         World world = (World)obj;
         info.AddValue("name", world._name);
-        info.AddValue("imageConfig",world._imageConfig);
+        info.AddValue("imageDivisionConfig",world._imageDivisionConfig);
     }
 
     public System.Object SetObjectData(System.Object obj, SerializationInfo info, StreamingContext context, ISurrogateSelector selector)
     {
         World world = (World)obj;
         world._name = (string)info.GetValue("name", typeof(string));
-        world._imageConfig = (int[])info.GetValue("imageConfig", typeof(int[]));
+        world._imageDivisionConfig = (int[])info.GetValue("imageDivisionConfig", typeof(int[]));
         obj = world;
         return obj;
     }

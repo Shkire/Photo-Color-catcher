@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FXTime : MonoBehaviour {
+/// <summary>
+/// Specifies the that passes between FXSequence launch and FXElement start and the duration of the FX.
+/// </summary>
+public class FXTime : MonoBehaviour
+{
 
+    /// <summary>
+    /// The start time of the FX.
+    /// </summary>
     public float _start;
 
+    /// <summary>
+    /// The duration of the FX.
+    /// </summary>
     public float _duration;
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }

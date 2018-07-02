@@ -10,11 +10,14 @@ public class GUIConfigImage : GUITool
     /// <summary>
     /// The path of the image.
     /// </summary>
-    public string path;
+    public string _path;
 
+    /// <summary>
+    /// Executes the action associated with the GUITool.
+    /// </summary>
     public override void Execute()
     {
-        ImageConfigurationManager.Instance.GetImageConfigurations(path);
+        ImageConfigurationManager.Instance.GetImageConfigurations(_path);
     }
 
 }
