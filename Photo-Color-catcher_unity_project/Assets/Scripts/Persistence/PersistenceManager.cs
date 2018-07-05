@@ -387,6 +387,7 @@ public class PersistenceManager : Singleton<PersistenceManager>
         {
             auxLevel = ((Level)(bf.Deserialize(file)));
             auxLevel._completed = true;
+            file.Position = 0;
             bf.Serialize(file, auxLevel);
         }
     }

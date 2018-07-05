@@ -223,7 +223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa074cf0e0a72f742a1e907f47621cd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _RGBComponent:
+  p_RGBComponent:
     _r: 0
     _g: 0
     _b: 1
@@ -231,8 +231,6 @@ MonoBehaviour:
   p_followingMovementTime: 0.6
   p_maxTime: 1
   p_minTime: 0.1
-  p_defaultFloorTile: {fileID: 1471962668046138, guid: da7d27a314ae31c40b4ea3105ed85e16,
-    type: 2}
   p_viewRange: 8
 --- !u!114 &114552446386004690
 MonoBehaviour:

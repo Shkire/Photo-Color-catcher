@@ -254,9 +254,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b07406534de909c40bab6cec62e87531, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  p_time: 0.4
-  p_defaultFloorTile: {fileID: 1471962668046138, guid: da7d27a314ae31c40b4ea3105ed85e16,
-    type: 2}
+  p_movementTime: 0.4
+  _colorStored: 0
   p_timeBetweenAttacks: 1
   p_storeColorCooldown: 4
 --- !u!114 &114696381305495338

@@ -125,29 +125,31 @@ public class PlayerController : MonoBehaviour
     //Inputs and Physics
     void Update()
     {
-        p_caughtMovement = true;
+        if (!p_willMove)
+        {
+            p_caughtMovement = true;
 
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            p_caughtDirection = Quaternion.Euler(0, 0, 0);
-        }
-        else if (Input.GetKey(KeyCode.DownArrow))
-        {
-            p_caughtDirection = Quaternion.Euler(0, 0, 180);
-        }
-        else if (Input.GetKey(KeyCode.RightArrow))
-        {
-            p_caughtDirection = Quaternion.Euler(0, 0, 270);
-        }
-        else if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            p_caughtDirection = Quaternion.Euler(0, 0, 90);
-        }
-        else
-            p_caughtMovement = false;
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                p_caughtDirection = Quaternion.Euler(0, 0, 0);
+            }
+            else if (Input.GetKey(KeyCode.DownArrow))
+            {
+                p_caughtDirection = Quaternion.Euler(0, 0, 180);
+            }
+            else if (Input.GetKey(KeyCode.RightArrow))
+            {
+                p_caughtDirection = Quaternion.Euler(0, 0, 270);
+            }
+            else if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                p_caughtDirection = Quaternion.Euler(0, 0, 90);
+            }
+            else
+                p_caughtMovement = false;
 
-        p_caughtRotation = ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && p_caughtMovement)) ? true : false;
-
+            p_caughtRotation = ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && p_caughtMovement)) ? true : false;
+        }
         p_caughtAttack = (Input.GetKey(KeyCode.Space)) ? true : false;
 
         p_caughtStore = (Input.GetKey(KeyCode.C)) ? true : false;
@@ -159,7 +161,10 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         if (p_storeRemainingCooldown > 0 && !p_caughtPause)
+        {
             p_storeRemainingCooldown -= Time.fixedDeltaTime;
+            LevelController.Instance.StoreColorRemainingTime(p_storeRemainingCooldown);
+        }
 
         if (p_attackRemainingTime > 0 && !p_caughtPause)
             p_attackRemainingTime -= Time.fixedDeltaTime;
@@ -190,7 +195,7 @@ public class PlayerController : MonoBehaviour
             }
         }
         //If the player must attack.
-        else if (p_attackRemainingTime <= 0 && p_caughtAttack)
+        else if (p_attackRemainingTime <= 0 && p_caughtAttack && !p_locked)
         {
             //Instantiates the attack Collider GameObject.
             GameObject aux = (GameObject)Instantiate(p_photoAtackCollider);
@@ -200,7 +205,7 @@ public class PlayerController : MonoBehaviour
             p_attackRemainingTime = p_timeBetweenAttacks;
         }
         //If the player must attack (storing or releasing a color).
-        else if (p_attackRemainingTime <= 0 && p_storeRemainingCooldown <= 0 && p_caughtStore)
+        else if (p_attackRemainingTime <= 0 && p_storeRemainingCooldown <= 0 && p_caughtStore && !p_locked)
         {
             //If there isn't a color stored.
             if (!_colorStored)
@@ -219,6 +224,7 @@ public class PlayerController : MonoBehaviour
                 LevelController.Instance.ReleaseColor();
             }
             p_storeRemainingCooldown = p_storeColorCooldown;
+            LevelController.Instance.StoreColorRemainingTime(p_storeRemainingCooldown);
             p_attackRemainingTime = p_timeBetweenAttacks;
         }
         //If the player must rotate.

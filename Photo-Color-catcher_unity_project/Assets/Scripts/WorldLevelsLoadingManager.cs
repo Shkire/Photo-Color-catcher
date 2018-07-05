@@ -67,6 +67,12 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
     /// </summary>
     private GameObject inputMenuController;
 
+    /// <summary>
+    /// The Sprite used for showing the player as cursor on the level selector.
+    /// </summary>
+    [SerializeField]
+    private Sprite p_playerOnGUI;
+
     protected WorldLevelsLoadingManager()
     {
     }
@@ -199,6 +205,7 @@ public class WorldLevelsLoadingManager : Singleton<WorldLevelsLoadingManager>
 
                 //Adds the disabled image.
                 auxGameObject.AddComponent<Image>().enabled = false;
+                auxGameObject.GetComponent<Image>().sprite = p_playerOnGUI;
             }
         }
 

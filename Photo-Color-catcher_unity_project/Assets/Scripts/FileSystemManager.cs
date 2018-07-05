@@ -173,14 +173,16 @@ public class FileSystemManager : Singleton<FileSystemManager>
                 {
                     //Sets up the directory button.
                     aux.GetComponentInChildren<GUIChangeDirectory>()._path = Directory.GetParent(path).FullName;
-                    aux.GetComponentInChildren<Text>().text = "back";
+                    foreach (Text textLabel in aux.GetComponentsInChildren<Text>())
+                        textLabel.text = "back";
                 }
                 else
                 {
                     //Sets up the directory button.
                     aux.GetComponentInChildren<GUIChangeDirectory>()._path = directories[i - parent];
                     pathSplit = directories[i - parent].Split(Path.DirectorySeparatorChar);
-                    aux.GetComponentInChildren<Text>().text = pathSplit[pathSplit.Length - 1];
+                    foreach (Text textLabel in aux.GetComponentsInChildren<Text>())
+                        textLabel.text = pathSplit[pathSplit.Length - 1];
                 }
 
                 //If it is the first element of the page.
@@ -204,7 +206,8 @@ public class FileSystemManager : Singleton<FileSystemManager>
                 aux.AddComponent<GUILaunchFX>()._target = p_selectImageFX;
                 aux.GetComponentInChildren<GUIConfigImage>()._path = images[i - directories.Length - 1];
                 pathSplit = images[i - directories.Length - 1].Split(Path.DirectorySeparatorChar);
-                aux.GetComponentInChildren<Text>().text = pathSplit[pathSplit.Length - 1];
+                foreach (Text textLabel in aux.GetComponentsInChildren<Text>())
+                    textLabel.text = pathSplit[pathSplit.Length - 1];
                 auxText = new Texture2D(4, 4);
                 loadingBytes = File.ReadAllBytes(images[i - directories.Length - 1]);
                 auxText.LoadImage(loadingBytes);

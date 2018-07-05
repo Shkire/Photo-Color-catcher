@@ -211,7 +211,7 @@ public class ImageConfigurationManager : Singleton<ImageConfigurationManager>
                 //Shows the image name.
                 pathSplit = i_path.Split(Path.DirectorySeparatorChar);
                 auxInt = Path.GetExtension(pathSplit[pathSplit.Length - 1]).Length;
-                p_pageList[p_pageList.Count - 1].GetChild("Image name").GetComponent<Text>().text = pathSplit[pathSplit.Length - 1].Remove(pathSplit[pathSplit.Length - 1].Length - auxInt, auxInt);
+                p_pageList[p_pageList.Count - 1].GetChild("Image name").GetComponent<Text>().text = pathSplit[pathSplit.Length - 1].Remove(pathSplit[pathSplit.Length - 1].Length - auxInt, auxInt) + " - " + imageConfigs[i][0] + "x" + imageConfigs[i][1];
                
                 //Shows the columns x rows configuration.
                 p_pageList[p_pageList.Count - 1].GetChild("Cells config").GetComponent<Text>().text = imageConfigs[i][0] + "x" + imageConfigs[i][1];

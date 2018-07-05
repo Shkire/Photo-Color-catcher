@@ -165,6 +165,17 @@ public class LevelController : Singleton<LevelController>
     /// </summary>
     private List<GameObject> p_goals;
 
+    private Text p_storeAttackRemainingTime;
+
+    [SerializeField]
+    private FXSequence p_levelCompletedFX;
+
+    [SerializeField]
+    private FXSequence p_gameOverFX;
+
+    [SerializeField]
+    private GUILoadLevels p_loadLevels;
+
     protected LevelController()
     {
     }
@@ -185,6 +196,7 @@ public class LevelController : Singleton<LevelController>
         p_emptyLives.Add(p_gameHud.GetChild("3").GetChild("Empty"));
         p_storedPrint = p_gameHud.GetChild("Color");
         p_storedPrint.SetActive(false);
+        p_storeAttackRemainingTime = p_gameHud.GetChild("StoreAttackReadyTime").GetComponent<Text>();
     }
 
     void Update()
@@ -251,7 +263,11 @@ public class LevelController : Singleton<LevelController>
         PrintGarbage();
 
         if (p_remainingR == 0 && p_remainingG == 0 && p_remainingB == 0)
+        {
             PersistenceManager.Instance.CompleteLevel(p_path, p_levelPos);
+            p_levelCompletedFX.Launch();
+            p_loadLevels._path = p_path;
+        }
     }
 
     /// <summary>
@@ -393,7 +409,10 @@ public class LevelController : Singleton<LevelController>
 
         //If the lives are empty.
         if (p_lives == 0)
+        {
             Destroy(p_player);
+            p_gameOverFX.Launch();
+        }        
         else
         {
             bool validPos;
@@ -479,6 +498,8 @@ public class LevelController : Singleton<LevelController>
         p_garbageCells = new List<RGBContent>();
 
         i_player.transform.SetParent(p_parentGameObject.transform);
+
+        p_storeAttackRemainingTime.text = "Ready";
     }
 
     /// <summary>
@@ -506,7 +527,10 @@ public class LevelController : Singleton<LevelController>
         p_garbageCells.Add(i_garbage);
 
         if (p_garbageCells.Count > p_maxGarbage)
+        {
             PlayerHit();
+            p_garbageCells.RemoveRange(0, p_maxGarbage);
+        }
 
         PrintGarbage();
     }
@@ -682,5 +706,13 @@ public class LevelController : Singleton<LevelController>
         if (p_goals == null)
             p_goals = new List<GameObject>();
         p_goals.Add(i_goal);
+    }
+
+    public void StoreColorRemainingTime(float i_time)
+    {
+        if (i_time <= 0)
+            p_storeAttackRemainingTime.text = "Ready";
+        else
+            p_storeAttackRemainingTime.text = i_time + "";
     }
 }
